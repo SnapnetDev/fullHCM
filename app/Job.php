@@ -10,7 +10,7 @@ class Job extends Model
     //
     public function users()
     {
-        return $this->hasMany('App\User');
+        return $this->hasMany('App\User','job_id');
     }
     public function department()
     {

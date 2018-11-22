@@ -48,6 +48,37 @@
   <script src="{{ asset('global/vendor/breakpoints/breakpoints.js') }}"></script>
   <script>
   Breakpoints();
+   function setfy(){
+
+    var year=document.getElementById('fiscalyear').value;
+    $.get('{{url('setfy')}}/'+year, function(data,status,xhr){
+    
+    if(xhr.status==200){
+      
+       
+      window.location.reload();
+       
+    }
+  }); 
+    
+    
+  }
+  function setcpny(){
+
+    var company_id=document.getElementById('cpny').value;
+    $.get('{{url('setcpny')}}/'+company_id, function(data,status,xhr){
+    
+    if(xhr.status==200){
+      
+       console.log(data);
+      window.location.reload();
+       
+    }
+  }); 
+    
+    
+  }
+
   </script>
 </head>
 <body class="animsition site-navbar-small app-contacts page-aside-left">
@@ -106,11 +137,40 @@
         <!-- End Navbar Toolbar -->
         <!-- Navbar Toolbar Right -->
         <ul class="nav navbar-toolbar navbar-right navbar-toolbar-right">
-          <li class="nav-item hidden-sm-down" id="toggleFullscreen">
+           @if (Auth::user()->role->permissions->contains('constant', 'group_access'))
+           <li class="nav-item hidden-float" style="margin-top:15px;">
+            <select class="form-control " id="cpny" onchange="setcpny()"> 
+              @php
+                $companies=companies();
+              @endphp
+              @foreach($companies as $company)
+             <option  value="{{$company->id}}"{{$company->id==session('company_id')?'selected':''}}>{{$company->name}}</option>
+             @endforeach
+                
+           </select>
+
+         </li>
+           @else
+            <li class="nav-item hidden-sm-down" id="toggleFullscreen">
             <a class="nav-link "  href="#" role="button" style="font-size: 16px;">
-              {{parentCompany()}}
+              {{parentCompanyName()}}
             </a>
           </li>
+           @endif
+          
+
+          <li class="nav-item hidden-float" style="margin-top:15px;">
+            <select class="form-control " id="fiscalyear" onchange="setfy()"> 
+             <option  >- {{__('Fiscal Year')}} -</option>
+
+            
+             @for($i=2016; $i<=date('Y'); $i++ )
+      
+             <option value="{{$i}}">{{$i}}</option>
+             @endfor
+           </select>
+
+         </li>
           <li class="nav-item dropdown">
             <a class="nav-link" data-toggle="dropdown" href="javascript:void(0)" data-animation="scale-up"
             aria-expanded="false" role="button">

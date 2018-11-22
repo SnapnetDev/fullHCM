@@ -29,7 +29,7 @@
 		@endphp
 		<tr>
 			<td>{{$detail->user->name}}</td>
-             <td>{{$detail->user->position->name}}</td>
+             <td>{{$detail->user->job->name}}</td>
              @for($i=1;$i<=$days;$i++)
 			<td>{{$tdays[$i]}}</td>
 			@endfor

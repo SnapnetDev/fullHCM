@@ -52,7 +52,13 @@
 	                    	@forelse($departments as $department)
 	                    	<tr>
 	                    		<td>{{$department->name}}</td>
-	                    		<td>{{$department->manager->name}}</td>
+	                    		<td>
+	                    		@if($department->manager)
+	                    		{{$department->manager->name}}
+	                    		@else
+	                    		None Selected
+	                    		@endif
+	                    		</td>
 	                    		<td>
 	                    			<div class="btn-group" role="group">
                     <button type="button" class="btn btn-primary dropdown-toggle" id="exampleIconDropdown1"
@@ -109,8 +115,10 @@
 		        success     : function(data, textStatus, jqXHR){
 
 		            toastr.success("Changes saved successfully",'Success');
-		           $('#addBranchModal').modal('toggle');
-					$( "#ldr" ).load('{{route('departments',['company_id'=>$company->id])}}');
+		           setTimeout(function(){
+            window.location.reload();
+           },2000);
+           return; 
 		        },
 		        error:function(data, textStatus, jqXHR){
 		        	 jQuery.each( data['responseJSON'], function( i, val ) {
@@ -139,8 +147,10 @@
 		        success     : function(data, textStatus, jqXHR){
 
 		            toastr.success("Changes saved successfully",'Success');
-		            $('#editDepartmentModal').modal('toggle');
-					$( "#ldr" ).load('{{route('departments',['company_id'=>$company->id])}}');
+		           setTimeout(function(){
+            window.location.reload();
+           },2000);
+           return;
 		        },
 		        error:function(data, textStatus, jqXHR){
 		        	 jQuery.each( data['responseJSON'], function( i, val ) {

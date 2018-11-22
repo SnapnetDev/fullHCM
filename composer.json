@@ -9,6 +9,7 @@
         "dompdf/dompdf": "^0.8.2",
         "fideloper/proxy": "^4.0",
         "flutterwave/flutterwave-php": "dev-master",
+        "fzaninotto/faker": "^1.8",
         "hngx/moneywave-php": "^1.2",
         "intervention/image": "^2.4",
         "ixudra/curl": "^6.16",
@@ -27,7 +28,6 @@
     },
     "require-dev": {
         "filp/whoops": "^2.0",
-        "fzaninotto/faker": "^1.4",
         "mockery/mockery": "^1.0",
         "nunomaduro/collision": "^2.0",
         "phpunit/phpunit": "^7.0"

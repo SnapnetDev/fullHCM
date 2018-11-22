@@ -21,13 +21,16 @@ class UserFilter
                       ->orWhere('emp_num','like' ,'%' . $q . '%');
             });
         }
-       // if ($filters->filled('company')&&$filters->input('company')!=0) {
+       if ($filters->filled('company')&&$filters->input('company')!=0) {
 
-       //      $user->where('company_id','=' ,$filters->input('company'));
-       //  }
-       //  if ($filters->filled('department')&&$filters->input('department')!=0) {
-       //      $user->where('department_id','=' ,$filters->input('department'));
-       //  }
+            $user->where('company_id','=' ,$filters->input('company'));
+        }
+        if ($filters->filled('department')&&$filters->input('department')!=0) {
+          $department_id=$filters->input('department');
+            $user->whereHas('job.department', function ($query) use($department_id){
+                  $query->where('departments.id', '=', $department_id);
+              });;
+        }
        //  if ($filters->filled('branch')&&$filters->input('branch')!=0) {
        //      $user->where('branch_id','=' ,$filters->input('branch'));
        //  }
@@ -37,9 +40,14 @@ class UserFilter
             $user->where('role_id','=' ,$filters->input('role'));
           }
          
-        // Search for a user based on their creation date.
+        // Search for a user based on their group date.
+          if ($filters->filled('user_group')&&$filters->input('user_group')!=0) {
+            $q=$filters->input('user_group');
+            $user->whereHas('user_groups', function ($query) use($q){
+                  $query->where('group_id', '=', $q);
+              });
+          }
        
-
 
         // Get the results and return them.
           if ($filters->filled('pagi')&&$filters->input('pagi')=='all') {

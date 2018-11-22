@@ -799,8 +799,8 @@ body {
 .page-content-table .table > tbody > tr > th,
 .page-content-table .table > thead > tr > td,
 .page-content-table .table > tbody > tr > td {
-  padding-top: 20px;
-  padding-bottom: 20px;
+  padding-top: 5px;
+  padding-bottom: 5px;
 }
 
 .page-content-table .table > thead > tr > th:first-child,

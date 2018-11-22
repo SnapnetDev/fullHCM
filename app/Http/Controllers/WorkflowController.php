@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\User;
+use App\Role;
+use App\UserGroup;
 use App\Workflow;
 use App\Stage;
 use App\Filters\WorkflowFilter;
@@ -52,7 +54,9 @@ class WorkflowController extends Controller
     {
         try {
           $users=User::all();
-          return view('workflows.create',['users'=>$users]);
+          $roles=Role::all();
+          $groups=UserGroup::all();
+          return view('workflows.create',compact('users','roles','groups'));
         } catch (\Exception $e) {
 
         }
@@ -67,33 +71,54 @@ class WorkflowController extends Controller
      */
     public function store(Request $request)
     {
-        try {
+        // try {
           $this->validate($request, ['name'=>'required']);
-          $wf= new Workflow();
-          $wf->name =$request->name;
-          $wf->save();
+           $no_of_stages=count($request->input('stagename'));
+           $no_of_users=count($request->input('user_id'));
+           $no_of_roles=count($request->input('role'));
+           $no_of_users_used=0;
+           $no_of_roles_used=0;
+           $no_of_groups_used=0;
+        $wf=Workflow::create(['name'=>$request->name]);
+        
+          if($no_of_stages>0){
+          for ($i=0; $i <$no_of_stages ; $i++) {
+            if ($request->type[$i]==1) {
+             $stage=$wf->stages()->create(['name'=>$request->stagename[$i],'position'=>$i,'user_id'=>$request->user_id[$no_of_users_used],'type'=>$request->type[$i]]);
+             $no_of_users_used++;
+            }elseif ($request->type[$i]==2) {
+              $stage=$wf->stages()->create(['name'=>$request->stagename[$i],'position'=>$i,'type'=>$request->type[$i],'role_id'=>$request->role[$no_of_roles_used]]);
+              $no_of_roles_used++;
+            }elseif($request->type[$i]==3)
+              $stage=$wf->stages()->create(['name'=>$request->stagename[$i],'position'=>$i,'type'=>$request->type[$i],'group_id'=>$request->role[$no_of_groups_used]]);
+              $no_of_groups_used++;
+                 
+             }
+            }
+          // $wf= new Workflow();
+          // $wf->name =$request->name;
+          // $wf->save();
 
-          $logmsg='Workflow was created.';
+          // $logmsg='Workflow was created.';
          
-          $no_of_stages=count($request->input('stagename'));
-          for ($i=0; $i < $no_of_stages; $i++) {
-            $stg=new Stage();
-            $stg->name=$request->stagename[$i];
-            $stg->position=$i;
-            $stg->user_id=$request->user_id[$i];
-            $stg->type=$request->type[$i];
-            $stg->role=$request->role[$i];
-            $stg->workflow_id=$wf->id;
-            $stg->save();
-            return $stg;
-            $logmsg='stage was created and added to ';
+          // $no_of_stages=count($request->input('stagename'));
+          // for ($i=0; $i < $no_of_stages; $i++) {
+          //   $stg=new Stage();
+          //   $stg->name=$request->stagename[$i];
+          //   $stg->position=$i;
+          //   $stg->user_id=$request->user_id[$i];
+          //   $stg->type=$request->type[$i];
+          //   $stg->role=$request->role[$i];
+          //   $stg->workflow_id=$wf->id;
+          //   $stg->save();
+          //   $logmsg='stage was created and added to ';
             
-          }
+          // }
           
           return redirect()->route('workflows')->with(['success'=>'Workflow Created Successfully']);
-        } catch (\Exception $e) {
+        // } catch (\Exception $e) {
 
-        }
+        // }
 
     }
 
@@ -123,8 +148,10 @@ class WorkflowController extends Controller
     {
         try {
               $users=User::all();
-            $wf=Workflow::find($id);
-            return view('workflows.edit',['workflow'=>$wf,'users'=>$users]);
+              $roles=Role::all();
+          $groups=UserGroup::all();
+            $workflow=Workflow::find($id);
+            return view('workflows.edit',compact('workflow','users','roles','groups'));
         } catch (\Exception $e) {
 
         }

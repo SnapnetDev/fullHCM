@@ -113,4 +113,16 @@ class HomeController extends Controller
 
     return ($time2 - $time1) / 3600;
     }
+
+    public function setfy($year){
+  session(['FY'=>$year]);
+  return response()->json('ok',200);
+  
+}
+public function setcpny($company_id){
+  session(['company_id'=>$company_id]);
+  return response()->json('ok',200);
+ 
+  
+}
 }

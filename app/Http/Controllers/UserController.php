@@ -16,6 +16,7 @@ use App\Position;
 use Validator;
 use App\Role;
 use App\Qualification;
+use App\UserGroup;
 
 
 class UserController extends Controller
@@ -36,10 +37,12 @@ class UserController extends Controller
         $qualifications=Qualification::all();
         $usersforcount=User::where('superadmin','!=',1)->get();
         $roles=Role::all();
+        $user_groups=UserGroup::all();
         $managers=User::whereHas('role',function ($query)  {
                 $query->where('manages','dr');
+                $query->orWhere('manages','all');
             })->get();
-        return view('empmgt.list',['users'=>$users,'usersforcount'=>$usersforcount,'companies'=>$companies,'branches'=>$branches,'departments'=>$departments,'roles'=>$roles,'managers'=>$managers,'qualifications'=>$qualifications]);
+        return view('empmgt.list',['users'=>$users,'usersforcount'=>$usersforcount,'companies'=>$companies,'branches'=>$branches,'departments'=>$departments,'roles'=>$roles,'user_groups'=>$user_groups,'managers'=>$managers,'qualifications'=>$qualifications]);
 
             }else{
             $users=UserFilter::apply($request);
@@ -48,10 +51,11 @@ class UserController extends Controller
         $departments=$companies->first()->departments;
         $usersforcount=User::where('superadmin','!=',1)->get();
         $roles=Role::all();
+        $user_groups=UserGroup::all();
         $managers=User::whereHas('role',function ($query)  {
                 $query->where('manages','dr');
             })->get();
-            return view('empmgt.list',['users'=>$users,'usersforcount'=>$usersforcount,'companies'=>$companies,'branches'=>$branches,'departments'=>$departments,'roles'=>$roles,'managers'=>$managers]);
+            return view('empmgt.list',['users'=>$users,'usersforcount'=>$usersforcount,'companies'=>$companies,'branches'=>$branches,'departments'=>$departments,'roles'=>$roles,'user_groups'=>$user_groups,'managers'=>$managers]);
 
       }
         
@@ -98,6 +102,25 @@ class UserController extends Controller
            //  })->get();
            if (!$has_manager && $manager_id!=$request->users[$i]) {
                $user->managers()->attach($manager_id);
+           }
+        }
+        return 'success';
+    }
+    public function assignGroup(Request $request)
+    {
+        // return $request->users;
+        $users_count=count($request->users);
+        $group_id=$request->group_id;
+        $group=UserGroup::find($group_id);
+           
+        for ($i=0; $i < $users_count; $i++) {
+        $user=User::find($request->users[$i]); 
+        $has_group=$user->user_groups->contains('id',$group_id);
+           // $has_manager=User::find($request->users[$i])->whereHas('managers',function ($query) use($manager_id)  {
+           //      $query->where('users.id',$manager_id);
+           //  })->get();
+           if (!$has_group) {
+               $user->user_groups()->attach($group_id);
            }
         }
         return 'success';

@@ -43,6 +43,8 @@
 		                        <th>Type:</th>
 		                        <th>Constant:</th>
 		                        <th>Formula</th>
+		                         <th>GL Code</th>
+		                          <th>Project Code</th>
 		                        <th>Comment</th>
 		                        <th>Status</th>
 		                         <th>Exemption List</th>
@@ -56,6 +58,8 @@
 		                    		<td>{{ $salary_component->type == 1 ? 'Allowance' : 'Deduction' }}</td>
 		                    		<td>{{$salary_component->constant}}</td>
 		                    		<td>{{$salary_component->formula}}</td>
+		                    		<td>{{$salary_component->gl_code}}</td>
+		                    		<td>{{$salary_component->project_code}}</td>
 		                    		<td>{{$salary_component->comment}}</td>
 		                    		<td><button class="btn sc-status btn-sm {{ $salary_component->status == 1 ? 'btn-success' : 'btn-warning' }}" title="{{ $salary_component->status == 1 ? 'Disable' : 'Enable' }}" id="{{$salary_component->id}}"><i class="fa fa-{{ $salary_component->status == 1 ? 'eye' : 'eye-slash' }}" ></i></button></td>
 		                    		<td>

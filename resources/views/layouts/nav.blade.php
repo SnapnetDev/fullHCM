@@ -124,6 +124,13 @@
                   </a>
                 </li>
                 @endif
+                 @if(Auth::user()->role->permissions->contains('constant', 'manage_user'))
+                <li class="site-menu-item ">
+                  <a class="animsition-link" href="{{url('groups')}}">
+                    <span class="site-menu-title">Manage User Groups</span>
+                  </a>
+                </li>
+                @endif
                 @if(Auth::user()->role->permissions->contains('constant', 'view_timesheet')||Auth::user()->role->permissions->contains('constant', 'export_timesheet'))
                 <li class="site-menu-item ">
                   <a class="animsition-link" href="{{ url('timesheets') }}">

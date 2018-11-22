@@ -3,6 +3,7 @@ namespace App\Traits;
 use App\Payroll;
 use App\Bank;
 use App\Company;
+use App\Department;
 use App\CompanyAccountDetail;
 use App\PayslipDetail;
 use App\PayrollDetail;
@@ -48,6 +49,14 @@ trait PayrollTrait{
 
                 return $this->downloadPayslip($request);
              break;
+             case'issuepayslip':
+
+                return $this->issuePayslip($request);
+             break;
+              case'exportford365':
+
+                return $this->exportForD365($request);
+             break;
 			default:
 				# code...
 				break;
@@ -75,6 +84,42 @@ trait PayrollTrait{
     {
        return view('compensation.userPayrollList');
     }
+
+    public function exportForD365(Request $request)
+    {
+       
+            $company_id=companyId();
+            $departments=Department::where('company_id',$company_id)->get();
+           
+       $payroll=Payroll::find($request->payroll_id);
+               if ($payroll) {
+                 $days=cal_days_in_month(CAL_GREGORIAN,$payroll->month,$payroll->year);
+                     $date=date('Y-m-d',strtotime($payroll->year.'-'.$payroll->month.'-'.$days));
+               $allowances=0;
+               $deductions=0;
+               $income_tax=0;
+               $salary=0;
+               $has_been_run=1;
+               foreach ($payroll->payroll_details as $detail) {
+                  $salary+=$detail->basic_pay;
+                  $allowances+=$detail->allowances;
+                  $deductions+=$detail->deductions;
+                  $income_tax+=$detail->paye;
+
+               }
+               // return $payroll->payroll_details->count();
+               $view='compensation.partials.d365payroll2';
+                // return view('compensation.d365payroll',compact('payroll','allowances','deductions','income_tax','salary','date','has_been_run'));
+                 return     \Excel::create("export", function($excel) use ($allowances,$view,$deductions,$income_tax,$salary,$payroll,$date,$departments) {
+
+            $excel->sheet("export", function($sheet) use ($allowances,$view,$deductions,$income_tax,$salary,$payroll,$date,$departments) {
+                $sheet->loadView("$view",compact('payroll','allowances','deductions','income_tax','salary','date','departments'))
+                ->setOrientation('landscape');
+            });
+
+        })->export('xlsx');
+           }
+    }
     public function payrollList(Request $request)
     {
         if ($request->filled('month')) {
@@ -82,9 +127,12 @@ trait PayrollTrait{
             }else{
                 $date=date('Y-m-d');
             }
+             $company_id=companyId();
+            // $company=\Auth::user()->company;
         $pmonth=date('m',strtotime($date));
         $pyear=date('Y',strtotime($date));
-       $payroll=Payroll::where(['month'=>$pmonth,'year'=>$pyear])->first();
+     
+       $payroll=Payroll::where(['month'=>$pmonth,'year'=>$pyear,'company_id'=>$company_id])->first();
        if ($payroll) {
             $date=date('Y-m-d');
        $allowances=0;
@@ -103,7 +151,8 @@ trait PayrollTrait{
        return view('compensation.payroll',compact('payroll','allowances','deductions','income_tax','salary','date','has_been_run'));
        } else {
           $has_been_run=0;
-          $employees=User::has('promotionHistories.grade')->get();
+           // $employees=\Auth::user()->company->users()->has('promotionHistories.grade')->get();
+          $employees=Company::where('id',$company_id)->first()->users()->has('promotionHistories.grade')->get();
     
 
     return view('compensation.payroll',compact('date','employees','has_been_run'));
@@ -146,17 +195,20 @@ trait PayrollTrait{
 	public function runPayroll(Request $request)
 	{
         
-		$users=User::has('promotionHistories.grade')->get();
+	    
         $date=date('Y-m-d',strtotime('01-'.$request->month));
         $pmonth=date('m',strtotime($date));
         $pyear=date('Y',strtotime($date));
-        $company=Company::find($request->company_id);
-        $payroll=Payroll::where(['month'=>$pmonth,'year'=>$pyear])->first();
+        // $company=Company::find($request->company_id);
+         $company_id=companyId();
+         $users=User::has('promotionHistories.grade')->where('company_id',$company_id)->get();
+        $payroll=Payroll::where(['month'=>$pmonth,'year'=>$pyear,'company_id'=>$company_id])->first();
         $pp=PayrollPolicy::first();
+
         if ($payroll) {
            return $payroll;
         } else {
-             $PR=Payroll::create(['month'=>$pmonth,'year'=>$pyear,'company_id'=>0,'workflow_id'=>$pp->workflow->id]);
+             $PR=Payroll::create(['month'=>$pmonth,'year'=>$pyear,'company_id'=>$company_id,'workflow_id'=>$pp->workflow->id]);
             
                 $allp=[];
             foreach ($users as $user) {
@@ -188,8 +240,22 @@ trait PayrollTrait{
                 $payroll['serialize']['deductions'] = $payroll['deductions'];
                 $payroll['serialize']['component_names'] = $payroll['component_names'];
                 $payroll['serialize'] = serialize($payroll['serialize']);
+
+                $payroll['sc_serialize']['sc_allowances'] = $payroll['sc_allowances'];
+                $payroll['sc_serialize']['sc_deductions'] = $payroll['sc_deductions'];
+                $payroll['sc_serialize']['sc_component_names'] = $payroll['sc_component_names'];
+                $payroll['sc_serialize']['sc_project_code'] = $payroll['sc_project_code'];
+                $payroll['sc_serialize']['sc_gl_code'] = $payroll['sc_gl_code'];
+                $payroll['sc_serialize'] = serialize($payroll['sc_serialize']);
+
+                $payroll['ssc_serialize']['ssc_allowances'] = $payroll['ssc_allowances'];
+                $payroll['ssc_serialize']['ssc_deductions'] = $payroll['ssc_deductions'];
+                $payroll['ssc_serialize']['ssc_component_names'] = $payroll['ssc_component_names'];
+                $payroll['ssc_serialize']['ssc_project_code'] = $payroll['ssc_project_code'];
+                $payroll['ssc_serialize']['ssc_gl_code'] = $payroll['ssc_gl_code'];
+                $payroll['ssc_serialize'] = serialize($payroll['ssc_serialize']);
                      }
-                 $payroll_details=PayrollDetail::create(['payroll_id'=>$PR->id,'user_id'=>$payroll['user_id'],'annual_gross_pay'=>$payroll['gross_pay'],'gross_pay'=>$payroll['gross_pay']/12,'basic_pay'=>$payroll['basic_pay'],'deductions'=>$payroll['total_deductions'],'allowances'=>$payroll['total_allowances'],'working_days'=>$payroll['working_days'],'worked_days'=>$payroll['days_worked'],'details'=>$payroll['serialize'],'is_anniversary'=>$payroll['is_anniversary'],'taxable_income'=>$payroll['taxable_income'],'annual_paye'=>$payroll['annual_paye'],'paye'=>$payroll['paye']]);   
+                 $payroll_details=PayrollDetail::create(['payroll_id'=>$PR->id,'user_id'=>$payroll['user_id'],'annual_gross_pay'=>$payroll['gross_pay'],'gross_pay'=>$payroll['gross_pay']/12,'basic_pay'=>$payroll['basic_pay'],'deductions'=>$payroll['total_deductions'],'allowances'=>$payroll['total_allowances'],'sc_allowances'=>$payroll['sc_total_allowances'],'sc_deductions'=>$payroll['sc_total_deductions'],'ssc_allowances'=>$payroll['ssc_total_allowances'],'ssc_deductions'=>$payroll['ssc_total_deductions'],'working_days'=>$payroll['working_days'],'worked_days'=>$payroll['days_worked'],'details'=>$payroll['serialize'],'sc_details'=>$payroll['sc_serialize'],'ssc_details'=>$payroll['ssc_serialize'],'is_anniversary'=>$payroll['is_anniversary'],'taxable_income'=>$payroll['taxable_income'],'annual_paye'=>$payroll['annual_paye'],'paye'=>$payroll['paye']]);   
                 $allp[]=$payroll;
 
               }  
@@ -250,20 +316,27 @@ trait PayrollTrait{
             $net = ['basic_pay' => $payroll['basic_pay'], 'gross_salary' => $payroll['gross_pay']];
 
             $payroll['allowances'] = $payroll['deductions'] = [];
+             $payroll['sc_allowances'] = $payroll['sc_deductions'] =$payroll['sc_project_code'] = $payroll['sc_gl_code']= [];
             $payroll['total_allowances']=$payroll['total_deductions']=0;
-            
+             $payroll['sc_total_allowances']=$payroll['sc_total_deductions']=0;
 
             foreach ($components as $component) {
 
                 if ($component->status == 1) {
                 
                     $payroll['component_names'][$component->constant] = $component->name;
+                    $payroll['sc_component_names'][$component->constant] = $component->name;
+                    $payroll['sc_project_code'][$component->constant] = $component->project_code;
+                    $payroll['sc_gl_code'][$component->constant] = $component->gl_code;
     
                     $net[$component->constant] = $value = $this->calculate_salary_component($component->constant, $component->formula, $net);
                     if ($component->type==1) {
                         $payroll['allowances'][$component->constant] = number_format($value, 2, '.', '');
+                         $payroll['sc_allowances'][$component->constant] = number_format($value, 2, '.', '');
+
                     } else {
-                        $payroll['deductions'][$component->constant] = number_format($value, 2, '.', '');
+                       $payroll['deductions'][$component->constant] = number_format($value, 2, '.', '');
+                        $payroll['sc_deductions'][$component->constant] = number_format($value, 2, '.', '');
                     }
                     
     
@@ -271,8 +344,10 @@ trait PayrollTrait{
                         // number_format($value, 2, '.', '');
                         if ($component->type == 1) {
                            $payroll['total_allowances'] += $value;
+                           $payroll['sc_total_allowances'] += $value;
                         } else {
                            $payroll['total_deductions'] += $value;
+                           $payroll['sc_total_deductions'] += $value;
                         }
                 
                     
@@ -315,18 +390,38 @@ trait PayrollTrait{
             $components = $user->specificSalaryComponents()->whereDate('starts', '<=', $payroll['date'])
             ->whereDate('ends', '>=',  $payroll['date'])
             ->get();
-            
+            $payroll['ssc_allowances'] = $payroll['ssc_deductions'] =$payroll['ssc_project_code'] = $payroll['ssc_gl_code'] = [];
             $payroll['specifics']['allowances'] = $payroll['specifics']['deductions'] = 0;
-
+            $payroll['ssc_total_allowances']=$payroll['ssc_total_deductions']=0;
+            $payroll['ssc_component_names']=[];
+            $user=User::find($payroll['user_id']);
             if ($components) {
                 
                 foreach ($components as $key => $component) {
-                    if($component->status==1){
+                    if($component->status==1 and $component->completed!=1){
 
-                     $payroll['component_names'][$key] = $component->name;
+                     $payroll['component_names'][$key] = $component->name.'-'.$user->name;
+                     $payroll['ssc_component_names'][$key] = $component->name.'-'.$user->name;
                     $payroll['specifics'][$component->type == 1 ? 'allowances' : 'deductions'] += $component->amount;
+                     $payroll[$component->type == 1 ? 'ssc_allowances' : 'ssc_deductions'][$key] = number_format($component->amount, 2, '.', '');
+                     $payroll['ssc_project_code'][$key] = $component->project_code;
+                      $payroll['ssc_gl_code'][$key] = $component->gl_code;
                     $payroll[$component->type == 1 ? 'allowances' : 'deductions'][$key] = number_format($component->amount, 2, '.', '');
 
+                    if (($component->grants+1)==$component->duration) {
+                        $component->update(['grants'=>intval($component->grants)+1,'completed'=>1]);
+
+                    }else{
+                        $component->update(['grants'=>intval($component->grants)+1]);
+                    }
+
+                    if ($component->type == 1) {
+                          
+                           $payroll['ssc_total_allowances'] += $component->amount;
+                        } else {
+                          
+                           $payroll['ssc_total_deductions'] += $component->amount;
+                        }
                 }
                    
                 }
@@ -344,15 +439,21 @@ trait PayrollTrait{
                     if($component->status==1 and $component->completed!=1){
 
                      $payroll['component_names'][] = $user->name.'- Loan';
+                     $payroll['ssc_component_names'][] = $user->name.'- Loan';
+
                     $payroll['loans']['deductions'] += $component->monthly_deduction;
                     $payroll['deductions'][] = number_format($component->monthly_deduction, 2, '.', '');
-                    
+                     $payroll['ssc_deductions'][] = number_format($component->monthly_deduction, 2, '.', '');
+                    $payroll['total_deductions']+=$component->monthly_deduction;
+                    $payroll['ssc_total_deductions'] += $component->monthly_deduction;
                     if (($component->months_deducted+1)==$component->period) {
                         $component->update(['months_deducted'=>intval($component->months_deducted)+1,'completed'=>1]);
 
                     }else{
                         $component->update(['months_deducted'=>intval($component->months_deducted)+1]);
                     }
+
+                    
                     
                 }
                    
@@ -480,7 +581,7 @@ trait PayrollTrait{
         $retVal = ($has_holiday) ? true : false ;
         return $retVal;
     }
-    public function issuePaysilp(Request $request)
+    public function issuePayslip(Request $request)
     {
         $payroll=Payroll::find($request->payroll_id);
        if ($payroll) {

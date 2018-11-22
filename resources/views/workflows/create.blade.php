@@ -111,10 +111,12 @@ $(document).ready(function() {
 
         $('#addStage').on('click', function() {
           //console.log('working');
-                $(' <li><div class="form-cont" > <div class="form-group"> <label for="">Name</label> <input type="text" class="form-control" name="stagename[]" id="" placeholder="" required> </div><div class="form-group type"> <label for="">Type</label> <select class="form-control select-type " name="type[]" >  <option value="1">User</option> <option value="2">Role</option> </select> </div> <div class="form-group users-div"> <label for="">Users</label> <select class="form-control users" name="user_id[]" > @forelse ($users as $user) <option value="{{$user->id}}">{{$user->name}}</option> @empty <option value="">No Users Created</option> @endforelse </select> </div> <div class="form-group roles-div"> <label for="">Roles</label> <select class="form-control roles" name="role[]" >  <option value="1">Line Manager</option> <option value="2">HR Admin</option> </select> </div> <div class="form-group"> <button type="button" class="btn btn-primary " id="remStage">Remove Stage</button> </div> </div> </li>').appendTo(stgcont);
+                $(' <li><div class="form-cont" > <div class="form-group"> <label for="">Name</label> <input type="text" class="form-control" name="stagename[]" id="" placeholder="" required> </div><div class="form-group type"> <label for="">Type</label> <select class="form-control select-type " name="type[]" >  <option value="1">User</option> <option value="2">Role</option> <option value="3">User Group</option></select> </div> <div class="form-group users-div"> <label for="">Users</label> <select class="form-control users" name="user_id[]" > @forelse ($users as $user) <option value="{{$user->id}}">{{$user->name}}</option> @empty <option value="">No Users Created</option> @endforelse </select> </div> <div class="form-group roles-div"> <label for="">Roles</label> <select class="form-control roles" name="role[]" >   @forelse ($roles as $role) <option value="{{$role->id}}">{{$role->name}}</option> @empty <option value="">No Roles Created</option> @endforelse </select> </div><div class="form-group groups-div"> <label for="">User Groups</label> <select class="form-control groups" name="group[]" >   @forelse ($groups as $group) <option value="{{$group->id}}">{{$group->name}}</option> @empty <option value="">No User Group Created</option> @endforelse </select> </div> <div class="form-group"> <button type="button" class="btn btn-primary " id="remStage">Remove Stage</button> </div> </div> </li>').appendTo(stgcont);
                 //console.log('working'+i);
                $('#stgcont li').last().find('.roles-div').hide();
                $('#stgcont li').last().find('.roles-div').find('.roles').attr("disabled",true);
+                $('#stgcont li').last().find('.groups-div').hide();
+               $('#stgcont li').last().find('.groups-div').find('.groups').attr("disabled",true);
                 i++;
                 return false;
         });
@@ -130,11 +132,25 @@ $(document).ready(function() {
     });
         $(document).on('change',".select-type",function() {
          
+
+         if (this.value==3)
+            {
+              $(this).parents('li').find('.users-div').find('.users').attr("disabled",true);
+              $(this).parents('li').find('.users-div').hide();
+              $(this).parents('li').find('.roles-div').find('.roles').attr("disabled",true);
+              $(this).parents('li').find('.roles-div').hide();
+               $(this).parents('li').find('.groups-div').find('.groups').removeAttr("disabled");
+             $(this).parents('li').find('.groups-div').show();
+             
+              
+            } 
           
           if (this.value==2)
             {
               $(this).parents('li').find('.users-div').find('.users').attr("disabled",true);
               $(this).parents('li').find('.users-div').hide();
+              $(this).parents('li').find('.groups-div').find('.groups').attr("disabled",true);
+              $(this).parents('li').find('.groups-div').hide();
                $(this).parents('li').find('.roles-div').find('.roles').removeAttr("disabled");
              $(this).parents('li').find('.roles-div').show();
              
@@ -142,6 +158,8 @@ $(document).ready(function() {
             } 
             if (this.value==1)
             {
+              $(this).parents('li').find('.groups-div').find('.groups').attr("disabled",true);
+              $(this).parents('li').find('.groups-div').hide();
               $(this).parents('li').find('.roles-div').find('.roles').attr("disabled",true);
               
                 $(this).parents('li').find('.users-div').find('.users').removeAttr("disabled");

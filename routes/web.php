@@ -28,10 +28,14 @@ Route::get('/home', 'HomeController@index')->name('home');
 Route::get('users/modal/{user_id}','UserController@modal')->name('users.modal');
 Route::get('users/assignrole','UserController@assignRole')->name('users.assignrole');
 Route::get('users/assignmanager','UserController@assignManager')->name('users.assignmanager');
+Route::get('users/assigngroup','UserController@assignGroup')->name('users.assigngroup');
 Route::get('users/search','UserController@search')->name('users.search');
 Route::resource('userprofile','UserProfileController')->middleware(['auth']); 
 Route::resource('users', 'UserController')->middleware(['permission:edit_settings','auth']);
 Route::get('users/company/departmentsandbranches/{company_id}','UserController@getCompanyDepartmentsBranches')->name('users.companydepartmentsandbranches')->middleware(['permission:edit_settings','auth']);
+Route::resource('groups', 'UserGroupController',['names'=>['create'=>'groups.create','index'=>'groups','store'=>'groups.save','edit'=>'groups.edit','update'=>'groups.update','show'=>'groups.view','destroy'=>'groups.delete']])->middleware(['auth']);
+Route::get('setfy/{year}','HomeController@setfy');
+Route::get('setcpny/{company_id}','HomeController@setcpny');
 //end user routes
 //settings routes
 Route::get('/settings', 'GlobalSettingController@index')->name('settings')->middleware(['permission:edit_settings','auth'])->middleware(['permission:edit_settings','auth']);
@@ -178,7 +182,7 @@ Route::resource('roles', 'RoleController')->middleware(['permission:edit_setting
 Route::resource('performances', 'PerformanceController')->middleware(['permission:edit_settings','auth']);
 Route::resource('leave','LeaveController')->middleware(['auth']);
 Route::resource('projects','ProjectController')->middleware(['auth']);
-Route::resource('recruits','RecruitController')->middleware(['auth']);
+Route::resource('recruit','RecruitController')->middleware(['auth']);
 Route::resource('compensation','CompensationController')->middleware(['auth']);
 Route::resource('loan','LoanController')->middleware(['auth']);
 

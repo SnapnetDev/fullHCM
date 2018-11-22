@@ -8,10 +8,10 @@
 <!-- Page -->
   <div class="page ">
   	<div class="page-header">
-  		<h1 class="page-title">{{__('Absence Management')}}</h1>
+  		<h1 class="page-title">{{__('Time and Attendance')}}</h1>
 		  <ol class="breadcrumb">
 		    <li class="breadcrumb-item"><a href="{{url('/')}}">{{__('Home')}}</a></li>
-		    <li class="breadcrumb-item active">{{__('Absence Management')}}</li>
+		    <li class="breadcrumb-item active">{{__('Time and Attendance')}}</li>
 		  </ol>
 		  <div class="page-header-actions">
 		    <div class="row no-space w-250 hidden-sm-down">
@@ -252,7 +252,7 @@
 					   </span>
                         </td>
 						<td>
-						<span class="tag {{$attendance['diff']>0?'tag-success':'tag-danger'}}">{{$attendance['diff']>0?'Early':'Late'}}</span>
+						<span class="tag {{$attendance['diff']>=0?'tag-success':'tag-danger'}}">{{$attendance['diff']>=0?'Early':'Late'}}</span>
 						</td>
 						<td>
 

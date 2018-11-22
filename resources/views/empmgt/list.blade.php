@@ -122,6 +122,20 @@
                           </div>
                           <div class="col-md-4">
                             <div class="form-group " data-plugin="formMaterial">
+                                  <label class="form-control-label" for="user_group">User Groups</label>
+                                  <select class="form-control" name="user_group">
+                                     <option value="0">All User Groups</option>
+                                    @forelse($user_groups as $group)
+                                    <option value="{{$group->id}}" {{ request()->group==$group->id?'selected':'' }}>{{$group->name}}</option>
+                                    @empty
+                                    <option value="0">Please Create User Groups</option>
+                                    @endforelse
+                                  </select>
+                                  
+                                </div>
+                          </div>
+                          <div class="col-md-4">
+                            <div class="form-group " data-plugin="formMaterial">
                                   <label class="form-control-label" for="company">Company</label>
                                   <select class="form-control" name="company" required onchange="getDepartmentBranchesFilter(this.value);">
                                      <option value="0">All Companies</option>
@@ -215,10 +229,18 @@
                 {{$user->name}}
               </td>
               <td class="cell-300">{{$user->emp_num}}</td>
-              <td>{{$user->job->title}}</td>
-              <td>{{$user->role->name}}</td>
+              <td>
+              @if($user->job)
+              {{$user->job->title}}
+              @endif
+              </td>
+              <td>
+              @if($user->role)
+              {{$user->role->name}}
+              @endif
+              </td>
               <td ><div class="btn-group" role="group">
-                    <button type="button" class="btn btn-primary dropdown-toggle" id="exampleIconDropdown1"
+                    <button type="button" class="btn btn-primary btn-sm dropdown-toggle" id="exampleIconDropdown1"
                     data-toggle="dropdown" aria-expanded="false">
                       Action
                     </button>
@@ -247,6 +269,9 @@
       <i class="back-icon md-close animation-scale-up" aria-hidden="true"></i>
     </button>
     <div class="site-action-buttons">
+      <button type="button" data-toggle="modal" data-target="#assignGroupModal" class="btn-raised btn btn-success btn-floating animation-slide-bottom" title="Add to Group" >
+        <i class="icon md-accounts-add" aria-hidden="true"></i>
+      </button>
       <button type="button" data-toggle="modal" data-target="#changeRoleModal" class="btn-raised btn btn-success btn-floating animation-slide-bottom" title="Assign to Role" >
         <i class="icon md-case" aria-hidden="true"></i>
       </button>
@@ -262,6 +287,7 @@
   <!-- Add User Form -->
   @include('empmgt.modals.newemployee')
   @include('empmgt.modals.assignLineManager')
+  @include('empmgt.modals.assignGroup')
   @include('empmgt.modals.changeRole')
   
   <!-- End Add User Form -->
@@ -380,6 +406,23 @@ if ($('.users-checkbox:checkbox:checked').length==0) {
     $.get('{{ url('/users/assignrole') }}/',{ role_id: role_id,users:users },function(data){
       toastr.success("Role Changed Successfully",'Success');
       $('#changeRoleModal').modal('toggle');
+    });
+    });
+
+$(document).on('click','#assignGroup',function(event){
+  event.preventDefault();
+if ($('.users-checkbox:checkbox:checked').length==0) {
+  toastr.error("Please Select a User",'Error');
+}
+    var users = $(".users-checkbox:checkbox:checked").map(function(){
+      if (this.checked === true) {
+        return this.id;
+         }
+    }).toArray();
+    group_id=$("#groups").val();
+    $.get('{{ url('/users/assigngroup') }}/',{ group_id: group_id,users:users },function(data){
+      toastr.success("Users Added Successfully",'Success');
+      $('#assignGroupModal').modal('toggle');
     });
     });
 

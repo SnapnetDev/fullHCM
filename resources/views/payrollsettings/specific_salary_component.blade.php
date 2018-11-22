@@ -44,6 +44,8 @@
 		                        <th>Employee Name:</th>
 		                        <th>Amount:</th>
 		                        <th>Comment:</th>
+		                         <th>GL Code</th>
+		                          <th>Project Code</th>
 		                        <th>Duration:</th>
 		                        <th>Grants:</th>
 		                        <th>Status</th>
@@ -59,6 +61,8 @@
 		                    		<td>{{$salary_component->user->name}}</td>
 		                    		<td>₦{{$salary_component->amount}}</td>
 		                    		<td>{{$salary_component->comment}}</td>
+		                    		<td>{{$salary_component->gl_code}}</td>
+		                    		<td>{{$salary_component->project_code}}</td>
 		                    		<td>{{$salary_component->duration}}</td>
 		                    		<td>{{$salary_component->grants}}</td>
 		                    		<td>{{'Completed'}}</td>
@@ -72,7 +76,7 @@
 					                      Action
 					                    </button>
 				                    <div class="dropdown-menu" aria-labelledby="exampleIconDropdown1" role="menu">
-				                       <a class="dropdown-item" id="{{$salary_component->id}}" onclick="deleteSalaryComponent(this.id)"><i class="fa fa-trash" aria-hidden="true"></i>&nbsp;Delete Salary Component</a>
+				                       <a class="dropdown-item" id="{{$salary_component->id}}" onclick="deleteSpecificSalaryComponent(this.id)"><i class="fa fa-trash" aria-hidden="true"></i>&nbsp;Delete Salary Component</a>
 				                      
 				                    </div>
 				                  </div></td>
@@ -159,11 +163,11 @@
   	
 
 
-  function deleteSalaryComponent(salary_component_id){
-    $.get('{{ url('/payrollsettings/delete_salary_component') }}/',{ salary_component_id: salary_component_id },function(data){
+  function deleteSpecificSalaryComponent(specific_salary_component_id){
+    $.get('{{ url('/payrollsettings/delete_specific_salary_component') }}/',{ specific_salary_component_id: specific_salary_component_id },function(data){
     	if (data=='success') {
  		toastr.success("Salary Component deleted successfully",'Success');
- 		$( "#ldr" ).load('{{url('payrollsettings/salary_components')}}');
+ 		$( "#ldr" ).load('{{url('payrollsettings/specific_salary_components')}}');
     	}else{
     		toastr.error("Error deleting Salary Component",'Success');
     	}

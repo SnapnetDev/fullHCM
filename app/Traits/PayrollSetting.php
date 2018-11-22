@@ -59,6 +59,14 @@ trait PayrollSetting
       # code...
       return $this->deleteSalaryComponent($request);
       break;
+       case 'change_specific_salary_component_status':
+      # code...
+      return $this->changeSpecificSalaryComponentStatus($request);
+      break;
+       case 'delete_specific_salary_component':
+      # code...
+      return $this->deleteSpecificSalaryComponent($request);
+      break;
       case 'lateness_policy':
       # code...
       return $this->latenessPolicy($request);
@@ -186,7 +194,7 @@ trait PayrollSetting
   }
   public function saveSpecificSalaryComponent(Request $request)
   {
-   $sc=SpecificSalaryComponent::updateOrCreate(['id'=>$request->specific_salary_component_id],['name'=>$request->name,'type'=>$request->ssctype,'comment'=>$request->comment,'emp_id'=>$request->user_id,'duration'=>$request->duration,'grants'=>$request->grant,'status'=>0,'starts'=>$request->starts,'ends'=>$request->ends]);
+   $sc=SpecificSalaryComponent::updateOrCreate(['id'=>$request->specific_salary_component_id],['name'=>$request->name,'gl_code'=>$request->gl_code,'project_code'=>$request->project_code,'type'=>$request->ssctype,'comment'=>$request->comment,'emp_id'=>$request->user_id,'duration'=>$request->duration,'grants'=>$request->grant,'status'=>0,'starts'=>$request->starts,'ends'=>$request->ends]);
    
     return 'success';
   }
@@ -212,7 +220,7 @@ trait PayrollSetting
   }
   public function saveSalaryComponent(Request $request)
   {
-    $sc=SalaryComponent::updateOrCreate(['id'=>$request->salary_component_id],['name'=>$request->name,'type'=>$request->sctype,'comment'=>$request->comment,'constant'=>$request->constant,'formula'=>$request->formula]);
+    $sc=SalaryComponent::updateOrCreate(['id'=>$request->salary_component_id],['name'=>$request->name,'gl_code'=>$request->gl_code,'project_code'=>$request->project_code,'type'=>$request->sctype,'comment'=>$request->comment,'constant'=>$request->constant,'formula'=>$request->formula]);
     $no_of_exemptions=count($request->input('exemptions'));
     if($no_of_exemptions>0){
       $sc->exemptions()->detach();
@@ -237,6 +245,19 @@ trait PayrollSetting
   public function changeSalaryComponentStatus(Request $request)
   {
    $sc=SalaryComponent::find($request->salary_component_id);
+   if ($sc->status==1) {
+     $sc->update(['status'=>0]);
+      return 2;
+   }elseif($sc->status==0){
+    $sc->update(['status'=>1]);
+    return 1;
+   }
+   
+  
+  }
+  public function changeSpecificSalaryComponentStatus(Request $request)
+  {
+   $sc=SpecificSalaryComponent::find($request->specific_salary_component_id);
    if ($sc->status==1) {
      $sc->update(['status'=>0]);
       return 2;

@@ -1,7 +1,50 @@
 <?php
 
-function parentCompany(){
-	return \App\Company::where('is_parent',1)->get()->first()->name;
+function parentCompanyName(){
+	if (session()->has('company_id')) {
+		$company=\App\Company::where('id',session('company_id'))->get()->first();
+		return $company->name;
+	}else{
+		if (\Auth::user()->company) {
+		
+		$company=\App\Company::where('id',\Auth::user()->company_id)->get()->first();
+		session(['company_id'=>$company->id]);
+		return $company->name;
+		 
+	}else{
+		
+		$company=\App\Company::where('is_parent',1)->get()->first();
+
+		session(['company_id'=>$company->id]);
+		return $company->name;
+	}
+	}
+
+	
+	
+}
+function companyId(){
+	if (session()->has('company_id')) {
+		$company=\App\Company::where('id',session('company_id'))->get()->first();
+		return $company->id;
+	}else{
+		if (\Auth::user()->company) {
+		
+		$company=\App\Company::where('id',\Auth::user()->company_id)->get()->first();
+		session(['company_id'=>$company->id]);
+		return $company->id;
+		 
+	}else{
+		
+		$company=\App\Company::where('is_parent',1)->get()->first();
+
+		session(['company_id'=>$company->id]);
+		return $company->id;
+	}
+	}
+}
+function companies(){
+	return \App\Company::all();
 }
 
 function punctualityStatus($time){

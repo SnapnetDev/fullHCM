@@ -65,9 +65,10 @@ class CompanySettingController extends Controller
 	//department functions
 	public function departments($company_id)
 	{
-		$departments=Department::all();
+		
 		$company=Company::find($company_id);
-		$users=User::all();
+		$departments=$company->departments;
+		$users=$company->users;
 		return view('settings.companysettings.department',compact('departments','company','users'));
 	}
 	public function saveDepartment(Request $request)
@@ -84,7 +85,8 @@ class CompanySettingController extends Controller
 	public function deleteDepartment($department_id)
 	{
 		$department=Department::find($department_id);
-		if ($department->has('users')) {
+		// return $department->users;
+		if ($department->users->count()>0) {
 			return 'Department has users and cannot be deleted';
 		}
 		$department->delete();

@@ -68,6 +68,12 @@
                   role="tab">Work Experience</a></li>
                   <li class="nav-item" role="presentation"><a class="nav-link" data-toggle="tab" href="#history" aria-controls="messages"
                   role="tab">Promotion History</a></li>
+                  <li class="nav-item" role="presentation"><a class="nav-link" data-toggle="tab" href="#managers" aria-controls="messages"
+                  role="tab">Managers</a></li>
+                   <li class="nav-item" role="presentation"><a class="nav-link" data-toggle="tab" href="#direct_reports" aria-controls="messages"
+                  role="tab">Direct reports</a></li>
+                   <li class="nav-item" role="presentation"><a class="nav-link" data-toggle="tab" href="#user_groups" aria-controls="messages"
+                  role="tab">User Groups</a></li>
                 
               </ul>
               <div class="tab-content">
@@ -513,6 +519,76 @@
                         <td>{{$ehistory->position}}</td>
                         <td>{{date("F j, Y", strtotime($ehistory->start_date))}}</td>
                         <td>{{date("F j, Y", strtotime($ehistory->end_date))}}</td>
+                        <td></td>
+                      </tr>
+                      @empty
+                      @endforelse
+                      
+                    </tbody>
+                  </table>
+                </div>
+                <div class="tab-pane animation-slide-left" id="managers" role="tabpanel">
+                  <table id="exampleTablePagination" data-toggle="table" 
+                  data-query-params="queryParams" data-mobile-responsive="true"
+                  data-height="400" data-pagination="true" data-search="true" class="table table-striped">
+                    <thead>
+                      <tr>
+                        <th >Name:</th>
+                        <th >Email:</th>
+                        <th >Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @forelse($user->managers as $manager)
+                      <tr>
+                        <td>{{$manager->name}}</td>
+                        <td>{{$manager->email}}</td>
+                        <td></td>
+                      </tr>
+                      @empty
+                      @endforelse
+                      
+                    </tbody>
+                  </table>
+                </div>
+                <div class="tab-pane animation-slide-left" id="direct_reports" role="tabpanel">
+                  <table id="exampleTablePagination" data-toggle="table" 
+                  data-query-params="queryParams" data-mobile-responsive="true"
+                  data-height="400" data-pagination="true" data-search="true" class="table table-striped">
+                    <thead>
+                      <tr>
+                        <th >Name:</th>
+                        <th >Email:</th>
+                        <th >Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @forelse($user->employees as $employee)
+                      <tr>
+                        <td>{{$employee->name}}</td>
+                        <td>{{$employee->email}}</td>
+                        <td></td>
+                      </tr>
+                      @empty
+                      @endforelse
+                      
+                    </tbody>
+                  </table>
+                </div>
+                <div class="tab-pane animation-slide-left" id="user_groups" role="tabpanel">
+                  <table id="exampleTablePagination" data-toggle="table" 
+                  data-query-params="queryParams" data-mobile-responsive="true"
+                  data-height="400" data-pagination="true" data-search="true" class="table table-striped">
+                    <thead>
+                      <tr>
+                        <th >Name:</th>
+                        <th >Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @forelse($user->user_groups as $group)
+                      <tr>
+                        <td>{{$group->name}}</td>
                         <td></td>
                       </tr>
                       @empty

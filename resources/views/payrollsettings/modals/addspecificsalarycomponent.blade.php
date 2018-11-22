@@ -53,6 +53,14 @@
                       <input type="text" name="amount"  class="form-control">
                     </div>
                     <div class="form-group">
+                      <h4 class="example-title">General Ledger Code</h4>
+                      <input type="text" name="gl_code"  class="form-control">
+                    </div>
+                    <div class="form-group">
+                      <h4 class="example-title">Project Code</h4>
+                      <input type="text" name="project_code"  class="form-control">
+                    </div>
+                    <div class="form-group">
                       <h4 class="example-title">Duration(Months)</h4>
                       <input type="number" name="duration"  class="form-control">
                     </div>

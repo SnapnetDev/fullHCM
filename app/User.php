@@ -4,6 +4,9 @@ namespace App;
 
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Scope;
+// use Auth;
 
 class User extends Authenticatable
 {
@@ -24,6 +27,27 @@ class User extends Authenticatable
     protected $hidden = [
         'password', 'remember_token',
     ];
+
+     /**
+     * The "booting" method of the model.
+     *
+     * @return void
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::addGlobalScope('company_id', function (Builder $builder) {
+            // if (!\Auth::guest()) {
+            //     if (\Auth::user()->role->permissions->contains('constant', 'group_access')) {
+            //         $builder->where('company_id', '>', 0);
+            //     }else{
+            //         $builder->where('company_id', '=', \Auth::user()->company_id);
+            //     }
+            // }
+            
+        });
+    }
 
     public function role()
     {
@@ -56,7 +80,7 @@ class User extends Authenticatable
     }
     public function job()
     {
-        return $this->belongsTo('App\Job');
+        return $this->belongsTo('App\Job','job_id');
     }
     public function dependants()
     {
@@ -240,6 +264,11 @@ public function getquarter(){
     public function payroll_details()
     {
          return $this->hasMany('App\PayrollDetail','user_id');
+    }
+
+    public function stages()
+    {
+        return $this->morphMany('App\Stage', 'stageable');
     }
 
 }

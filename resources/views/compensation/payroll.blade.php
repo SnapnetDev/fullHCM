@@ -59,17 +59,17 @@
 	                <ul class="list-group list-group-dividered ">
 	            	<li class="list-group-item"><strong>Payroll For:	{{date('M-Y',strtotime($date))}}</strong></li>
 	                  <li class="list-group-item">Wallet Balance:</li>
-	                  <li class="list-group-item">Salary:&#8358;@php printf("%01.2f", $salary)@endphp</li>
-	                 <li class="list-group-item">Allowances:&#8358;@php printf("%01.2f", $allowances)@endphp</li>
-	                  <li class="list-group-item">Deductions:&#8358;@php printf("%01.2f", $deductions+$income_tax)@endphp</li>
+	                  <li class="list-group-item">Salary:&#8358;{{number_format( $salary,2)}}</li>
+	                 <li class="list-group-item">Allowances:&#8358;{{number_format( $allowances,2)}}</li>
+	                  <li class="list-group-item">Deductions:&#8358;{{number_format( $deductions+$income_tax,2)}}</li>
 	                </ul>
 	                <div class="btn-group btn-group-justified">
 	                    <div class="btn-group" role="group">
-	                      <button type="button" class="btn btn-primary btn-outline">
+	                      <a type="button" class="btn btn-primary btn-outline" href="{{ url('compensation/issuepayslip?payroll_id='.$payroll->id) }}">
 	                        <i class="icon fa fa-list-alt" aria-hidden="true"></i>
 	                        <br>
 	                        <span class="text-uppercase hidden-sm-down">Issue Payslip</span>
-	                      </button>
+	                      </a>
 	                    </div>
 	                    <div class="btn-group" role="group">
 	                      <button type="button" class="btn btn-info btn-outline">
@@ -84,6 +84,13 @@
 	                        <br>
 	                        <span class="text-uppercase hidden-sm-down">Export Payroll</span>
 	                      </button>
+	                    </div>
+	                    <div class="btn-group" role="group">
+	                      <a type="button" class="btn btn-success btn-outline" href="{{ url('compensation/exportford365?payroll_id='.$payroll->id) }}">
+	                        <i class="icon fa fa-download" aria-hidden="true"></i>
+	                        <br>
+	                        <span class="text-uppercase hidden-sm-down">Export for NAV</span>
+	                      </a>
 	                    </div>
 	              	</div>
 
@@ -119,7 +126,7 @@
 	  						<td>{{$detail->user->emp_num}}</td>
 	  						<td>{{$detail->user->name}}</td>
 	  						<td>{{$detail->user->promotionHistories()->latest()->first()->grade->level}}</td>
-	  						<td>{{$detail->user->promotionHistories()->latest()->first()->grade->basic_pay}}</td>
+	  						<td>&#8358;{{number_format( $detail->user->promotionHistories()->latest()->first()->grade->basic_pay,2)}}</td>
 	  						<td> <a onclick="viewMore({{$detail->id}})" class="text-center"><i class="btn btn-sm btn-primary waves-effect icon fa fa-eye" aria-hidden="true" title="view"></i></a></td>
 	  					</tr>
 	  					@php

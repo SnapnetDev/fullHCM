@@ -10,7 +10,7 @@
 		<tr>
 			
 			<th>Basic Pay</th>
-			<td style="text-align: right">&#8358;{{$detail->basic_pay}}</td>
+			<td style="text-align: right">&#8358;{{number_format($detail->basic_pay,2)}}</td>
 			
 		</tr>
 	</tbody>
@@ -24,7 +24,7 @@
 		<tr>
 			
 			<th>{{$pdetails['component_names'][$key]}}</th>
-			<td style="text-align: right">&#8358;{{round($allowance,2)}}</td>
+			<td style="text-align: right">&#8358;{{number_format($allowance,2)}}</td>
 			
 		</tr>
 		@endforeach
@@ -40,17 +40,17 @@
 		<tr>
 			
 			<th>{{$pdetails['component_names'][$key]}}</th>
-			<td style="text-align: right">-&#8358;{{$deduction}}</td>
+			<td style="text-align: right">-&#8358;{{number_format($deduction,2)}}</td>
 			
 		</tr>
 		@endforeach
 		<tr>
 			<th>Income Tax</th>
-			<td style="text-align: right">&#8358;{{$detail->paye}}</td>
+			<td style="text-align: right">&#8358;{{number_format($detail->paye,2)}}</td>
 		</tr>
 	</tbody>
 	
 </table>
 <hr>
-<h4><span class="">Net Salary</span><span class="pull-right">&#8358;{{($detail->basic_pay+$detail->allowances)-($detail->deductions+$detail->paye)}}</span></h4>
+<h4><span class="">Net Salary</span><span class="pull-right">&#8358;{{number_format(($detail->basic_pay+$detail->allowances)-($detail->deductions+$detail->paye),2)}}</span></h4>
 </div>

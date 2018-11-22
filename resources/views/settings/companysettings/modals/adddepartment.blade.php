@@ -18,6 +18,7 @@
                     <div class="form-group">
                     	<h4 class="example-title">Head of Department</h4>
                     	<select class="form-control" name="manager_id" >
+                        <option value="0">None</option>
                     		@foreach($users as $user)
                     		<option value="{{$user->id}}">{{$user->name}}</option>
                     		@endforeach

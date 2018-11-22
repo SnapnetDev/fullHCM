@@ -13,4 +13,6 @@ class UserGroup extends Model
     {
     	return $this->belongsToMany('App\User','user_group_user','user_group_id','user_id');
     }
+
+     
 }

@@ -86,7 +86,7 @@
                       <td>{{$request->monthly_deduction}}</td>
                       <td>{{ $request->current_rate}}%</td>
                       <td>{{ date('M, Y', strtotime($request->repayment_starts))}}</td>
-                      <td><span class=" tag tag-outline  {{$request->status==1?'tag-success':'tag-warning'}}">{{$request->completed==1?'completed':'pending'}}</span></td>
+                      <td><span class=" tag tag-outline  {{$request->completed==1?'tag-success':'tag-warning'}}">{{$request->completed==1?'completed':'pending'}}</span></td>
                       <td>{{ $request->created_at }}</td>
                       <td>{{ $request->status==1?$request->approver->name:'Not Yet Approved' }}</td>
                       <td>
@@ -143,10 +143,10 @@ $('.select2').select2();
       loan_request_id= $(this).attr('id');
       
        $.get('{{ url('/loan/approve_loan_request') }}/',{ loan_request_id: loan_request_id },function(data){
-        if (data==1) {
+        if (data=='success') {
           toastr.success("Loan Request Enabled",'Success');
         }
-        if(data==2){
+        if(data=='failed'){
           toastr.warning("Loan Request Disabled",'Success');
         }
        

@@ -37,8 +37,8 @@ class AttendanceTableSeeder extends Seeder
     	$timein=0;
     	$timeout=0;
     	foreach ($users as $user) {
-    		for ($i=1; $i <= 31; $i++) { 
-    			$attendance=$user->attendances()->create(['date'=>'2018-10-'.$i,'shift_id'=>1]);
+    		for ($i=1; $i <= 30; $i++) { 
+    			$attendance=$user->attendances()->create(['date'=>'2018-11-'.$i,'shift_id'=>1]);
     			for ($j=0; $j <4; $j++) {
 	    			if ($j==0) {
 	    				$timein=mt_rand(6,9);

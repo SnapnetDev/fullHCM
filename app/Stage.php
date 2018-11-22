@@ -6,9 +6,19 @@ use Illuminate\Database\Eloquent\Model;
 
 class Stage extends Model
 {
+ protected $fillable= ['name','position','user_id','type','role_id','group_id'];
+ 
   public function user()
       {
-          return $this->belongsTo('App\User');
+          return $this->belongsTo('App\User','user_id');
+      }
+      public function role()
+      {
+          return $this->belongsTo('App\Role','role_id');
+      }
+      public function group()
+      {
+          return $this->belongsTo('App\UserGroup','group_id');
       }
       public function workflow()
           {

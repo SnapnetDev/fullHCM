@@ -32,6 +32,14 @@
                       <input type="text" name="constant" class="form-control">
                     </div>
                     <div class="form-group">
+                      <h4 class="example-title">General Ledger Code</h4>
+                      <input type="text" name="gl_code"  class="form-control">
+                    </div>
+                    <div class="form-group">
+                      <h4 class="example-title">Project Code</h4>
+                      <input type="text" name="project_code"  class="form-control">
+                    </div>
+                    <div class="form-group">
                       <label class="example-title" for="constant">Applies to All Employee Except</label>
                       
                       <select required="" name="exemptions[]" style="width:100%;" id="exemptions" class="form-control " multiple><option selected value='0'>Not Appllicable</option></select>

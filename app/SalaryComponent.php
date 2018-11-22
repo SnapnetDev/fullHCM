@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class SalaryComponent extends Model
 {
     protected $table='salary_components';
-    protected $fillable=['name','type','constant','formula','comment','status'];
+    protected $fillable=['name','gl_code','project_code','type','constant','formula','comment','status'];
 
     public function exemptions()
     {
