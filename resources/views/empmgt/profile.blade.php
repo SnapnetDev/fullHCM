@@ -1,7 +1,7 @@
 @extends('layouts.master')
 @section('stylesheets')
   <link rel="stylesheet" href="{{ asset('global/vendor/bootstrap-datepicker/bootstrap-datepicker.css') }}">
-
+<link href="{{ asset('global/vendor/select2/select2.min.css') }}" rel="stylesheet" />
   <link rel="stylesheet" href="{{ asset('global/vendor/bootstrap-table/bootstrap-table.css') }}">
   <style type="text/css">
   	.btn-file {
@@ -86,7 +86,7 @@
                     <div class="col-md-4 col-lg-4">
                       <div class="form-group">
                   <label>Upload Image</label>
-                  <img class="img-circle img-bordered img-bordered-blue text-center" width="150" height="150" src="{{ asset('global/portraits/2.jpg') }}" alt="..." id='img-upload'>
+                  <img class="img-circle img-bordered img-bordered-blue text-center" width="150" height="150" src="{{ $user->image!=''?asset('storage/avatar'.$user->image):($user->sex=='M'?asset('global/portraits/male-user.png'):asset('global/portraits/female-user.png'))}}" alt="..." id='img-upload'>
                 
                   <div class="input-group">
                       <span class="input-group-btn">
@@ -178,26 +178,30 @@
                       <div class="col-md-4">
                     <div class="form-group form-material" data-plugin="formMaterial">
                       <label class="form-control-label" for="select">Country</label>
-                      <select class="form-control select2" id="country" name="country" onchange="changeStates(this.value)" required>
-                        @foreach($countries as $country)
-                         <option value="{{$country->id}}">{{$country->name}}</option>
-                        @endforeach
+                      <select class="form-control " id="country" name="country"  required>
+                        @if($user->lga)
+                        <option value="{{$user->lga->state->country->id}}">{{$user->lga->state->country->name}}</option>
+                        @endif
                       </select>
                     </div>
                       </div>
                       <div class="col-md-4">
                         <div class="form-group form-material" data-plugin="formMaterial">
                       <label class="form-control-label" for="select">State/Region</label>
-                      <select class="form-control select2" id="state" name="state" onchange="changeLgas(this.value)" required>
-                        
+                      <select class="form-control " id="state" name="state"  required>
+                         @if($user->lga)
+                         <option value="{{$user->lga->state->id}}">{{$user->lga->state->name}}</option>
+                           @endif
                       </select>
                     </div>
                       </div>
                       <div class="col-md-4">
                         <div class="form-group form-material" data-plugin="formMaterial">
                       <label class="form-control-label" for="select">LGA/ District</label>
-                      <select class="form-control select2" id="lga" name="lga" required>
-                        
+                      <select class="form-control " id="lga" name="lga" required>
+                         @if($user->lga)
+                         <option value="{{$user->lga->id}}">{{$user->lga->name}}</option>
+                          @endif
                       </select>
                     </div>
                       </div>
@@ -208,9 +212,10 @@
                       <div class="col-md-4">
                     <div class="form-group form-material" data-plugin="formMaterial">
                       <label class="form-control-label" for="select">Company</label>
-                      <select class="form-control" id="company_id" name="company_id">
-                        <option>Company 1</option>
-                        <option>Company 2</option>
+                      <select class="form-control" id="company_id" name="company_id" onchange="companyChange(this.value)">
+                        @foreach ($companies as $comp)
+                          <option value="{{$comp->id}}" {{$comp->id==$user->company->id?'selected':''}}>{{$comp->name}}</option>
+                        @endforeach
                       </select>
                     </div>
                       </div>
@@ -218,18 +223,26 @@
                     <div class="form-group form-material" data-plugin="formMaterial">
                       <label class="form-control-label" for="select">Branch</label>
                       <select class="form-control" id="branch_id" name="branch_id">
-                        <option>Branch 1</option>
-                        <option>Branch 2</option>
+                        @if ($user->company()->count()>0 && $user->company->branches()->count()>0)
+                          @foreach($user->company->branches as $branch)
+                          <option value="{{$branch->id}}" {{$branch->id==$user->branch_id?'selected':''}}>{{$branch->name}}</option>
+                          @endforeach
+                        @endif
+                        @if($company->branches()->count()>0)
+                        @foreach($company->branches as $branch)
+                          <option value="{{$branch->id}}" {{$branch->id==$user->branch_id?'selected':''}}>{{$branch->name}}</option>
+                        @endforeach
+                        @endif
                       </select>
                     </div>
                       </div>
                       <div class="col-md-4">
                     <div class="form-group form-material" data-plugin="formMaterial">
                       <label class="form-control-label" for="select">Department</label>
-                      <select class="form-control" id="dept_id" name="dept_id">
-                        <option>Company 1</option>
-                        <option>Company 2</option>
-                      </select>
+                      
+                        <input type="text" class="form-control " disabled  id="inputText" name="inputText" placeholder="{{$user->jobs()->count()>0?$user->jobs()->latest('started')->first()->department->name:''}}" 
+                        />
+                      
                     </div>
                       </div>
                       
@@ -239,23 +252,21 @@
                       <div class="col-md-4">
                         <div class="form-group form-material" data-plugin="formMaterial">
                         <label class="form-control-label" for="inputText">Hire Date</label>
-                        <input type="text" class="form-control datepicker"  id="hiredate" name="hiredate" placeholder="Hire Date"
+                        <input type="text" class="form-control datepicker"  id="hiredate" name="hiredate" placeholder="Hire Date" value="{{$user->hiredate?date('m/d/Y',strtotime($user->hiredate)):''}}" 
                         />
                       </div>
                       </div>
                       <div class="col-md-4">
                     <div class="form-group form-material" data-plugin="formMaterial">
-                      <label class="form-control-label" for="select">Job Role</label>
-                      <select class="form-control" id="job_id" name="job_id">
-                        <option>Branch 1</option>
-                        <option>Branch 2</option>
-                      </select>
+                      <label class="form-control-label" for="select">Current Job Role</label>
+                      <input type="text" class="form-control " disabled  id="inputText" name="inputText" placeholder="{{$user->jobs()->count()>0?$user->jobs()->latest('started')->first()->title:''}}" 
+                        />
                     </div>
                       </div>
                       <div class="col-md-4">
                     <div class="form-group form-material" data-plugin="formMaterial">
                       <label class="form-control-label" for="select">Grade</label>
-                      <input type="text" class="form-control " disabled  id="inputText" name="inputText" placeholder="Grade 14" 
+                      <input type="text" class="form-control " disabled  id="inputText" name="inputText" placeholder="{{$user->promotionHistories()?$user->promotionHistories()->latest()->first()->grade->level:''}}" 
                         />
                     </div>
                       </div>
@@ -268,16 +279,17 @@
                       <div class="col-md-4">
                     <div class="form-group form-material" data-plugin="formMaterial">
                       <label class="form-control-label" for="select">Bank</label>
-                      <select class="form-control" id="bank_id" name="bank_id">
-                        <option>Bank A</option>
-                        <option>Bank B</option>
+                      <select class="form-control" id="bank_id" required name="bank_id">
+                        @foreach ($banks as $bank)
+                         <option value="{{$bank->id}}">{{$bank->bank_name}}</option> 
+                        @endforeach
                       </select>
                     </div>
                       </div>
                       <div class="col-md-4">
                         <div class="form-group form-material" data-plugin="formMaterial">
                         <label class="form-control-label" for="inputText">Account Number</label>
-                        <input type="text" class="form-control "  id="account_no" name="account_no" placeholder="Account Number"
+                        <input type="text" class="form-control " required value="{{$user->bank_account_no}}"  id="account_no" name="bank_account_no" placeholder="Account Number"
                         />
                       </div>
                       </div>
@@ -288,32 +300,41 @@
                     <div class="row">
                       <h4 style="padding-left: 15px;">Next of Kin</h4>
                       <div class="col-md-4">
+                        <input type="hidden" name="nok_id" value="{{$user->nok()->count()>0?$user->nok->id:''}}">
                         <div class="form-group form-material" data-plugin="formMaterial">
                         <label class="form-control-label" for="inputText">Name</label>
-                        <input type="text" class="form-control "  id="nok_name" name="nok_name" placeholder="Name"
+                        <input type="text" class="form-control " required  id="nok_name" value="{{$user->nok()->count()>0?$user->nok->name:''}}" name="nok_name" placeholder="Name"
                         />
                       </div>
                       </div>
                       <div class="col-md-4">
                     <div class="form-group form-material" data-plugin="formMaterial">
                       <label class="form-control-label" for="select">Relationship</label>
-                      <select class="form-control" id="nok_relationship" name="nok_relationship">
-                        <option>Father</option>
-                        <option>Mother</option>
+                      <select class="form-control" id="nok_relationship" required name="nok_relationship" >
+                         <option value="father">Father</option>
+                        <option value="mother">Mother</option>
+                        <option value="brother">Brother</option>
+                        <option value="sister">Sister</option>
+                        <option value="nephew">Nephew</option>
+                        <option value="niece">Niece</option>
+                        <option value="uncle">Uncle</option>
+                        <option value="aunt">Aunt</option>
+                        <option value="son">Son</option>
+                        <option value="daughter">Daughter</option> 
                       </select>
                     </div>
                       </div>
                       <div class="col-md-4">
                         <div class="form-group form-material" data-plugin="formMaterial">
                         <label class="form-control-label" for="inputText">Phone Number</label>
-                        <input type="text" class="form-control "  id="nok_phone" name="nok_phone" placeholder="Phone Number"
+                        <input type="text" class="form-control "  id="nok_phone" name="nok_phone" value="{{$user->nok()->count()>0?$user->nok->phone:''}}" required placeholder="Phone Number"
                         />
                       </div>
                       </div>
                       <div class="col-md-12">
                         <div class="form-group form-material" data-plugin="formMaterial">
                         <label class="form-control-label" for="inputText">Address of Next of Kin</label>
-                        <textarea class="form-control" id="nok_address" name="nok_address" rows="3"></textarea>
+                        <textarea class="form-control" id="nok_address" required name="nok_address" rows="3">{{$user->nok()->count()>0?$user->nok->address:''}}</textarea>
                       </div>
                       </div>
                       
@@ -426,28 +447,24 @@
                     <thead>
                       <tr>
                         <th >Skill:</th>
-                        <th >Experience (Years):</th>
-                        <th >Rating:</th>
-                        <th >Remarks:</th>
+                        <th >Competency:</th>
                         <th >Action</th>
                       </tr>
                     </thead>
                     <tbody>
                       @forelse($user->skills as $skill)
                       <tr>
-                        <td>{{$skill->skill}}</td>
-                        <td>{{$skill->experience}}</td>
-                        <td>{{$skill->rating}}</td>
-                        <td>{{$skill->remark}}</td>
+                        <td>{{$skill->name}}</td>
+                        <td>{{$skill->pivot->competency->proficiency}}</td>
                         <td>
                               <div class="btn-group" role="group">
-                              <button type="button" class="btn btn-primary dropdown-toggle" id="exampleIconDropdown1"
+                              <button type="button" class="btn btn-primary btn-sm dropdown-toggle" id="exampleIconDropdown1"
                               data-toggle="dropdown" aria-expanded="false">
                                 Action
                               </button>
                             <div class="dropdown-menu" aria-labelledby="exampleIconDropdown1" role="menu">
-                              <a class="dropdown-item" id="{{$skill->id}}" onclick="prepareEditSData(this.id)"><i class="fa fa-pencil" aria-hidden="true"></i>&nbsp;Edit Dependant</a>
-                               <a class="dropdown-item" id="{{$skill->id}}" onclick="deleteSkill(this.id)"><i class="fa fa-trash" aria-hidden="true"></i>&nbsp;Delete Dependant</a>
+                              <a class="dropdown-item" id="{{$skill->id}}" onclick="prepareEditSData(this.id)"><i class="fa fa-pencil" aria-hidden="true"></i>&nbsp;Edit Skill</a>
+                               <a class="dropdown-item" id="{{$skill->id}}" onclick="deleteSkill(this.id)"><i class="fa fa-trash" aria-hidden="true"></i>&nbsp;Delete Skill</a>
                               
                             </div>
                           </div></td>
@@ -487,8 +504,8 @@
                                 Action
                               </button>
                             <div class="dropdown-menu" aria-labelledby="exampleIconDropdown1" role="menu">
-                              <a class="dropdown-item" id="{{$ehistory->id}}" onclick="prepareEditWEData(this.id)"><i class="fa fa-pencil" aria-hidden="true"></i>&nbsp;Edit Dependant</a>
-                               <a class="dropdown-item" id="{{$ehistory->id}}" onclick="deleteWorkExperience(this.id)"><i class="fa fa-trash" aria-hidden="true"></i>&nbsp;Delete Dependant</a>
+                              <a class="dropdown-item" id="{{$ehistory->id}}" onclick="prepareEditWEData(this.id)"><i class="fa fa-pencil" aria-hidden="true"></i>&nbsp;Edit Employment History</a>
+                               <a class="dropdown-item" id="{{$ehistory->id}}" onclick="deleteWorkExperience(this.id)"><i class="fa fa-trash" aria-hidden="true"></i>&nbsp;Delete Employment History</a>
                               
                             </div>
                           </div></td>
@@ -505,21 +522,19 @@
                   data-height="400" data-pagination="true" data-search="true" class="table table-striped">
                     <thead>
                       <tr>
-                        <th >Organization:</th>
-                        <th >Position:</th>
-                        <th >Start Date:</th>
-                        <th >End Date:</th>
-                        <th >Action</th>
+                        <th >Old Grade:</th>
+                        <th >New Grade:</th>
+                        <th >Approved By</th>
+                        <th >Approved On</th>
                       </tr>
                     </thead>
                     <tbody>
-                      @forelse($user->employmentHistories as $ehistory)
+                      @forelse($user->promotionHistories as $phistory)
                       <tr>
-                        <td>{{$ehistory->organization}}</td>
-                        <td>{{$ehistory->position}}</td>
-                        <td>{{date("F j, Y", strtotime($ehistory->start_date))}}</td>
-                        <td>{{date("F j, Y", strtotime($ehistory->end_date))}}</td>
-                        <td></td>
+                        <td>{{$phistory->oldgrade->level}}</td>
+                        <td>{{$phistory->grade->level}}</td>
+                        <td>{{$phistory->approver->name}}</td>
+                        <td>{{date("F j, Y", strtotime($phistory->approved_on))}}</td>
                       </tr>
                       @empty
                       @endforelse
@@ -621,7 +636,7 @@
 @section('scripts')
 	<script src="{{asset('global/vendor/bootstrap-datepicker/bootstrap-datepicker.js')}}"></script>
   <script src="{{asset('global/js/Plugin/bootstrap-datepicker.js')}}"></script>
-
+<script src="{{asset('global/vendor/select2/select2.min.js')}}"></script>
   <script src="{{asset('global/vendor/bootstrap-table/bootstrap-table.min.js')}}"></script>
   <script src="{{asset('global/vendor/bootstrap-table/extensions/mobile/bootstrap-table-mobile.js')}}"></script>
   <script src="{{asset("js/countries.js")}}"></script>
@@ -768,10 +783,10 @@
             processData : false,
             type        : 'POST',
             success     : function(data, textStatus, jqXHR){
-
-                toastr.success("Changes saved successfully",'Success');
-               $('#addDependantModal').modal('toggle');
-                location.reload();
+              console.log(data);
+                // toastr.success("Changes saved successfully",'Success');
+               // $('#addDependantModal').modal('toggle');
+                // location.reload();
 
             },
             error:function(data, textStatus, jqXHR){
@@ -861,6 +876,7 @@
             type        : 'POST',
             success     : function(data, textStatus, jqXHR){
 
+
                 toastr.success("Changes saved successfully",'Success');
                $('#addSkillModal').modal('toggle');
                 location.reload();
@@ -908,23 +924,44 @@
         });
       
     });
-  });
 
+    $('.skills').select2({
+    placeholder: "Skill",
+     multiple: false,
+    id: function(bond){ return bond._id; },
+     ajax: {
+     delay: 250,
+     processResults: function (data) {
+          return {        
+    results: data
+      };
+    },
+    url: function (params) {
+    return '{{url('job_skill_search')}}';
+    } 
+    },
+  tags: true
+    
+  });
+  
+  });
+  
     
     function prepareEditSData(skill_id){
-    $.get('{{ url('/userprofile/skill') }}/',{ skill_id: skill_id },function(data){
+    $.get('{{ url('/userprofile/skill') }}/',{ skill_id: skill_id,user_id:{{$user->id}} },function(data){
       
-     $('#editsname').val(data.name);
-     $('#editsexperience').val(data.experience);
-     $('#editsrating').val(data.rating);
-     $('#editsremark').val(data.remark);
+     
+     $('#editscompetency').val(data.pivot.competency_id);
      $('#skill_id').val(data.id);
+     $("#editsskill").find('option')
+    .remove();
     $('#editSkillModal').modal();
+     $("#editsskill").append($('<option>', {value:data.id, text:data.name,selected:'selected'}));
   });
   }
 
   function deleteSkill(skill_id){
-    $.get('{{ url('/userprofile/delete_skill') }}/',{ skill_id: skill_id },function(data){
+    $.get('{{ url('/userprofile/delete_skill') }}/',{ skill_id: skill_id,user_id:{{$user->id}} },function(data){
       if (data=='success') {
     toastr.success("Skill deleted successfully",'Success');
     location.reload();
@@ -1047,7 +1084,7 @@
 
                 toastr.success("Changes saved successfully",'Success');
                $('#addWorkExperienceModal').modal('toggle');
-                // location.reload();
+                location.reload();
 
             },
             error:function(data, textStatus, jqXHR){
@@ -1080,7 +1117,7 @@
 
                 toastr.success("Changes saved successfully",'Success');
                 $('#editWorkExperienceModal').modal('toggle');
-                // location.reload();
+                location.reload();
             },
             error:function(data, textStatus, jqXHR){
                jQuery.each( data['responseJSON'], function( i, val ) {
@@ -1121,27 +1158,76 @@
 
  
 
-     function changeStates(country_id){
-
-    $.get('{{ url('/userprofile/states') }}/',{ country_id: country_id },function(data){
-      $('#state').html();
-    jQuery.each( data, function( i, val ) {
+     
+     function companyChange(company_id){
+    event.preventDefault();
+    $.get('{{ url('/users/company/departmentsandbranches') }}/'+company_id,function(data){
       
-       $("#state").append($('<option>', {value:val.id, text:val.name}));
-       // console.log(val.name);
-              }); 
-  });
-     }
-    function changeLgas(state_id){
-      $.get('{{ url('/userprofile/lgas') }}/',{ state_id: state_id },function(data){
-      $('#lga').html();
-    jQuery.each( data, function( i, val ) {
       
-       $("#lga").append($('<option>', {value:val.id, text:val.name}));
-       // console.log(val.name);
-              }); 
-  });
-    }
+      if (data.branches=='') {
+         $("#branch_id").empty();
+        $('#branch_id').append($('<option>', {value:0, text:'Please Create a Branch'}));
+      }else{
+        $("#branch_id").empty();
+        jQuery.each( data.branches, function( i, val ) {       
+               $('#branch_id').append($('<option>', {value:val.id, text:val.name}));  
+              });
+      }
+      
+     });
+  }
+  //   function changeLgas(state_id){
+  //     $.get('{{ url('/userprofile/lgas') }}/',{ state_id: state_id },function(data){
+  //     $('#lga').html();
+  //   jQuery.each( data, function( i, val ) {
+      
+  //      $("#lga").append($('<option>', {value:val.id, text:val.name}));
+  //      // console.log(val.name);
+  //             }); 
+  // });
+  //   }
+var country=$('#country').val();
+var state=$('#state').val();
+      $('#country').select2({
+        ajax: {
+         delay: 250,
+         processResults: function (data) {
+              return {        
+        results: data
+          };
+        },
+        url: function (params) {
+        return '{{url('location/country')}}';
+        } 
+        }
+    });
+       $('#state').select2({
+        ajax: {
+         delay: 250,
+         processResults: function (data) {
+              return {        
+        results: data
+          };
+        },
+        url: function (country) {
+        return '{{url('location/state')}}/'+$('#country').val();
+        } 
+        }
+    });
+        $('#lga').select2({
+        ajax: {
+         delay: 250,
+         processResults: function (data) {
+              return {        
+        results: data
+          };
+        },
+        url: function (state) {
+        return '{{url('location/lga')}}/'+$('#state').val();
+        } 
+        },
+        tags: true
+    });
 
 
   </script>

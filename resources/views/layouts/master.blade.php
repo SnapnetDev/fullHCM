@@ -143,6 +143,7 @@
               @php
                 $companies=companies();
               @endphp
+              <option value="0"{{session('company_id')==0?'selected':''}}">All Companies</option>
               @foreach($companies as $company)
              <option  value="{{$company->id}}"{{$company->id==session('company_id')?'selected':''}}>{{$company->name}}</option>
              @endforeach
@@ -153,7 +154,7 @@
            @else
             <li class="nav-item hidden-sm-down" id="toggleFullscreen">
             <a class="nav-link "  href="#" role="button" style="font-size: 16px;">
-              {{parentCompanyName()}}
+              {{userCompanyName()}}
             </a>
           </li>
            @endif

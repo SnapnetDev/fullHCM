@@ -17,4 +17,13 @@ class PromotionHistory extends Model
     {
         return $this->belongsTo('App\Grade','grade_id');
     }
+
+    public function oldgrade()
+    {
+        return $this->belongsTo('App\Grade','old_grade_id');
+    }
+    public function approver()
+    {
+        return $this->belongsTo('App\User','approved_by');
+    }
 }

@@ -11,27 +11,19 @@
                   <div class="col-xs-12"> 
                   	@csrf
                   	
-                    <div class="form-group">
+                   <div class="form-group">
                       <h4 class="example-title">Skill</h4>
-                       <input type="text"  required placeholder="Name" id="editsname" name="name"   class="form-control">
-                    </div>
-                  	<div class="form-group">
-                  		<h4 class="example-title">Experience (Years)</h4>
-                  		 <input type="number"  required placeholder="Experience" id="editsexperience" name="experience"   class="form-control">
-                  	</div>
-                    <div class="form-group">
-                      <h4 class="example-title">Rating</h4>
-                       <select name="rating" id="editsrating" class="form-control" required>
-                         <option value="1">Beginner</option>
-                         <option value="2">Amateur</option>
-                         <option value="3">Intermediate</option>
-                         <option value="4">Professional</option>
-                         <option value="5">Expert</option>
-                       </select>
+                        <select class="form-control skills" id="editsskill" style="width:100%;" name="skill" ></select>
                     </div>
                     <div class="form-group">
-                      <h4 class="example-title">Remark</h4>
-                      <textarea class="form-control" id="editsremark" name="remark"></textarea>
+                      <h4 class="example-title">Competency</h4>
+                        <select class="form-control roles" id="editscompetency" name="competency_id" >
+                           @forelse ($competencies as $competency) 
+                           <option value="{{$competency->id}}">{{$competency->proficiency}}</option>
+                            @empty
+                             <option value="">No Competency Created</option>
+                             @endforelse
+                          </select>
                     </div>
                   	
                   	 <input type="hidden" name="user_id" value="{{$user->id}}">

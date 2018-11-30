@@ -7,10 +7,16 @@ use Illuminate\Database\Eloquent\Model;
 
 class Skill extends Model
 {
-	protected $table="emp_skills";
-	protected $fillable=['skill','experience','rating','remarks','user_id'];
-    public function user()
+	protected $table="skills";
+	protected $fillable=['name'];
+
+    public function users()
     {
-        return $this->belongsTo('App\User','user_id');
+        return $this->belongsToMany('App\User')->using('App\UserSkillCompetency')->withTimestamps()->withPivot('competency_id');
     }
+    public function jobs()
+    {
+        return $this->belongsToMany('App\Job')->using('App\JobSkillCompetency')->withTimestamps()->withPivot('competency_id');
+    }
+    
 }

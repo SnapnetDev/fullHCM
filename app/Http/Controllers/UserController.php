@@ -17,6 +17,8 @@ use Validator;
 use App\Role;
 use App\Qualification;
 use App\UserGroup;
+use App\Competency;
+use App\Bank;
 
 
 class UserController extends Controller
@@ -37,12 +39,13 @@ class UserController extends Controller
         $qualifications=Qualification::all();
         $usersforcount=User::where('superadmin','!=',1)->get();
         $roles=Role::all();
+        $competencies=Competency::all();
         $user_groups=UserGroup::all();
         $managers=User::whereHas('role',function ($query)  {
                 $query->where('manages','dr');
                 $query->orWhere('manages','all');
             })->get();
-        return view('empmgt.list',['users'=>$users,'usersforcount'=>$usersforcount,'companies'=>$companies,'branches'=>$branches,'departments'=>$departments,'roles'=>$roles,'user_groups'=>$user_groups,'managers'=>$managers,'qualifications'=>$qualifications]);
+        return view('empmgt.list',['users'=>$users,'usersforcount'=>$usersforcount,'companies'=>$companies,'branches'=>$branches,'departments'=>$departments,'roles'=>$roles,'user_groups'=>$user_groups,'managers'=>$managers,'qualifications'=>$qualifications,'competencies'=>$competencies]);
 
             }else{
             $users=UserFilter::apply($request);
@@ -51,11 +54,13 @@ class UserController extends Controller
         $departments=$companies->first()->departments;
         $usersforcount=User::where('superadmin','!=',1)->get();
         $roles=Role::all();
+        $competencies=Competency::all();
         $user_groups=UserGroup::all();
+
         $managers=User::whereHas('role',function ($query)  {
                 $query->where('manages','dr');
             })->get();
-            return view('empmgt.list',['users'=>$users,'usersforcount'=>$usersforcount,'companies'=>$companies,'branches'=>$branches,'departments'=>$departments,'roles'=>$roles,'user_groups'=>$user_groups,'managers'=>$managers]);
+            return view('empmgt.list',['users'=>$users,'usersforcount'=>$usersforcount,'companies'=>$companies,'branches'=>$branches,'departments'=>$departments,'roles'=>$roles,'user_groups'=>$user_groups,'managers'=>$managers,'competencies'=>$competencies]);
 
       }
         
@@ -150,17 +155,28 @@ class UserController extends Controller
                     $validator->errors()
                     ],401);
         }
-        $user=User::where('id', $request->user_id)->update(['name'=>$request->name,'email'=>$request->email,'phone'=>$request->phone,'emp_num'=>$request->emp_num,'sex'=>$request->sex,'marital_status'=>$request->marital_status,'dob'=>date('Y-m-d',strtotime($request->dob)),'branch_id'=>$request->branch_id,'location_id'=>$request->location_id,'job_id'=>$request->job_id]);
+        //build LGA
+        $lga=\App\LocalGovernment::find($request->lga);
+        if (!$lga) {
+            $lga=\App\LocalGovernment::create(['name'=>$request->lga,'state_id'=>$request->state]);
+        }
+        //end build LGA
+        $user=User::find($request->user_id);
+        $user->update(['name'=>$request->name,'email'=>$request->email,'phone'=>$request->phone,'emp_num'=>$request->emp_num,'sex'=>$request->sex,'address'=>$request->address,'marital_status'=>$request->marital_status,'dob'=>date('Y-m-d',strtotime($request->dob)),'branch_id'=>$request->branch_id,'company_id'=>$request->company_id,'bank_id'=>$request->bank_id,'bank_account_no'=>$request->bank_account_no,'country_id'=>$request->country,'state_id'=>$request->state,'lga_id'=>$lga->id]);
+       
+            $nok=\App\Nok::updateOrCreate(['id'=>$request->nok_id],['name'=>$request->nok_name,'phone'=>$request->nok_phone,'address'=>$request->nok_address,'relationship'=>$request->nok_relationship,'user_id'=>$request->user_id]);
+       
           if ($request->file('avatar')) {
-                    $path = $request->file('avatar')->store('public');
-                    if (Str::contains($path, 'public/')) {
-                       $filepath= Str::replaceFirst('public/', '', $path);
+                    $path = $request->file('avatar')->store('public/avatar');
+                    if (Str::contains($path, 'public/avatar')) {
+                       $filepath= Str::replaceFirst('public/avatar', '', $path);
                     } else {
                         $filepath= $path;
                     }
                     $user->image = $filepath;
                     $user->save();
                 }
+        
        return 'success';
     }
 
@@ -210,7 +226,15 @@ class UserController extends Controller
        $user=User::find($user_id);
        $countries=\App\Country::all();
        $qualifications=Qualification::all();
-       return view('empmgt.profile',['user'=>$user,'qualifications'=>$qualifications,'countries'=>$countries]);
+       $competencies=Competency::all();
+        $companies=Company::all();
+        $banks=Bank::all();
+        $company=Company::find(session('company_id'));
+        if(!$company){
+          $company=Company::first();
+        }
+       // return $user->skills()->where('skills.id',1)->first()->pivot->competency;
+       return view('empmgt.profile',['user'=>$user,'qualifications'=>$qualifications,'countries'=>$countries,'competencies'=>$competencies,'companies'=>$companies,'banks'=>$banks,'company'=>$company]);
     }
 
     /**

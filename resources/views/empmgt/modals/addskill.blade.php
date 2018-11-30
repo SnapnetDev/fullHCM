@@ -1,4 +1,4 @@
-<div class="modal fade in modal-3d-flip-horizontal modal-info" id="addSkillModal" aria-hidden="true" aria-labelledby="addSkillModal" role="dialog" tabindex="-1">
+<div class="modal fade in modal-3d-flip-horizontal modal-info" id="addSkillModal" aria-hidden="true" aria-labelledby="addSkillModal" role="dialog" >
 	    <div class="modal-dialog ">
 	      <form class="form-horizontal" id="addSkillForm"  method="POST">
 	        <div class="modal-content">        
@@ -13,25 +13,17 @@
                   	
                     <div class="form-group">
                       <h4 class="example-title">Skill</h4>
-                       <input type="text"  required placeholder="Name" name="name"   class="form-control">
-                    </div>
-                  	<div class="form-group">
-                  		<h4 class="example-title">Experience (Years)</h4>
-                  		 <input type="text"  required placeholder="Experience" name="experience"   class="form-control">
-                  	</div>
-                    <div class="form-group">
-                      <h4 class="example-title">Rating</h4>
-                       <select name="rating" class="form-control" required>
-                         <option value="1">Beginner</option>
-                         <option value="2">Amateur</option>
-                         <option value="3">Intermediate</option>
-                         <option value="4">Professional</option>
-                         <option value="5">Expert</option>
-                       </select>
+                        <select class="form-control skills" id="skill" style="width:100%;" name="skill" ></select>
                     </div>
                     <div class="form-group">
-                      <h4 class="example-title">Remark</h4>
-                      <textarea class="form-control" name="remark"></textarea>
+                      <h4 class="example-title">Competency</h4>
+                        <select class="form-control roles" name="competency_id" >
+                           @forelse ($competencies as $competency) 
+                           <option value="{{$competency->id}}">{{$competency->proficiency}}</option>
+                            @empty
+                             <option value="">No Competency Created</option>
+                             @endforelse
+                          </select>
                     </div>
                   	
                   	 <input type="hidden" name="user_id" value="{{$user->id}}">

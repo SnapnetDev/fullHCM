@@ -185,6 +185,18 @@ Route::resource('projects','ProjectController')->middleware(['auth']);
 Route::resource('recruit','RecruitController')->middleware(['auth']);
 Route::resource('compensation','CompensationController')->middleware(['auth']);
 Route::resource('loan','LoanController')->middleware(['auth']);
+Route::get('jobs_departments','JobController@departments')->name('job_departments.view')->middleware(['auth']);
+Route::get('job_skill_search','JobController@skill_search')->middleware(['auth']);
+Route::get('job_search','JobController@job_search')->middleware(['auth']);
+Route::get('joblist/{department_id}', 'JobController@list')->name('job_list.view')->middleware(['auth']);
+Route::get('jobs/department/{department_id}','JobController@index')->middleware(['auth']);
+Route::get('jobs/create/{department_id}','JobController@create')->middleware(['auth'])->name('jobs.create');
+Route::get('job_search','JobController@job_search')->middleware(['auth']);
+Route::resource('jobs', 'JobController',['names'=>['store'=>'jobs.save','edit'=>'jobs.edit','update'=>'jobs.update','show'=>'jobs.view','destroy'=>'jobs.delete']])->except([
+    'index', 'create'])->middleware('auth');
+Route::get('location/country','HomeController@countries')->middleware(['auth']);
+Route::get('location/state/{country_id}','HomeController@states')->middleware(['auth']);
+Route::get('location/lga/{state_id}','HomeController@lgas')->middleware(['auth']);
 
 
 

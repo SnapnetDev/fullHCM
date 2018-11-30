@@ -29,7 +29,7 @@
                     </div>
                   	<div class="form-group">
                   		<h4 class="example-title">Relationship</h4>
-                  		<select name="relationship" class="form-control">
+                  		<select name="relationship" class="form-control" required>
                         <option value="father">Father</option>
                         <option value="mother">Mother</option>
                         <option value="brother">Brother</option>
@@ -37,7 +37,9 @@
                         <option value="nephew">Nephew</option>
                         <option value="niece">Niece</option>
                         <option value="uncle">Uncle</option>
-                        <option value="aunt">Aunt</option>  
+                        <option value="aunt">Aunt</option>
+                        <option value="son">Son</option>
+                        <option value="daughter">Daughter</option>  
                       </select> 
                   	</div>
                   	 <input type="hidden" name="user_id" value="{{$user->id}}">

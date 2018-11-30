@@ -127,7 +127,7 @@ public function delete_dependant(Request $request)
 public function save_dependant(Request $request)
 {
 	try{
-		$dependant = Dependant::updateOrCreate(['id'=>$request->dependant_id],['name'=>$request->name,'dob'=>$request->dob,'email'=>$request->email,'phone'=>$request->phone,'relationship'=>$request->relationship,'user_id'=>$request->user_id]);
+		$dependant = Dependant::updateOrCreate(['id'=>$request->dependant_id],['name'=>$request->name,'dob'=>date('Y-m-d',strtotime($request->dob)),'email'=>$request->email,'phone'=>$request->phone,'relationship'=>$request->relationship,'user_id'=>$request->user_id]);
 		return 'success';
 
 	}catch(\Exception $ex){
@@ -136,22 +136,34 @@ public function save_dependant(Request $request)
 }
 public function skill(Request $request)
 {
-	$skill=Skill::find($request->skill_id);
+	$user=User::find($request->user_id);
+	$skill=$user->skills()->where('skills.id',$request->skill_id)->first();
 	return $skill;
 }
 public function delete_skill(Request $request)
 {
-	$skill=Skill::find($request->skill_id);
-	if ($skill) {
-		$skill->delete();
-		return 'success';
-	}
-	return 'failed';
+	$user=User::find($request->user_id);
+	
+	
+	$user->skills()->detach($request->skill_id);
+	return 'success';
 }
 public function save_skill(Request $request)
 {
 	try{
-		$skill = Skill::updateOrCreate(['id'=>$request->skill_id],['name'=>$request->name,'experience'=>$request->experience,'rating'=>$request->rating,'remark'=>$request->remark,'user_id'=>$request->user_id]);
+	$skill=Skill::where('id',$request->skill)->orWhere('name','like','%'.$request->skill.'%')->first();
+	if (!$skill) {
+		$skill=Skill::create(['name'=>$request->skill]);
+	}
+	$user=User::find($request->user_id);
+	$has_skill = User::whereHas('skills', function ($query) use($skill){
+		    $query->where('skills.id', $skill->id);
+		})->get();
+	if ($has_skill) {
+		$user->skills()->detach($skill->id);
+	}
+	
+	$user->skills()->attach($skill->id, ['competency_id' => $request->competency_id]);
 		return 'success';
 
 	}catch(\Exception $ex){
@@ -175,7 +187,7 @@ public function delete_work_experience(Request $request)
 public function save_work_experience(Request $request)
 {
 	try{
-		$work_experience = EmploymentHistory::updateOrCreate(['id'=>$request->work_experience_id],['organization'=>$request->organization,'position'=>$request->position,'start_date'=>$request->start_date,'end_date'=>$request->end_date,'user_id'=>$request->user_id]);
+		$work_experience = EmploymentHistory::updateOrCreate(['id'=>$request->work_experience_id],['organization'=>$request->organization,'position'=>$request->position,'start_date'=>date('Y-m-d',strtotime($request->start_date)),'end_date'=>date('Y-m-d',strtotime($request->end_date)),'user_id'=>$request->user_id]);
 		return 'success';
 
 	}catch(\Exception $ex){

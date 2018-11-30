@@ -9,6 +9,7 @@ use App\WorkingPeriod;
 use App\Attendance;
 use App\Leave;
 use App\LeaveRequest;
+use App\Job;
 
 class HomeController extends Controller
 {
@@ -29,6 +30,14 @@ class HomeController extends Controller
      */
     public function index()
     {
+        $company_id=companyId();
+        if ($company_id>0) {
+          $company=Company::find($company_id);
+                 $jobs=$company->jobs()->get();
+        }else{
+             $jobs=Job::all();
+            }
+        
         $pending_leave_requests=LeaveRequest::where('status',0)->whereYear('start_date', date('Y'))->count();
         $date=date('Y-m-d');
      $yesterday=date('Y-m-d', strtotime('yesterday'));
@@ -84,7 +93,7 @@ class HomeController extends Controller
         $last_month_early_users=\App\TimesheetDetail::orderBy('average_first_clock_in','asc')->take(5)->get();
         $last_month_late_users=\App\TimesheetDetail::orderBy('average_first_clock_in','desc')->take(5)->get();
         $companies=Company::all();
-        return view('demo_home',compact('companies','absentees','usersPresent','yesterday_absentees','yesterday_usersPresent','earlys','lates','yesterday_earlys','yesterday_lates','last_month_early_users','last_month_late_users','pending_leave_requests'));
+        return view('demo_home',compact('companies','absentees','usersPresent','yesterday_absentees','yesterday_usersPresent','earlys','lates','yesterday_earlys','yesterday_lates','last_month_early_users','last_month_late_users','pending_leave_requests','jobs'));
     }
     public function executiveView()
     {
@@ -124,5 +133,52 @@ public function setcpny($company_id){
   return response()->json('ok',200);
  
   
+}
+public function countries(Request $request)
+{
+    if($request->q==""){
+            return "";
+        }
+       else{
+        $name=\App\Country::where('name','LIKE','%'.$request->q.'%')
+                        ->select('id as id','name as text')
+                        ->get();
+            }
+        
+        
+        return $name;
+    
+}
+public function states(Request $request,$country_id)
+{
+   
+    if($request->q==""){
+            return "";
+        }
+       else{
+        $country=\App\Country::find($country_id);
+        $name=$country->states()->where('name','LIKE','%'.$request->q.'%')
+                        ->select('id as id','name as text')
+                        ->get();
+            }
+        
+        
+        return $name;
+}
+public function lgas(Request $request,$state_id)
+{
+   
+    if($request->q==""){
+            return "";
+        }
+       else{
+         $state=\App\State::find($state_id);
+        $name=$state->lgas()->where('name','LIKE','%'.$request->q.'%')
+                        ->select('id as id','name as text')
+                        ->get();
+            }
+        
+        
+        return $name;
 }
 }

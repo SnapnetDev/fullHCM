@@ -17,7 +17,7 @@ class User extends Authenticatable
      *
      * @var array
      */
-    protected $fillable = ['name', 'email', 'password','emp_num','sex','dob','phone','marital_status','password','company_id','branch_id','job_id','hiredate','role_id','image','remember_token','created_at','updated_at','address','state_of_origin_id','lga_id','employment_status_id','superadmin','bank_id','account_num','locale','location_id','staff_category_id','position_id'];
+    protected $fillable = ['name', 'email', 'password','emp_num','sex','dob','phone','marital_status','password','company_id','branch_id','job_id','hiredate','role_id','image','remember_token','created_at','updated_at','address','lga_id','employment_status_id','superadmin','bank_id','bank_account_no','state_id','country_id'];
     protected $dates=['hiredate'];
     /**
      * The attributes that should be hidden for arrays.
@@ -36,17 +36,81 @@ class User extends Authenticatable
     protected static function boot()
     {
         parent::boot();
+        if(!\Auth::guest()){
+        $auth = \Auth::user();
+    //     if (session()->has('company_id')) {
+    //     $comp_id=session('company_id');
+    //     static::addGlobalScope('company_id', function (Builder $builder) use ($auth,$comp_id){
+             
+    //            if ($auth->role->permissions->contains('constant', 'group_access')) {
+    //                     if ($comp_id==0) {
+    //                          $builder->where('company_id', '>',  0);
+    //                     } else {
+    //                         $builder->where('company_id',  $comp_id);
+    //                     }
+                        
+                       
 
-        static::addGlobalScope('company_id', function (Builder $builder) {
-            // if (!\Auth::guest()) {
-            //     if (\Auth::user()->role->permissions->contains('constant', 'group_access')) {
-            //         $builder->where('company_id', '>', 0);
-            //     }else{
-            //         $builder->where('company_id', '=', \Auth::user()->company_id);
-            //     }
-            // }
+    //             }
+    //             else{
+    //                 $builder->where('company_id', $auth->company_id);
+    //             }
+            
+    //     });
+    // }else{
+    //     if (\Auth::user()->company and \Auth::user()->role->permissions->contains('constant', 'group_access')) {
+        
+    //     static::addGlobalScope('company_id', function (Builder $builder) use ($auth){
+             
+              
+    //                     $builder->where('company_id', '>',  0);
+            
+    //     });
+    //     session(['company_id'=>0]);
+        
+         
+    // }elseif (\Auth::user()->company) {
+    //     static::addGlobalScope('company_id', function (Builder $builder) use ($auth){
+             
+               
+    //                 $builder->where('company_id', $auth->company_id);
+                
+            
+    //     });
+        
+    //     $company=\App\Company::where('id',\Auth::user()->company_id)->get()->first();
+    //     session(['company_id'=>$company->id]);
+        
+         
+    // }else{
+    //     $company=\App\Company::where('is_parent',1)->get()->first();
+    //     static::addGlobalScope('company_id', function (Builder $builder) use ($company){
+             
+              
+    //                 $builder->where('company_id', $company->id);
+               
+            
+    //     });
+        
+
+    //     session(['company_id'=>$company->id]);
+        
+    // }
+    // }
+
+
+        static::addGlobalScope('company_id', function (Builder $builder) use ($auth){
+             
+               if ($auth->role->permissions->contains('constant', 'group_access')) {
+                        $builder->where('company_id', '>',  0);
+
+                }
+                else{
+                    $builder->where('company_id', $auth->company_id);
+                }
             
         });
+        }
     }
 
     public function role()
@@ -78,9 +142,9 @@ class User extends Authenticatable
     {
         return $this->hasOne('App\Nok');
     }
-    public function job()
+    public function jobs()
     {
-        return $this->belongsTo('App\Job','job_id');
+        return $this->belongsToMany('App\Job','employee_job','user_id','job_id')->withPivot('started', 'ended')->withTimestamps();
     }
     public function dependants()
     {
@@ -100,8 +164,9 @@ class User extends Authenticatable
     }
     public function skills()
     {
-        return $this->hasMany('App\Skill','user_id');
+        return $this->belongsToMany('App\Skill')->using('App\UserSkillCompetency')->withTimestamps()->withPivot('competency_id');
     }
+   
     public function profHistories()
     {
         return $this->hasMany('App\ProfHistory');
@@ -269,6 +334,10 @@ public function getquarter(){
     public function stages()
     {
         return $this->morphMany('App\Stage', 'stageable');
+    }
+    public function lga($value='')
+    {
+       return $this->belongsTo('App\LocalGovernment');
     }
 
 }

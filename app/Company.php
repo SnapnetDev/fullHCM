@@ -28,5 +28,9 @@ class Company extends Model
     {
         return $this->hasOne('App\WorkingPeriod');
     }
+    public function jobs()
+    {
+       return $this->hasManyThrough('App\Job','App\Department');
+    }
    
 }

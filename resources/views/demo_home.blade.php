@@ -39,9 +39,9 @@
           <div class="col-xl-3 col-md-6 col-xs-12 info-panel marg">
             <div class="card card-shadow card-shadow1">
               <div class="card-block bg-white p-30">
-                <button onclick="url('https://snapnet.hcmatrix.com/employee/performance')" type="button" class="btn btn-floating btn-sm btn-dark">
+                <a href="{{url('userprofile')}}" type="button" class="btn btn-floating btn-sm btn-dark">
                   <i class="icon md-account-box"></i>
-                </button>
+                </a>
                 <span class="m-l-15 font-weight-400">Profile</span>
                 <div class="content-text text-xs-center m-b-0">
 
@@ -167,7 +167,7 @@
           <div class="card">
             <div class="card-header white bg-cyan-600 p-30 clearfix">
               <a class="avatar avatar-100 pull-xs-left m-r-20" href="javascript:void(0)">
-                <img src="../../../global/portraits/5.jpg" alt="">
+                <img src="{{ asset('storage/avatar'.Auth::user()->image) }}" alt="">
               </a>
               <div class="pull-xs-left">
                 <div class="font-size-20 m-b-15">{{Auth::user()->name}}</div>
@@ -181,7 +181,7 @@
                   <span class="text-break">{{Auth::user()->phone}}</span>
                 </p>
                 <p class="m-b-5 text-nowrap"><i title="Job Title" class="icon fa fa-briefcase m-r-10" aria-hidden="true"></i>
-                  <span class="text-break">{{Auth::user()->job->title}}</span>
+                  {{-- <span class="text-break">{{Auth::user()->job->title}}</span> --}}
                 </p>
                 <p class="m-b-5 text-nowrap"><i title="User Role" class="icon fa fa-sign-in m-r-10" aria-hidden="true"></i>
                   <span class="text-break">{{Auth::user()->role->name}}</span>
@@ -509,56 +509,32 @@
                     <td>Position</td>
                     <td>Department</td>
                     <td>Priority</td>
-                    <td>Vacant since</td>
+                    <td>No. of Vacancies</td>
                   </tr>
                 </thead>
                 <tbody>
+                  @php
+                    $sn=1;
+                  @endphp
+                  @foreach ($jobs as $job)
+                  @if($job->users()->count() <$job->personnel)
                   <tr>
-                    <td>1</td>
-                    <td>Application Developer</td>
-                    <td>IT</td>
+                    <td>{{$sn}}</td>
+                    <td>{{$job->title}}</td>
+                    <td>{{$job->department->name}}</td>
                     <td>
                       <span class="tag tag-danger">Urgent</span>
                     </td>
 
-                    <td>1 day ago</td>
+                    <td>{{$job->personnel-$job->users()->count()}}</td>
                   </tr>
-                  <tr>
-                    <td>2</td>
-                    <td>Business Development Officer</td>
-                    <td>Sales and Marketing</td>
-                    <td>
-                      <span class="tag tag-danger">Urgent</span>
-                    </td>
-                     <td>2 weeks ago</td>
-                  </tr>
-                  <tr>
-                    <td>3</td>
-                    <td>Executive Assistant</td>
-                    <td>Admin</td>
-                    <td>
-                      <span class="tag tag-warning">Not Urgent</span>
-                    </td>
-                     <td>1 week ago</td>
-                  </tr>
-                  <tr>
-                    <td>4</td>
-                    <td>Sales Executive</td>
-                    <td>Sales and Marketing</td>
-                    <td>
-                      <span class="tag tag-danger">Urgent</span>
-                    </td>
-                     <td>3 weeks ago</td>
-                  </tr>
-                  <tr>
-                    <td>5</td>
-                    <td>Driver</td>
-                    <td>Admin</td>
-                    <td>
-                      <span class="tag tag-danger">Urgent</span>
-                    </td>
-                     <td>2 weeks ago</td>
-                  </tr>
+                  @php
+                    $sn++;
+                  @endphp
+                  @endif
+                  @endforeach
+                  
+                  
                 </tbody>
               </table>
                 </div>  
@@ -650,11 +626,7 @@
   <script src="{{ asset('global/vendor/moment/moment-duration-format.js') }}"></script>
 <script type="text/javascript">
   $(document).ready(function() {
-    $('#vacancytable').DataTable( {
-        "paging":   false,
-        "searching": false,
-        "info":     false
-    } );
+    $('#vacancytable').DataTable( );
 } );
 
  var ctx = document.getElementById('earlyChart').getContext('2d');

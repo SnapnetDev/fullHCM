@@ -89,7 +89,13 @@ trait PayrollTrait{
     {
        
             $company_id=companyId();
-            $departments=Department::where('company_id',$company_id)->get();
+            if ($company_id==0) {
+               $departments=Department::all();
+            } else {
+                $departments=Department::where('company_id',$company_id)->get();
+            }
+            
+           
            
        $payroll=Payroll::find($request->payroll_id);
                if ($payroll) {

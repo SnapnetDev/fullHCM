@@ -41,7 +41,7 @@
         <button type="button" class="btn btn-floating btn-sm btn-info" data-toggle="modal" data-target="#holidays">
           <i class="fa fa-lg fa-plane"></i>
         </button>
-        <span class="m-l-15 font-weight-400 font-size-40">Projects</span>
+        <span class="m-l-15 font-weight-400 font-size-40">Total Projects</span>
         <div class="content-text text-xs-center m-b-0">
           <i class="text-success icon wb-triangle-up font-size-20"></i>
           <span class="font-size-40 font-weight-100">{{count($projects)}} </span>
@@ -56,7 +56,7 @@
         <button type="button" class="btn btn-floating btn-sm btn-warning">
           <i class="fa fa-calendar-o"></i>
         </button>
-        <span class="m-l-15 font-weight-400 font-size-40">Projects</span>
+        <span class="m-l-15 font-weight-400 font-size-40">Open Projects</span>
         <div class="content-text text-xs-center m-b-0">
           <i class="text-success icon wb-triangle-down font-size-20">
           </i>
@@ -72,7 +72,7 @@
         <button type="button" class="btn btn-floating btn-sm btn-success" data-toggle="modal" data-target="#requests">
           <i class="fa fa-question"></i>
         </button>
-        <span class="m-l-15 font-weight-400 font-size-40">Projects</span>
+        <span class="m-l-15 font-weight-400 font-size-40">Closed Projects</span>
         <div class="content-text text-xs-center m-b-0">
           <i class="text-danger icon wb-triangle-up font-size-20">
           </i>

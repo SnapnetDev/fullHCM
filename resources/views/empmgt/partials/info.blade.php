@@ -58,7 +58,7 @@
       <tr>
         <td class="info-label">Position:</td>
         <td>
-          <span>{{$user->job->title}}</span>
+          {{-- <span>{{$user->job->title}}</span> --}}
           <div class="form-group form-material floating">
             <input type="text" class="form-control empty" name="inputFloatingBirthday" value="1990/2/15">
           </div>

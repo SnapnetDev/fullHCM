@@ -51,17 +51,20 @@ class AssignCompanySeeder extends Seeder
       //   ]);
       // }
       // }
-      $users=App\User::where('company_id',8)->get();
-  $i=1;
-      foreach ($users as $user) {
+  //     $users=App\User::where('company_id',8)->get();
+  // $i=1;
+  //     foreach ($users as $user) {
 
-       $user->update(['job_id'=>$i]);
-       $i++;
-       if ($i>=34) {
-        $i=1;
-       }
+  //      $user->update(['job_id'=>$i]);
+  //      $i++;
+  //      if ($i>=34) {
+  //       $i=1;
+  //      }
+  //     }
+      $jobs=App\Job::all();
+      foreach ($jobs as $job) {
+       $job->update(['personnel'=>rand(1,5)]);
       }
-      
     	
     }
 }
