@@ -5,7 +5,7 @@
                           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">×</span>
                           </button>
-                          <h4 class="modal-title" id="modaltitle">Add KPI</h4>
+                           <h4 class="modal-title" id="modaltitle" style="text-transform: uppercase;">Add KPI</h4>
                         </div>
                         <div class="modal-body">
                         <form id="kpiform">
@@ -17,12 +17,13 @@
 
                                 </tr>
                                  <tr>
-                                    <td>Target Weight</td>
+                                    <td>Weight</td>
                                     <td> <input required type="number" min="0"  id="targetweight" class="form-control"></td>
+                                      <input type="hidden" id="assigned_to" value="{{$employee->id}}">
 
                                 </tr>
                                 <tr>
-                                    <td>Target Amount</td>
+                                    <td>Annual Target</td>
                                     <td> <input required type="number" min="0"   id="targetamount" class="form-control"></td>
 
                                 </tr>
@@ -31,14 +32,16 @@
                                     <td><textarea required="" class="form-control" rows="3" id="comment" ></textarea></td>
 
                                 </tr> 
-                
-                                 <tr>
-                                <td>Duration</td>
+                                  <tr style="display: none;">
+                                <td>Quarter</td>
                                 <td>
-                                   From &nbsp;<input class="form-control" name="start" type="" readonly="" data-plugin="datepicker" id="froms">  &nbsp;to &nbsp;
-                                   <input name="end" type="" class="form-control" readonly="" data-plugin="datepicker" id="tos">
+                                <select class="form-control" id="kpi_quarter" style="">
+                                  <option value="0">-Select Quarter-</option>
+                                  @for($i = 1; $i <= $employee->getquarter(); $i++)
+                                   <option value="{{$i}}"  @if(isset($_GET['quarter']) && $_GET['quarter']==$i)  selected @elseif(\Auth::user()->getquarter()==$i) selected @endif  >{{ $employee->quarterName($i) }} Quarter </option>    
+                                  @endfor
+                                </select>
                                 </td>
-
                                 </tr>
                           </table>
                           

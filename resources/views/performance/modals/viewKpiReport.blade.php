@@ -30,7 +30,7 @@
                     </td>
                     <td> <span class="tag tag-primary">{{$report->achievedamount}} </span></td>
 
-                    <td> {{$report->from}} <b style="font-weight:bold">to</b> {{$report->to}} </td>
+                    <td> {{date('Y-m-d',strtotime($report->from))}} <b style="font-weight:bold">to</b> {{date('Y-m-d',strtotime($report->to))}} </td>
 
                     <td>{!! $report->resolve_status !!}</td>
                     <td>
@@ -74,8 +74,7 @@
               <form id="savecomment">
                 <div class="modal-body">
 
-
-                  <textarea placeholder="LineManager's comment goes here" {{in_array(Auth::user()->role,[2,3]) ? '' : 'readonly'}} class="form-control" id="reportcomment" rows="6"></textarea>
+                  <textarea placeholder="LineManager's comment goes here" {{( in_array(Auth::user()->role->manages,['dr','all']) ||  Auth::user()->role->permissions->contains('constant', 'add_hr_comment') ) ? '' : 'readonly'}} class="form-control" id="reportcomment" rows="6"></textarea>
                 </div>
                 <div class="modal-footer">
                   <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>

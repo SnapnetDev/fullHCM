@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Job extends Model
 {
 	protected $table="jobroles";
-    protected $fillable=['name','department_id','parent_id','description','personnel'];
+    protected $fillable=['name','department_id','parent_id','description','personnel','qualification_id'];
     //
     public function users()
     {
@@ -16,6 +16,10 @@ class Job extends Model
     public function department()
     {
         return $this->belongsTo('App\Department');
+    }
+    public function qualification()
+    {
+        return $this->belongsTo('App\Qualification');
     }
 
     public function skills()
@@ -31,5 +35,9 @@ class Job extends Model
     public function children()
     {
        return $this->hasMany('App\Job','parent_id');
+    }
+    public function listings()
+    {
+       return $this->hasMany('App\JobListing','job_id');
     }
 }

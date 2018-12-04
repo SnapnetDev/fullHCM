@@ -5,7 +5,7 @@ use App\JobList;
 use App\Applicant;
 use App\User;
 use App\JobApplication;
-use App\
+
 
 trait RecruitTrait
 {

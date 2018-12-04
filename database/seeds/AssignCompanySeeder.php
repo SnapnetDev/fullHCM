@@ -39,15 +39,17 @@ class AssignCompanySeeder extends Seeder
        //          $i=1;
        //      }
        // }
-      ///create jobs
+      //create jobs
       // $departments=App\Department::all();
       // foreach ($departments as $department) {
       //   for ($i=0; $i <=7 ; $i++) { 
       //   $faker = Faker\Factory::create();
+      //   $jobname=$faker->jobTitle;
       //   $job= App\Job::create([
-      //     'title'=>$faker->jobTitle,
-      //     'description'=>$faker->jobTitle,
-      //     'department_id'=>$department->id
+      //     'title'=>$jobname,
+      //     'description'=>$jobname,
+      //     'department_id'=>$department->id,
+      //     'personnel'=>mt_rand(1,4)
       //   ]);
       // }
       // }
@@ -61,10 +63,90 @@ class AssignCompanySeeder extends Seeder
   //       $i=1;
   //      }
   //     }
-      $jobs=App\Job::all();
-      foreach ($jobs as $job) {
-       $job->update(['personnel'=>rand(1,5)]);
+      // $jobs=App\Job::all();
+      // foreach ($jobs as $job) {
+      //  $job->update(['personnel'=>rand(1,5)]);
+      // }
+
+      // $users=App\User::all();
+      // foreach($users as $user){
+      //   $faker = Faker\Factory::create();
+      //   $gender = ['male', 'female'];
+      //    $key = array_rand($gender);
+      //   $sex= $gender[$key];
+      //   $male = array('father','son','nephew','uncle','brother');
+      //   $female = array('mother','daughter','niece','aunt','sister');
+      //   $rel='';
+      //   if ( $sex=='male') {
+      //  $key = array_rand($male);
+      //   $rel= $male[$key];
+      //   }elseif ($sex=='female') {
+      //    $key = array_rand($female);
+      //   $rel= $female[$key];
+      //   }
+        
+        
+      //   $nok= App\Nok::create([
+      //     'name'=>$faker->name($sex),
+      //     'address'=>$faker->address,
+      //     'user_id'=>$user->id,
+      //     'phone'=>$faker->e164PhoneNumber,
+      //     'relationship'=>$rel
+      //   ]);
+
+      // }
+
+      // $users=App\User::all();
+      // foreach($users as $user){
+      //   $faker = Faker\Factory::create();
+      //   $user->update(
+      //     ['dob'=>$faker->dateTimeBetween($startDate = '-50 years', $endDate = '-22 years', $timezone = null),
+      //     'hiredate'=>$faker->dateTimeThisDecade($max = 'now', $timezone = null),
+      //     'created_at'=>$faker->dateTimeThisYear($max = 'now', $timezone = null)
+      //   ]);
+      // }
+
+      $users=App\User::all();
+       // $cnt=1000;
+      foreach($users as $user){
+        // $faker = Faker\Factory::create();
+       // $num=$cnt+1;
+        $companies=App\Company::all();
+        // echo $user->company->has('departments')->jobs()->inRandomOrder()->first()->id.'-';
+        $user->jobs()->attach($user->company->jobs()->inRandomOrder()->first()->id,['started'=>$user->hiredate]);
+        
       }
+
+      //  $users=App\User::all();
+      //  // $cnt=1000;
+      // foreach($users as $user){
+      //   // $faker = Faker\Factory::create();
+      //  // $num=$cnt+1;
+      //   $company=App\Company::inRandomOrder()->first();
+      //   $user->update(['company_id'=>$company['id']]);
+        
+        
+      // }
+
+//       $companies=App\Company::where('id','!=',8)->get();
+//       foreach ($companies as $company) {
+//         $company->departments()->createMany([
+//     [
+//         'name' => 'Admin','manager_id'=>$company->users()->inRandomOrder()->first()['id']
+//     ],
+//     [
+//         'name' => 'Drivers','manager_id'=>$company->users()->inRandomOrder()->first()['id']
+//     ],
+//     [
+//         'name' => 'Section 1','manager_id'=>$company->users()->inRandomOrder()->first()['id']
+//     ],
+//     [
+//         'name' => 'Section 2','manager_id'=>$company->users()->inRandomOrder()->first()['id']
+//     ],
+// ]);
+        
+//       }
+
     	
     }
 }

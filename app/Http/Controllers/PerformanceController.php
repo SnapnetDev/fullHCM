@@ -14,6 +14,15 @@ class PerformanceController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    public function __construct(){
+
+        if(!session()->has('FY')){
+            session(['FY'=>date('Y')]);
+        }
+
+        
+    }
+
     public function index()
     {
         $users=User::all();

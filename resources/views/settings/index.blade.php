@@ -64,7 +64,9 @@
                 <a class="list-group-item setting-linker" href="{{ route('systemsettings') }}">
                  <i class="icon fa fa-wrench" aria-hidden="true"></i>{{__('System Settings')}}
                 </a>
-
+                 <a class="list-group-item setting-linker" href="{{ url('performances')}}/settings">
+                 <i class="icon fa fa-wrench" aria-hidden="true"></i>{{__('Performance Settings')}}
+                </a>
                 
                
               </div>

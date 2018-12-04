@@ -5,6 +5,7 @@
 
   <link rel="stylesheet" href="{{ asset('global/vendor/ladda/ladda.css') }}">
   <link rel="stylesheet" href="{{ asset('assets/examples/css/uikit/buttons.css') }}">
+  <link href="{{asset('global/vendor/rwd-table-patterns/dist/css/rwd-table.min.css')}}" rel="stylesheet" type="text/css" media="screen">
 @endsection
 @section('content')
 <div class="page bg-white">
@@ -193,6 +194,7 @@
                   
                 </div>
         <!-- Contacts -->
+        <div class="table-responsive"  data-pattern="priority-columns">
         <table class="table is-indent tablesaw" data-tablesaw-mode="swipe" data-plugin="animateList"
         data-animate="fade" data-child="tr" data-selectable="selectable">
           <thead>
@@ -205,11 +207,14 @@
                   <label for="select_all"></label>
                 </span>
               </th>
-              <th class="cell-300" scope="col" data-tablesaw-sortable-col data-tablesaw-priority="3">Name</th>
-              <th class="cell-300" scope="col" data-tablesaw-sortable-col data-tablesaw-priority="3">Staff ID</th>
-              <th  class="cell-300" scope="col" data-tablesaw-sortable-col data-tablesaw-priority="4">Job</th>
-               <th  class="cell-300" scope="col" data-tablesaw-sortable-col data-tablesaw-priority="4">Role</th>
-              <th class="cell-300"  scope="col" data-tablesaw-sortable-col data-tablesaw-priority="4">Options</th>
+              <th  data-priority="1" class="cell-300" scope="col" data-tablesaw-sortable-col data-tablesaw-priority="3">Name</th>
+              <th data-priority="2" class="cell-300" scope="col" data-tablesaw-sortable-col data-tablesaw-priority="3">Staff ID</th>
+              <th data-priority="3"  class="cell-300" scope="col" data-tablesaw-sortable-col data-tablesaw-priority="4">Job</th>
+              <th data-priority="4"  class="cell-300" scope="col" data-tablesaw-sortable-col data-tablesaw-priority="4">Email</th>
+              <th data-priority="4"  class="cell-300" scope="col" data-tablesaw-sortable-col data-tablesaw-priority="4">Manager</th>
+              <th data-priority="4"  class="cell-300" scope="col" data-tablesaw-sortable-col data-tablesaw-priority="4">Address</th>
+               <th data-priority="4" class="cell-300" scope="col" data-tablesaw-sortable-col data-tablesaw-priority="4">Role</th>
+              <th data-priority="5" class="cell-300"  scope="col" data-tablesaw-sortable-col data-tablesaw-priority="4">Options</th>
               <th class="suf-cell"></th>
             </tr>
           </thead>
@@ -228,12 +233,19 @@
                 
                 {{$user->name}}
               </td>
-              <td class="cell-300">{{$user->emp_num}}</td>
-              <td>
-              @if($user->job)
-              {{$user->job->title}}
+              <td class="cell-300" >{{$user->emp_num}}</td>
+              <td >
+              @if(count($user->jobs)>0)
+              {{$user->jobs()->latest()->first()->title}}
               @endif
               </td>
+              <td class="cell-300" >{{$user->email}}</td>
+               <td >
+              @if(count($user->managers)>0)
+              {{$user->managers()->first()->name}}
+              @endif
+              </td>
+              <td class="cell-300" >{{$user->address}}</td>
               <td>
               @if($user->role)
               {{$user->role->name}}
@@ -255,6 +267,7 @@
             
           </tbody>
         </table>
+        </div>
         @if (request()->pagi!='all')
          {!! $users->appends(Request::capture()->except('page'))->render() !!}
         @endif
@@ -319,6 +332,7 @@
 @endsection
 @section('scripts')
  {{-- <script src="{{ asset('global/vendor/tablesaw/tablesaw.jquery.js')}}"></script> --}}
+ <script src="{{asset('global/vendor/rwd-table-patterns/dist/js/rwd-table.min.js')}}" type="text/javascript"></script>
 <script type="text/javascript">
 
   function getDepartmentBranchesFilter(company_id){

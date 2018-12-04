@@ -86,8 +86,8 @@
                 }
                 else
                 {
-                  swal('Error','Rating Failed! Please try again.','error');
-                  toastr.warning('Rating Failed! Please try again.');
+                  swal('Error',data.message,'error');
+                  toastr.warning(data.message);
                   
                 }
               });

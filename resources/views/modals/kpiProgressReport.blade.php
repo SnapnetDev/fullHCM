@@ -39,7 +39,7 @@
           <table class="table table-striped">
              <tr>
               <td>
-              Amount Achieved</td>
+              Target Achieved</td>
               <td>
                <input {{$disable}} required="" class="form-control" type="number" min="0"  id="achievedamount" /></td>
              </tr>

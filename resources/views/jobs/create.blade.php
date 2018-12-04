@@ -86,13 +86,19 @@
                     <textarea class="form-control" id="descripton" name="descripton"></textarea>
                   </div>
                   <div class="form-group skills-div" >
-                              <label for="">Parent Job</label>
-                              <select class="form-control parent" name="parent_id" >
-                               
-                               
-                              </select>
-
-                            </div>
+                    <label for="">Parent Job</label>
+                    <select class="form-control parent" name="parent_id" >
+                     
+                     
+                    </select>
+                  </div>
+                  <div class="form-group " >
+                      <label class="form-control-label" for="select">Least Qualification</label>
+                      <select class="form-control " id="qualification" name="qualification" required>
+                        
+                        
+                      </select>
+                    </div>
 
                 </div>
 
@@ -140,6 +146,20 @@ $(document).ready(function() {
     },
     url: function (params) {
     return '{{url('job_skill_search')}}';
+    } 
+    },
+  tags: true
+});
+        $('#qualification').select2({
+    ajax: {
+     delay: 250,
+     processResults: function (data) {
+          return {        
+    results: data
+      };
+    },
+    url: function (params) {
+    return '{{url('job_qualification_search')}}';
     } 
     },
   tags: true

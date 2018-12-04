@@ -14,6 +14,8 @@
   <link rel="stylesheet" href="{{asset('global/vendor/bootstrap-table/bootstrap-table.css')}}">
 
   <link rel="stylesheet" href="{{asset('global/vendor/bootstrap-datepicker/bootstrap-datepicker.css')}}">
+  <link rel="stylesheet" type="text/css" href="{{asset('global/vendor/bootstrap-sweetalert/sweetalert.css')}}">
+
 @endsection
 @section('content')
 <!-- Page -->
@@ -52,7 +54,7 @@
               </a>
               <div class="font-size-18">{{$employee->name}}</div>
               <div class="grey-300 font-size-14">
-              	<p>{{$employee->job->title}}</p>
+              	{{-- <p>{{$employee->job->title}}</p> --}}
               
               </div>
             </div>
@@ -104,9 +106,9 @@
               <li class="list-group-item"> 
               	<p class="margin"><b class="text-primary">Direct Report(s)</b></p>
             	 
-              	@foreach($employee->employees as $employee)
+              	@foreach($employee->employees as $employeeLoop)
                          
-                <p class="margin" data-toggle="tooltip" data-original-title="View {{$employee->name}} name"><a  style="text-decoration: none"  href="{{url('users')}}/{{$manager->id}}/edit">{{$employee->name}}</a></p>
+                <p class="margin" data-toggle="tooltip" data-original-title="View {{$employeeLoop->name}} name"><a  style="text-decoration: none"  href="{{url('users')}}/{{$employeeLoop->id}}/edit">{{$employeeLoop->name}}</a></p>
                 	 
                 @endforeach
                  
@@ -118,22 +120,34 @@
         <div class="col-sm-9">
         	<div class="panel nav-tabs-horizontal" data-plugin="tabs">
             <div class="panel-heading">
-              <h3 class="panel-title">Performance Appraisal
+              <h3 class="panel-title">Performance Appraisal - 
+                @if(isset($_GET['quarter']))  
+                (Quarter {{$_GET['quarter']}})
+                 @else
+                  (Quarter {{Auth::user()->getquarter()}}) 
+                  @endif 
+ 
               	@if(Auth::user()->role->permissions->contains('constant', 'edit_performance'))
-              	(On/Off)&nbsp;&nbsp;
+              	OFF&nbsp;&nbsp;
               	 <li class="list-inline-item m-r-25 m-b-25">
-                    <input id="perf_switch" type="checkbox" data-plugin="switchery" {{$employee->performanceseason()==1 ? 'checked' : ''}} />
+                    <input id="perf_switch" disabled type="checkbox" data-plugin="switchery" {{$employee->performanceseason()==1 ? 'checked' : ''}} />
                   </li>
+                  ON
                   @endif
               </h3>
               <div class="panel-actions panel-actions-keep">
+
               	<div class="btn-group" role="group" data-toggle="tooltip" data-original-title="Click to dropdown">
                     <button type="button" class="btn btn-primary dropdown-toggle waves-effect" id="exampleIconDropdown1" data-toggle="dropdown" aria-expanded="false">
                       <i class="icon md-apps" aria-hidden="true"></i>
                     </button>
                     <div class="dropdown-menu" aria-labelledby="exampleIconDropdown1" role="menu">
                       <a class="dropdown-item" onclick="showModal('addGoal')" href="javascript:void(0)" role="menuitem">Add Goal</a>
+                      @if(Auth::user()->role->permissions->contains('constant', 'add_kpi') && Auth::user()->id!=$employee->id)
                       <a class="dropdown-item" data-target="#addkpi" onclick="unhide()" title="add Kpi" class="btn btn-outline btn-pure btn-success" data-toggle="modal" href="javascript:void(0)" role="menuitem">Add Kpi</a> 
+                      @endif
+                      <a class="dropdown-item" data-target="#changeQuarter"   title="Change Quarter" class="btn btn-outline btn-pure btn-success" data-toggle="modal" href="javascript:void(0)" role="menuitem">Change Quarter</a> 
+                          
                     </div>
                   </div>  
               </div>
@@ -176,7 +190,7 @@
                 </div>
                 <div class="tab-pane" id="lmapp" role="tabpanel" aria-expanded="false">
                   <!-- START HERE -->
-						@include('partials.lmapp')
+						    @include('partials.lmapp')
                  <!-- END HERE -->
                 </div>
                 <div class="tab-pane" id="idpapp" role="tabpanel" aria-expanded="true">
@@ -207,6 +221,7 @@
 @include('performance.modals.Appraisalcomment')
 @include('performance.modals.addGoal')
 @include('performance.modals.addKpiModal')
+@include('performance.modals.changeQuarter')
   <!-- End Page -->
 @endsection
 @section('scripts')
@@ -219,8 +234,17 @@
   <script src="{{asset('global/vendor/bootstrap-table/bootstrap-table.min.js')}}"></script>
   <script src="{{asset('global/vendor/bootstrap-table/extensions/mobile/bootstrap-table-mobile.js')}}"></script>
     <script src="{{asset('global/vendor/bootstrap-datepicker/bootstrap-datepicker.js')}}"></script>
+
+ <script src="{{asset('global/vendor/bootstrap-sweetalert/sweetalert.min.js')}}"></script>
   <script type="text/javascript">
 
+    $(function(){
+    $('.rate_quarter').change(function(){ 
+      window.location="{{url('performances')}}/employee?id={{$_GET['id']}}&quarter="+$('.rate_quarter').val();
+       
+    })
+
+  });
   	function loadcbox( id , reportcomment,kpidel ){
 
   		$('#reportcomment').val($('#realComment'+id).val());
@@ -243,21 +267,20 @@ function unhide(){
        $targetamount=$('#targetamount').val('');
        $comment=$('#comment').val('');
       // $('#emphideid').addClass('hide');
-        $froms=$('#froms').val('');
-       $tos=$('#tos').val('');
+        $quarter=$('#kpi_quarter').val('');
+     
 }
 
  
 
-  function fillmodal(deliverable,targetweight,targetamount,from,to,comment,formid){
+  function fillmodal(deliverable,targetweight,targetamount,quarter,comment,formid){
 
     $deliverables=$('#deliverables').val(deliverable);
     $targetweight=$('#targetweight').val(targetweight);
     $targetamount=$('#targetamount').val(targetamount);
     $comment=$('#comment').val(comment);
     $('#emphideid').addClass('hide');
-    $froms=$('#froms').val(from);
-    $tos=$('#tos').val(to);
+    $('#kpi_quarter').val(quarter);
     sessionStorage.setItem('modify',1);
     sessionStorage.setItem('formid',formid);
     $('#modaltitle').text('Modify Kpi');
@@ -280,9 +303,8 @@ function unhide(){
                                   else{
                                     $formid=$formid;
                                   }
-                                  $Assigned=$('#employeeid').val();
-                                  $froms=$('#froms').val();
-                                  $tos=$('#tos').val();
+                                  $Assigned=$('#assigned_to').val();
+                                  $quarter=$('#kpi_quarter').val();
 
                               $.post('{{url('performance')}}',{
 
@@ -293,8 +315,7 @@ function unhide(){
                                   type:$type,
                                   formid:$formid,
                                   assignedto:$Assigned,
-                                  from:$froms,
-                                  to:$tos,
+                                  quarter:$quarter,
                                   type:'addKpi',
                                   _token:"{{csrf_token()}}"
 
@@ -342,7 +363,7 @@ function unhide(){
                       if(data.status=="success"){
                       	$('#realComment'+$reportid).val($comment);
                       	$('#commentbox').modal('hide');
-                        return toastr.success('Comment Successfully Save and Employee has been Notified');
+                        return toastr.success('Comment Successfully Saved and Employee has been Notified');
                       }
                       toastr.error(data.message);
 
@@ -355,9 +376,9 @@ function unhide(){
  		loadStar('hrrating');
  		loadStar('lmrating');
 
- $('#addKpiReport').submit(function(){
+ $('#addKpiReport').submit(function(e){
 
-        event.preventDefault();
+        e.preventDefault();
 
         $progressreport=$('#progressreport').val();
         $reportfroms=$('input[name=start]').val();
@@ -481,7 +502,7 @@ function unhide(){
 
 	 }
 
-	function comment($pilot_id,$employee_id,$type=0){
+	function comment($pilot_id,$employee_id,text,$type=0){
 	 	pilotid=sessionStorage.setItem('pilotid',$pilot_id);
 	 	employeeid=sessionStorage.setItem('employeeid',$employee_id);
 	 	if($type==0){
@@ -491,7 +512,8 @@ function unhide(){
 	 	else{
 	 		$('#rate_quarterPack').addClass('hide');
 	 	}
-	 
+   
+	 $('#commentMsg').val(text);
 	 	$('#commentModal').modal('show');
 	 }
  

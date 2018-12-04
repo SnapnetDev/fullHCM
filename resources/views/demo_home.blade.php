@@ -52,9 +52,9 @@
            <div class="col-xl-3 col-md-6 col-xs-12 info-panel marg">
             <div class="card card-shadow card-shadow1">
               <div class="card-block bg-white p-30">
-                <button onclick="url('https://snapnet.hcmatrix.com/employee/performance')" type="button" class="btn btn-floating btn-sm btn-success">
+                <a href="{{ url('performances/employee?id='.Auth::user()->id) }}"  class="btn btn-floating btn-sm btn-success">
                   <i class="fa fa-signal"></i>
-                </button>
+                </a>
                 <span class="m-l-15 font-weight-400 text-success">Performance</span>
                 <div class="content-text text-xs-center m-b-0">
 
@@ -78,9 +78,9 @@
            <div class="col-xl-3 col-md-6 col-xs-12 info-panel marg">
             <div class="card card-shadow card-shadow1">
               <div class="card-block bg-white p-30">
-                <button onclick="url('https://snapnet.hcmatrix.com/employee/performance')" type="button" class="btn btn-floating btn-sm btn-success">
+                <a href="{{ route('attendance.user',['user_id'=>Auth::user()->id]) }}"  class="btn btn-floating btn-sm btn-success">
                   <i class="icon md-calendar-check"></i>
-                </button>
+                </a>
                 <span class="m-l-15 font-weight-400 text-success">My Attendance</span>
                 <div class="content-text text-xs-center m-b-0">
 
@@ -91,9 +91,9 @@
            <div class="col-xl-3 col-md-6 col-xs-12 info-panel marg">
             <div class="card card-shadow card-shadow1">
               <div class="card-block bg-white p-30">
-                <button onclick="url('https://snapnet.hcmatrix.com/employee/performance')" type="button" class="btn btn-floating btn-sm btn-warning">
+                <a href="{{ url('leave/myrequests') }}"  class="btn btn-floating btn-sm btn-warning">
                   <i class="fa fa-calendar"></i>
-                </button>
+                </a>
                 <span class="m-l-15 font-weight-400 text-warning">Leave Requests</span>
                 <div class="content-text text-xs-center m-b-0">
 
@@ -104,9 +104,9 @@
            <div class="col-xl-3 col-md-6 col-xs-12 info-panel marg">
             <div class="card card-shadow card-shadow1">
               <div class="card-block bg-white p-30">
-                <button onclick="url('https://snapnet.hcmatrix.com/employee/performance')" type="button" class="btn btn-floating btn-sm btn-success">
+                <a href=" {{url('loan/my_loan_requests')}}" class="btn btn-floating btn-sm btn-success">
                   <i class="icon md-money-box"></i>
-                </button>
+                </a>
                 <span class="m-l-15 font-weight-400 text-success">Loan Requests</span>
                 <div class="content-text text-xs-center m-b-0">
 
@@ -167,7 +167,7 @@
           <div class="card">
             <div class="card-header white bg-cyan-600 p-30 clearfix">
               <a class="avatar avatar-100 pull-xs-left m-r-20" href="javascript:void(0)">
-                <img src="{{ asset('storage/avatar'.Auth::user()->image) }}" alt="">
+                <img src="{{ Auth::user()->image!=''?asset('storage/avatar'.Auth::user()->image):(Auth::user()->sex=='M'?asset('global/portraits/male-user.png'):asset('global/portraits/female-user.png'))}}" alt="">
               </a>
               <div class="pull-xs-left">
                 <div class="font-size-20 m-b-15">{{Auth::user()->name}}</div>
@@ -200,13 +200,13 @@
               <div class="row no-space p-y-20 p-x-30 text-xs-center">
                 <div class="col-xs-4">
                   <div class="counter">
-                    <span class="counter-number cyan-600">102</span>
-                    <div class="counter-label">Projects</div>
+                    <span class="counter-number cyan-600">{{Auth::user()->employees()->count()}}</span>
+                    <div class="counter-label">Direct Reports</div>
                   </div>
                 </div>
                 <div class="col-xs-4">
                   <div class="counter">
-                    <span class="counter-number cyan-600">125</span>
+                    <span class="counter-number cyan-600"></span>
                     <div class="counter-label">Clients</div>
                   </div>
                 </div>
@@ -628,7 +628,7 @@
   $(document).ready(function() {
     $('#vacancytable').DataTable( );
 } );
-
+@if($last_month_early_users->count()>0)
  var ctx = document.getElementById('earlyChart').getContext('2d');
     var myLineChart = new Chart(ctx, {
   type: "bar",
@@ -643,7 +643,7 @@
                     data: [@foreach($last_month_early_users as $last_month_early_user) "{{time_to_seconds($last_month_early_user->average_first_clock_in)}}", @endforeach],
                 }
             ],
-            labels: [@foreach($last_month_early_users as $last_month_early_user)"{{$last_month_early_user->user->name}}", @endforeach],
+            labels: [@foreach($last_month_early_users as $last_month_early_user)"{{$last_month_early_user->user?$last_month_early_user->user->name:''}}", @endforeach],
         },
   options: {
     elements: {
@@ -667,7 +667,8 @@
     }
   }
 });
-    
+  @endif 
+  @if($last_month_late_users->count()>0) 
     var ctx = document.getElementById('lateChart').getContext('2d');
 
 var myLineChart = new Chart(ctx, {
@@ -684,7 +685,7 @@ var myLineChart = new Chart(ctx, {
                     data: [@foreach($last_month_late_users as $last_month_late_user) "{{time_to_seconds($last_month_late_user->average_first_clock_in)}}", @endforeach],
                 }
             ],
-            labels: [@foreach($last_month_late_users as $last_month_late_user)"{{$last_month_late_user->user->name}}", @endforeach],
+            labels: [@foreach($last_month_late_users as $last_month_late_user)"{{$last_month_late_user->user?$last_month_late_user->user->name:''}}", @endforeach],
         },
 
   options: {
@@ -709,7 +710,7 @@ var myLineChart = new Chart(ctx, {
     }
   }
 });
-
+@endif
   function showRequests() {
     $('#requestsModal').modal();
   }

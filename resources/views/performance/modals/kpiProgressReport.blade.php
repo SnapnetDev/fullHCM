@@ -1,6 +1,8 @@
 
-@php $disable2=in_array(Auth::user()->role,[3,2]) && ($employee->id!=Auth::user()->id) ? '' : 'disabled';
-     $disable=in_array(Auth::user()->role,[1]) || ($employee->id==Auth::user()->id) ? '' : 'disabled';
+@php
+ 
+    $disable2= ( in_array(Auth::user()->role->manages,['dr','all']) ||  Auth::user()->role->permissions->contains('constant', 'add_hr_comment') ) && ($employee->id!=Auth::user()->id) ? '' : 'disabled';
+     $disable= $employee->id==Auth::user()->id ? '' : 'disabled';
 @endphp
 <div class="modal fade modal-3d-slit in" id="review" aria-labelledby="exampleModalTitle" role="dialog" >
   <div class="modal-dialog modal-lg">
@@ -63,7 +65,7 @@
          </div>
          <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-          <button id="submitReport" {{ in_array(Auth::user()->role,[2,3]) && $employee->id!=Auth::user()->id ? '' : 'disable' }} type="submit" class="btn btn-success"> Submit </button> 
+          <button id="submitReport"  type="submit" class="btn btn-success"> Submit </button> 
         </form>
         
       </div>

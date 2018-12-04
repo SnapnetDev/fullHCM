@@ -30,12 +30,6 @@
                  <td>Status</td>
                  <td>{!! $kpi->html_status !!}</td>
                   </tr>
-                  
-                  <tr>
-                   <td>Duration</td>
-                   <td>{{$kpi->from}} to {{$kpi->to}}</td>
-                   
-                 </tr>
                  <tr>
                    <td>Comment</td>
                    <td>{{$kpi->comment}}</td>
@@ -52,7 +46,10 @@
                       <a class="dropdown-item" href="javascript:void(0)" onclick="progressReport({{$kpi->id}},'{{$kpi->deliverable}}')" role="menuitem">Add Report</a>
                       @endif
                       <a class="dropdown-item" href="javascript:void(0)"onclick="showModal('viewreport{{$kpi->id}}')" role="menuitem">View Progress Report</a>
-                      <a class="dropdown-item" href="javascript:void(0)" onclick="fillmodal('{!! $kpi->deliverable !!}','{{$kpi->targetweight}}','{{$kpi->targetamount}}','{{$kpi->from}}','{{$kpi->to}}','{{$kpi->comment}}','{{$kpi->id}}')" role="menuitem">Edit KPI</a>
+                      
+                      @if(Auth::user()->role->permissions->contains('constant', 'edit_kpi') && in_array(Auth::user()->role->manages,['dr','all']))
+                      <a class="dropdown-item" href="javascript:void(0)" onclick="fillmodal('{!! $kpi->deliverable !!}','{{$kpi->targetweight}}','{{$kpi->targetamount}}','{{$kpi->quarter}}','{{$kpi->comment}}','{{$kpi->id}}')" role="menuitem">Edit KPI</a>
+                      @endif
                     </div>
                   </div>
                    </td>

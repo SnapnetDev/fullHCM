@@ -3,6 +3,7 @@
  <link rel="stylesheet" href="{{ asset('global/vendor/bootstrap-datepicker/bootstrap-datepicker.min.css')}}"> 
  <link rel="stylesheet" href="{{ asset('global/vendor/datatables-bootstrap/dataTables.bootstrap.css') }}">
  <link rel="stylesheet" href="{{ asset('global/vendor/morris/morris.css')}}">
+ <link rel="stylesheet" href="{{ asset('assets/examples/css/apps/work.css')}}">
 @endsection
 @section('content')
 <!-- Page -->
@@ -31,26 +32,36 @@
 		  </div>
 	</div>
     
-		<div class="page-content container-fluid bg-white">
-			<div class="row">
-				<div class="col-md-9">
-					<div class="panel panel-info panel-line">
-						<div class="panel-header">
-							<h3 class="panel=title">Job Title</h3>
-							<div class="panel-actions">
-								<a href="" class="btn btn-info">View Applicants</a>
-							</div>
-						</div>
-						<div class="panel-body">
-							
-						</div>
-					</div>
-				</div>
-				<div class="col-md-3">
-					
-				</div>
-			</div>
-  		</div>
+		<div class="page-content">
+
+      	<div class="panel panel-bordered">
+            <div class="panel-heading">
+              <h3 class="panel-title">Job Title</h3>
+              {{-- <div class="panel-actions">
+              	<a href="#" class=" panel-action btn btn-info"><i class="icon md-edit"></i>Edit</a>
+              </div> --}}
+            </div>
+            <div class="panel-body">
+            	<div class="ribbon ribbon-clip ribbon-reverse ribbon-primary">
+                        <span class="ribbon-inner"><a href="#">Ribbon</a></span>
+                      </div>
+                      <div class="ribbon ribbon-clip">
+                        <span class="ribbon-inner"><a href="#">Ribbon</a></span>
+                      </div>
+              <h4><i class="icon md-graduation-cap"></i>Minimum Educational Qualification</h4>
+              <p>Easily add a heading container to your panel with <code>.panel-heading</code>.
+                You may also include any <code>&lt;h1&gt;</code>-<code>&lt;h6&gt;</code>                with a <code>.panel-title</code> class to add a pre-styled heading.</p>
+              <p>For proper link coloring, be sure to place links in headings within
+                <code>.panel-title</code>.</p>
+            </div>
+          </div>
+
+          <div class="site-action" data-plugin="actionBtn">
+    <button type="button" class="site-action-toggle btn-raised btn btn-success btn-floating" data-toggle="">
+      <i class="icon md-plus animation-scale-up" aria-hidden="true"></i>
+      
+    </button>
+    </div>
 		</div> 
 
       	</div>
@@ -75,6 +86,6 @@
      viewMode: "months", 
     minViewMode: "months"
 });
-    
+    });
   </script>
 @endsection

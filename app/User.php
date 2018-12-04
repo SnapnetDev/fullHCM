@@ -192,8 +192,9 @@ class User extends Authenticatable
         return $this->hasManyThrough('App\Grade','App\PromotionHistory');
     }
     public function performanceseason(){
-         $checkseason= \App\PerformanceSeason::select('season')->value('season');
+         $checkseason= \App\PerformanceSeason::select('reviewStart')->value('reviewStart');
              return $checkseason;
+
     }
     public function quarterName($num){
         switch ($num) {
@@ -226,8 +227,9 @@ class User extends Authenticatable
 public function getquarter(){
     
     //getquarter
-    $review=\App\fiscal::where('id',1)->first();
-    return 12/$review->end_month;
+    $review=\App\PerformanceSeason::value('reviewFreq');
+    
+    return 12/$review;
     
   }
     public function getEmploymentStatusAttribute(){

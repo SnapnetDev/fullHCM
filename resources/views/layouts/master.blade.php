@@ -81,7 +81,7 @@
 
   </script>
 </head>
-<body class="animsition site-navbar-small app-contacts page-aside-left">
+<body class="animsition site-navbar-small app-{{isset($pageType) ? $pageType : 'contacts'}} page-aside-left">
   <!--[if lt IE 8]>
         <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
     <![endif]-->

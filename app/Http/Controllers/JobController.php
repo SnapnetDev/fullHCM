@@ -55,7 +55,11 @@ class JobController extends Controller
           // try {
           $no_of_skills=count($request->input('skill_id'));
           $this->validate($request, ['title'=>'required|min:5']);
-          $job=Job::create(['title'=>$request->title,'description'=>$request->description,'parent_id'=>$request->parent_id,'department_id'=>$request->department_id,'personnel'=>$request->personnel]);
+          $qualification=\App\Qualification::find($request->qualification);
+        if (!$qualification) {
+            $qualification=\App\Qualification::create(['name'=>$request->qualification]);
+        }
+          $job=Job::create(['title'=>$request->title,'description'=>$request->description,'parent_id'=>$request->parent_id,'department_id'=>$request->department_id,'personnel'=>$request->personnel,'qualification_id'=>$qualification->id]);
           $job->skills()->detach();
           // $logmsg='UserGroup created';
           // $this->saveLog('info','App\UserGroup',$group->id,'groups',$logmsg,Auth::user()->id);
@@ -112,7 +116,11 @@ class JobController extends Controller
         
          $no_of_skills=count($request->input('skill'));
           // $this->validate($request, ['title'=>'required|min:5']);
-         $job->update(['title'=>$request->title,'description'=>$request->description,'parent_id'=>$request->parent_id,'personnel'=>$request->personnel]);
+         $qualification=\App\Qualification::find($request->qualification);
+        if (!$qualification) {
+            $qualification=\App\Qualification::create(['name'=>$request->qualification]);
+        }
+         $job->update(['title'=>$request->title,'description'=>$request->description,'parent_id'=>$request->parent_id,'personnel'=>$request->personnel,'qualification_id'=>$qualification->id]);
          
           $job->skills()->detach();
           // $logmsg='UserGroup created';
@@ -192,6 +200,24 @@ class JobController extends Controller
        else{
         $name=\App\Job::where('title','LIKE','%'.$request->q.'%')
                         ->select('id as id','title as text')
+                        ->get();
+            }
+        
+        
+        return $name;
+    
+     
+    }
+    public function qualification_search(Request $request)
+    {
+     
+                
+        if($request->q==""){
+            return "";
+        }
+       else{
+        $name=\App\Qualification::where('name','LIKE','%'.$request->q.'%')
+                        ->select('id as id','name as text')
                         ->get();
             }
         

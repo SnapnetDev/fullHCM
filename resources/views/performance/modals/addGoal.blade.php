@@ -7,12 +7,13 @@
               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">×</span>
               </button>
-              <h4 class="modal-title">Add {{Auth::user()->role->permissions->contains('constant', 'edit_performance')==false ? '' :'Stretch' }} Goal(s)</h4>
+              <h4 class="modal-title">Add  {{Auth::user()->id==$employee->id ? '' :'Stretch' }} Goal(s)</h4>
             </div>
 
             <div class="modal-body">
               <form class="" id="goalform">
-                  @if(Auth::user()->role->permissions->contains('constant', 'edit_performance')==false)
+                  @if(Auth::user()->id==$employee->id)
+
                  <b>Goal Type</b>:<br><br>
                         <select class="form-control" id="goalType">
                           <option value="">-Select Goal Type-</option>
@@ -51,7 +52,7 @@
           if(objective=='' || commitment==''){
             return toastr.warning('Some Fields Empty');
           }
-            @if(Auth::user()->role->permissions->contains('constant', 'edit_performance')==false)
+            @if(Auth::user()->id==$employee->id)
               goalType=$('#goalType').val();
               if(goalType==''){ return toastr.error('Please Select Goal Type'); }
             @endif
@@ -61,18 +62,19 @@
             _token:'{{csrf_token()}}',
             emp_id:'{{$employee->id}}',
             type:'addStretch'
-              @if(Auth::user()->role->permissions->contains('constant', 'edit_performance')==false)
+              @if(Auth::user()->id==$employee->id)
              , goalType:goalType
             @endif
           };
 
-          $.post('{{url('performance')}}',formData,function(data){
+          $.post('{{url('performances')}}',formData,function(data){
                           if(data.status=='success'){
                             setTimeout(function(){
                               window.location.reload();
                             },2000);
                             return toastr.success(data.message);
                           }
+                          return  toastr.error(data.message); 
 
                                   })
 

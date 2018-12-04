@@ -15,8 +15,9 @@
                  <select class="form-control" id="rate_quarter">
                     <option value="0">-Select Quarter-</option>
                         @for($i = 1; $i <= $employee->getquarter(); $i++)
-                     <option value="{{$i}}">{{ $employee->quarterName($i) }} Quarter</option>                    @endfor
-                        </select>
+                     <option value="{{$i}}"  @if(isset($_GET['quarter']) && $_GET['quarter']==$i)  selected @elseif(\Auth::user()->getquarter()==$i) selected @endif  >{{ $employee->quarterName($i) }} Quarter</option>              
+                      @endfor
+                        </select> 
                   </div>
         <br>
         <div class="form-group" id="rate_quarterPack">

@@ -31,8 +31,14 @@ class UserController extends Controller
      */
     public function index(Request $request)
     {
+        $company_id=companyId();
         if (count($request->all())==0) {
-            $users=User::where('superadmin','!=',1)->paginate(10);
+            if ($company_id>0) {
+                $users=User::where('company_id','!=',1)->paginate(10);
+            }else{
+                $users=User::paginate(10);
+            }
+            
         $companies=Company::all();
         $branches=$companies->first()->branches;
         $departments=$companies->first()->departments;

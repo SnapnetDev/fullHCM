@@ -9,6 +9,7 @@ use App\User;
 trait Performance {
 	use Micellenous;
 
+
 	public function processGet($route,Request $request){
 		switch ($route) {
 			case 'employee':
@@ -23,6 +24,14 @@ trait Performance {
 				# code...
 				return $this->toggleSeason($request);
 				break;
+			case 'settings':
+				return $this->settings($request);
+				# code...
+				break;
+			case 'setQuarter':
+				# code...
+				return $this->setQuarter($request);
+				break;
 			default:
 				return $this->index($request);
 				break;
@@ -32,6 +41,7 @@ trait Performance {
 
 
 	public function processPost(Request $request){
+
 		try{
 		switch ($request->type) {
 			case 'saveComment':
@@ -54,6 +64,23 @@ trait Performance {
 				# code...
 				return $this->addKpi($request);
 				break;
+			case 'addPilot':
+				# code...
+				return $this->addPilot($request);
+				break;
+			case 'deleteGoal':
+				# code...	
+				return $this->deleteGoal($request);
+				break;
+			case 'publishPilot':
+				# code...
+				return $this->publishPilot($request);
+				break;
+			case 'saveSettings':
+				# code...
+				return $this->saveSettings($request);
+				
+				break;
 			default:
 				# code...
 				break;
@@ -75,13 +102,13 @@ trait Performance {
 			 	 'targetweight'=>$request->targetamount,
 			 	 'targetamount'=>$request->targetweight,
 			 	 'status'=>0,
-			 	 'from'=>date('Y-m-d',strtotime($request->from)),
-			 	 'to'=>date('Y-m-d',strtotime($request->to)),
+			 	 'quarter'=>$request->quarter,
 			 	 'comment'=>$request->comment,
 			 	 'created_by'=>$request->user()->id,
 			 	 'created_at'=>date('Y-m-d H:i:s'),
-			 	 'assigned_to'=>$request->assigned_to
+			 	 'assigned_to'=>$request->assignedto
 			 	]);
+			 $kpiassignedto=\App\kpiassignedto::updateOrCreate(['user_id'=>$request->assignedto,'kpi_id'=>$kpi->id],['user_id'=>$request->assignedto,'kpi_id'=>$kpi->id]);
 
 			 return response()->json(['status'=>'success','message'=>'Operation Successfull']);
 
@@ -132,124 +159,251 @@ trait Performance {
 
 	private function saveComment(Request $request){
 		// session(['FY'=>date('Y')]);
+
 		 $data=['goal_id'=>$request->goalid,'emp_id'=>$request->empid,'quarter'=>$request->quarter];
 		 $rate= $request->has('rating') ? $request->rating : 0;
+
 		 if($request->user()->id==$request->empid){
 		 	$rateColumn='lm_rate';
 		 	$comment='emp_comment';
 		 }
 		 else{
-		 	$rateColumn=$this->resolveRate();
-		 	$comment=$this->resolveCommentRow();
-		 }
- 		 $data2=[$rateColumn=>$rate,$comment=>$request->comment];
+		 	$rateColumn=$this->resolveRate($request->goalid);
+		 	$comment=$this->resolveCommentRow($request->goalid);
 
+		 }
+
+ 		 $data2=[$rateColumn=>$rate,$comment=>$request->comment];
+ 		 // dd($data2);
 		$updateRatingComment=\App\Rating::where($data)->whereYear('created_at',session('FY'))->update($data2);
 		 $data=array_merge($data,$data2);
 		if(!$updateRatingComment){
+
 			$createRating=\App\Rating::create($data);
 		}
-		// dd($data)
+		
 		return response()->json(['status'=>'success','message'=>'Comment Successfully Added']);
 	}
 
 	private function addStretch(Request $request){
+		if(in_array(\Auth::user()->role->manages,['dr','all'])){
 		$goalCatid=$request->has('goalType') ? $request->goalType : 1;
-
+		if(session()->has('company_id')){
+            $compid=session('company_id');
+        }
+        else{
+            $compid=\Auth::user()->company_id;
+        }
 			$data=['objective'=>$request->objective,
 					 'commitment'=>$request->commitment, 
 					 'user_id'=>$request->user()->id,
 					 'assigned_to'=>$request->emp_id,
 					  'goal_cat_id'=>$goalCatid,
-					  'quarter'=>$this->predictQuarter()
+					  'quarter'=>$this->predictQuarter(),
+					  'company_id'=>$compid
 					];
 		
 			$saveStrech=\App\Goal::updateOrcreate(['id'=>$request->id],$data);
 		return response()->json(['status'=>'success','message'=>'Strech Goal Successfully Applied']);
-
+		}
+		else{
+			throw new \Exception("You Donot Have Permission to perform this action");
+			
+		}
 
 	}
 
 	private function predictQuarter(){
 		$getQuarter=\Auth::user()->getquarter();
-		return 1;
+		return $getQuarter;
+	}
+
+	private function settings(Request $request){
+	// return $request->all();
+		if(session()->has('company_id')){
+   			$compid=session('company_id');
+   		}
+   		else{
+   			$compid=\Auth::user()->company_id;
+   		}
+		$published=\App\PublishedGoalFY::where('year',session('FY'))->value('published');
+		$pilots=\App\Goal::where('goal_cat_id',2)->whereYear('created_at',session('FY'))->get();
+		$companys=\App\Company::get();
+		$performanceSettings=\App\PerformanceSeason::where('company_id',$compid)->first();
+		$performancesettings= !is_null($performanceSettings) ? $performanceSettings->toArray() : [];
+		// dd($performanceSettings);
+		// Notify All Employees
+		return view('settings.performancesettings.index',compact('pilots','published','performanceSettings','companys'));
 	}
 
 
 
+	private function resolveRate($id){
+		$getCat=\App\Goal::where('id',$id)->value('goal_cat_id');
+		if(\Auth::user()->role->permissions->contains('constant', 'add_hr_comment') && $getCat==2){
 
-	private function resolveRate(){
-		switch (\Auth::user()->role) {
-			case 3:
-				# code...
-				return 'admin_rate';
-				break;
-			case 2:
-				# code...
-				return 'lm_rate';
-				break;
-
-			default:
-				# code...
-				break;
+			return 'admin_rate';
 		}
-	}
-	private function resolveCommentRow(){
-			switch (\Auth::user()->role) {
-			case 3:
-				# code...
-				return 'admin_comment';
-				break;
-			case 2:
-				# code...
-				return 'lm_comment';
-				break;
+		else if(in_array(\Auth::user()->role->manages, ['dr','all'])){
+			return 'lm_rate';
+		} 
+		else {
 
-			default:
-				# code...
-				return 'emp_comment';
-				break;
+			return 'lm_rate';
 		}
-	
-	}
-	private function  employee(Request $request){
 
+	}
+	private function resolveCommentRow($id){
+
+			$getCat=\App\Goal::where('id',$id)->value('goal_cat_id');
+		if(\Auth::user()->role->permissions->contains('constant', 'add_hr_comment') && $getCat==2){
+
+			return 'admin_comment';
+
+		}
+
+		else if(in_array(\Auth::user()->role->manages, ['dr','all'])){
+			return 'lm_comment';
+		}
+		 
+		else {
+
+			return 'emp_comment';
+		}
+
+
+	}
+	private function  employee(Request $request){ 
 		$employee=\App\User::where('id',$request->id)->first();
     	$fiscal= $this->fiscalYear(); 
     	$pilots= $this->pilotGoals();
-    	$quarter=$request->has('quarter') ? $request->quarter: 1;
+    	$quarter=$request->has('quarter') ? $request->quarter: $this->predictQuarter();
     	$date=$request->has('date') ? $request->date: date('Y');
-     	$yearquarter=(object) ['quarter'=>$quarter,'year'=>$date];
+     	$yearquarter=(object) ['quarter'=>$quarter,'year'=>$date,'emp_id'=>$request->id];
 
      	$lmGoals= $this->goals(1,$request->id,$quarter,$date);
 
      	$idps= $this->goals(3,$request->id,$quarter,$date);
   	
      	$carasps= $this->goals(4,$request->id,$quarter,$date);
- 	 	$kpis= $this->getkpis($request);
+ 	 	$kpis= $this->getkpis($request,$quarter);
 		return view('performance.employee',compact('employee','fiscal','lmGoals','pilots','yearquarter','carasps','idps','kpis')); 
 	}
 
 
-	   public function getkpis(Request $request) {
+	   public function getkpis(Request $request,$quarter) {
               
                $kpis=\App\kpi::whereYear('created_at',date('Y')) 
                					->where(function($query) use ($request){
-               					$query->where('created_by',$request->id)
-               						   ->orwhere('assigned_to',0)
+               					$query->where('assigned_to',0)
                						   ->orwhereHas('kpiassignedto',function($query) use ($request){
                								$query->where('user_id',$request->id);
                					});
-               		});
+               		})->where('quarter',$quarter);
                					
-               	if($request->has('start') || $request->has('end')){
-               		$kpis=$kpis->whereRaw("DATE(created_at) BETWEEN $request->start and $request->end");
-               	}
+               	 
                	  $kpis=$kpis->paginate(10);
                					  
 
             return $kpis;
  
-          }
+       }
+
+   private function addPilot(Request $request){
+
+      	if(session()->has('company_id')){
+            $compid=session('company_id');
+        }
+        else{
+            $compid=\Auth::user()->company_id;
+        } 
+       if($request->user()->role->permissions->contains('constant', 'add_pilot')){
+
+       	$unpublish=\App\PublishedGoalFY::where('year',session('FY'))->delete();
+      	$savepilot=\App\Goal::updateOrcreate(['id'=>$request->id],['objective'=>$request->objective,'commitment'=>$request->commitment,'goal_cat_id'=>2,'company_id'=>$compid,'user_id'=>$request->user()->id,'assigned_to'=>0]);
+		 	return response()->json(['status'=>'success','message'=>'Pilot Goal Successfully Added']);
+
+		 }
+		 else{
+		 	throw new \Exception("You do not have Permission  to perform this action");
+		 	
+		 }
+
+      }
+
+   private function deleteGoal(Request $request){
+
+     if($request->user()->role->permissions->contains('constant', 'delete_pilot')){
+     	$goal=\App\Goal::where('id',$request->id)->delete();
+     	return response()->json(['status'=>'success','message'=>'Operation Successfull']);
+
+     }
+     else{
+     		throw new \Exception("You do not have Permission  to perform this action");
+     }
+
+
+   }
+
+   private function publishPilot(Request $request){
+
+   	if($request->user()->role->permissions->contains('constant', 'publish_pilot')){
+   		$publishPilot=\App\PublishedGoalFY::updateOrCreate(['year'=>session('FY')],['year'=>session('FY'),'published'=>'YES']);
+   	
+   		return response()->json(['status'=>'success','message'=>'Operation Successfull']);
+   	}
+   	else{
+   		throw new \Exception("You do not have Permission  to perform this action");
+   	}
+
+   }
+
+  private function saveSettings(Request $request){
+  	// dd($request->all());
+   	if($request->user()->role->permissions->contains('constant', 'performance_settings_all_company') || $request->user()->role->permissions->contains('constant', 'group_access')){
+   		//All Companies
+   		if($request->company_id==0){
+   			$companyList=\App\Company::pluck('id');
+   			foreach($companyList as $company){
+
+   				$this->saveCompanySettings($company,$request);
+   			}
+   		}
+   		else{
+   			$this->saveCompanySettings($request->company_id,$request);
+   		}
+   		return response()->json(['status'=>'success','message'=>'Operation Successfull']);
+   	}
+
+   	elseif($request->user()->role->permissions->contains('constant', 'performance_settings_own_company')){
+   		if(session()->has('company_id')){
+   			$compid=session('company_id');
+   		}
+   		else{
+   			$compid=\Auth::user()->company_id;
+   		}	
+   		$this->saveCompanySettings($compid,$request);
+
+   		return response()->json(['status'=>'success','message'=>'Operation Successfull']);
+   	}
+   	else{
+   		throw new \Exception("You Do Not Have Permission to perform this action");
+   	}
+   }
+
+
+   private function saveCompanySettings($compid,Request $request){
+   	$data=$request->all();
+    $data['company_id']= $request->company_id==0 ? $compid : $request->company_id;
+  
+   	$savefiscal=\App\PerformanceSeason::updateOrCreate(['company_id'=>$compid],$data);
+   	return 1;
+   }
+
+   private function setQuarter(Request $request){
+    	session(['quarter',$request->quarter]);
+
+   		return response()->json(['status'=>'success','message'=>'Operation Successfull']);
+   }
 
 }

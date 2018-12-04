@@ -16,12 +16,20 @@ class CompanyScope implements Scope
      * @param  \Illuminate\Database\Eloquent\Model  $model
      * @return void
      */
-    public function apply(Builder $builder, Model $model)
+     public function apply(Builder $builder, Model $model)
     {
-        if (Auth::user()->role->permissions->contains('constant', 'group_access')) {
+        if(session()->has('company_id')){
+            $compid=session('company_id');
+        }
+        else{
+ 
+            $compid=\Auth::user()->company_id;
+        }
+
+        if (Auth::user()->role->permissions->contains('constant', 'group_access') && !session()->has('company_id')) {
             $builder->where('company_id', '>', 0);
         }else{
-            $builder->where('company_id', '=', Auth::user()->company_id);
+            $builder->where('company_id', '=', $compid);
         }
         
     }

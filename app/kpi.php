@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class kpi extends Model
 {
     //
-    protected $fillable=['deliverable','targetweight','targetamount','status','from','to','comment','created_by','approved','approval_id','reason','assigned_to'];
+    protected $fillable=['deliverable','targetweight','targetamount','status','quarter','comment','created_by','approved','approval_id','reason','assigned_to'];
 
     public function kpiassignedto(){
     	return $this->hasMany('App\kpiassignedto','kpi_id');

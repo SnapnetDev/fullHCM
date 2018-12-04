@@ -96,6 +96,15 @@
                               </select>
 
                             </div>
+                            <div class="form-group " >
+                      <label class="form-control-label" for="select">Least Qualification</label>
+                      <select class="form-control " id="qualification" name="qualification" required>
+                         @if($job->qualification)
+                                  <option value="{{$job->qualification->id}}" >{{$job->qualification->name}}</option>
+                                 @endif
+                        
+                      </select>
+                    </div>
 
                 </div>
 
@@ -182,7 +191,7 @@ $(document).ready(function() {
   tags: true
 });
        $('#descripton').summernote();
-       
+
        $('.parent').select2({
     ajax: {
      delay: 250,
@@ -195,6 +204,20 @@ $(document).ready(function() {
     return '{{url('job_search')}}';
     } 
     }
+});
+        $('#qualification').select2({
+    ajax: {
+     delay: 250,
+     processResults: function (data) {
+          return {        
+    results: data
+      };
+    },
+    url: function (params) {
+    return '{{url('job_qualification_search')}}';
+    } 
+    },
+  tags: true
 });
 
   var sklcont = $('#sklcont');

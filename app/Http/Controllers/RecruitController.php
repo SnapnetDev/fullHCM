@@ -16,11 +16,9 @@ class RecruitController extends Controller
      */
     public function index()
     {
-        // $projects=Project::all();
-        // $projects_pending=Project::where('status',0)->get();
-        // $projects_completed=Project::where('status',1)->get();
+        
 
-        // return view('project_management.index',compact('projects','projects_pending','projects_completed'));
+        return view('recruit.listing');
     }
 
     /**

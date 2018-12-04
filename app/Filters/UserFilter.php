@@ -48,14 +48,17 @@ class UserFilter
               });
           }
        
-
+             $company_id=companyId();
+           if ($company_id>0) {
+                $user->where('company_id','!=',1)->paginate(10);
+            }
         // Get the results and return them.
           if ($filters->filled('pagi')&&$filters->input('pagi')=='all') {
             return $user->get();
           } elseif($filters->filled('pagi')&&($filters->input('pagi')==10||$filters->input('pagi')==15||$filters->input('pagi')==25||$filters->input('pagi')==50)){
            return $user->paginate($filters->input('pagi'));
           }
-          
+
         return $user->paginate(10);
 
         }

@@ -180,7 +180,9 @@ Route::get('/people_analytics_attendance', 'HomeController@executiveViewAttendan
 // end of executive view
 Route::resource('roles', 'RoleController')->middleware(['permission:edit_settings','auth']);
 Route::resource('performances', 'PerformanceController')->middleware(['permission:edit_settings','auth']);
+Route::resource('performance', 'PerformanceController')->middleware(['permission:edit_settings','auth']);
 Route::resource('leave','LeaveController')->middleware(['auth']);
+Route::resource('document','DocumentController')->middleware(['auth']);
 Route::resource('projects','ProjectController')->middleware(['auth']);
 Route::resource('recruit','RecruitController')->middleware(['auth']);
 Route::resource('compensation','CompensationController')->middleware(['auth']);
@@ -188,6 +190,7 @@ Route::resource('loan','LoanController')->middleware(['auth']);
 Route::get('jobs_departments','JobController@departments')->name('job_departments.view')->middleware(['auth']);
 Route::get('job_skill_search','JobController@skill_search')->middleware(['auth']);
 Route::get('job_search','JobController@job_search')->middleware(['auth']);
+Route::get('job_qualification_search','JobController@qualification_search')->middleware(['auth']);
 Route::get('joblist/{department_id}', 'JobController@list')->name('job_list.view')->middleware(['auth']);
 Route::get('jobs/department/{department_id}','JobController@index')->middleware(['auth']);
 Route::get('jobs/create/{department_id}','JobController@create')->middleware(['auth'])->name('jobs.create');
