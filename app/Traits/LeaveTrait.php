@@ -113,9 +113,31 @@ trait LeaveTrait
 		$leave_workflow_id=Setting::where('name','leave_workflow')->first()->value;
 		$leave_request=LeaveRequest::create(['leave_id'=>$request->leave_id,'user_id'=>Auth::user()->id,'start_date'=>date('Y-m-d',strtotime($request->start_date)),'end_date'=>date('Y-m-d',strtotime($request->end_date)),'reason'=>$request->reason,'workflow_id'=>$leave_workflow_id,'paystatus'=>$request->paystatus,'status'=>0,'priority'=>$request->priority]);
 		  $stage=Workflow::find($leave_request->workflow_id)->stages->first();
-		$leave_request->leave_approvals()->create([
-			    'leave_request_id' => $request->id,'stage_id'=>$stage->id,'comments'=>'','status'=>0
+		  if($stage->type==1){
+		  	$leave_request->leave_approvals()->create([
+			    'leave_request_id' => $request->id,'stage_id'=>$stage->id,'comments'=>'','status'=>0,'approver_id'=>$stage->user_id
 			]);
+			$stage->user->notify(new ApproveLeaveRequest($leave_request));
+		  }elseif($stage->type==2){
+		  	if ($stage->role->manages=='dr') {
+		  		foreach($leave_request->user->managers as $manager){
+		  			$manager->notify(new ApproveLeaveRequest($leave_request));
+		  		}
+		  	}elseif($stage->role->manage=='all'){
+		  		foreach($stage->role->users as $user){
+		  			$user->notify(new ApproveLeaveRequest($leave_request));
+		  		}
+		  	}elseif($stage->role->manage=='none'){
+		  		foreach($stage->role->users as $user){
+		  			$user->notify(new ApproveLeaveRequest($leave_request));
+		  		}
+		  	}
+		  }elseif ($stage->type==3) {
+		  	foreach($stage->group->users as $user){
+		  		$user->notify(new ApproveLeaveRequest($leave_request));
+		  	}
+		  }
+		
 		if ($request->file('absence_doc')) {
                     $path = $request->file('absence_doc')->store('public');
                     if (Str::contains($path, 'public/')) {
@@ -126,7 +148,7 @@ trait LeaveTrait
                     $leave_request->absence_doc = $filepath;
                     $leave_request->save();
                 }
-   	$stage->user->notify(new ApproveLeaveRequest($leave_request));
+   	
         
         return 'success';
 	}
@@ -162,6 +184,25 @@ trait LeaveTrait
 	  {
 	  	$leave_request=LeaveRequest::find($request->leave_request_id);
       // return view('documents.review',['document'=>$document]);
+	  }
+
+	  public function approvals()
+	  {
+	  	$user=Auth::user();
+	  	$leave_approvals = (new LeaveApproval)->newQuery();
+
+			$leave_approvals->whereHas('stage.user',function($query) use($user){
+				$query->where('users.id',$user->id);
+
+			});
+			$leave_approvals->whereHas('stage.role.users',function($query) use($user){
+				$query->where('users.id',$user->id);
+			});
+			$leave_approvals->whereHas('stage.group.users',function($query) use($user){
+				$query->where('users.id',$user->id);
+			});
+
+			$leave_approvals->where('status',0)->get();
 	  }
 
 	  public function saveApproval(Request $request)

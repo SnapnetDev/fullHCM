@@ -32,12 +32,19 @@
                       <input type="text" name="constant" id="editscconstant" class="form-control">
                     </div>
                     <div class="form-group">
+                      <label class="example-title" for="edittaxable">Taxable</label>
+                      
+                      <select required="" name="taxable" style="width:100%;" id="editsctaxable" class="form-control " >
+                        <option selected value='0'>No</option>
+                        <option selected value='1'>Yes</option></select>
+                    </div>
+                    <div class="form-group">
                       <h4 class="example-title">General Ledger Code</h4>
-                      <input type="text" name="gl_code"  class="form-control">
+                      <input type="text" name="gl_code" id="editscgl_code" class="form-control">
                     </div>
                     <div class="form-group">
                       <h4 class="example-title">Project Code</h4>
-                      <input type="text" name="project_code"  class="form-control">
+                      <input type="text" name="project_code" id="editscproject_code" class="form-control">
                     </div>
                     <div class="form-group">
                       <label class="example-title" for="constant">Applies to All Employee Except</label>

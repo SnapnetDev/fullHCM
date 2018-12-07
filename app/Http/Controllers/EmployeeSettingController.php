@@ -27,7 +27,8 @@ class EmployeeSettingController extends Controller
 	}
 	public function saveGrade(Request $request)
 	{
-		Grade::updateOrCreate(['id'=>$request->grade_id],['level'=>$request->level,'basic_pay'=>$request->basic_pay,'leave_length'=>$request->leave_length]);
+		$company_id=companyId();
+		Grade::updateOrCreate(['id'=>$request->grade_id],['level'=>$request->level,'basic_pay'=>$request->basic_pay,'leave_length'=>$request->leave_length,'company_id'=>$company_id]);
 		return  response()->json('success',200);
 	}
 	public function getGrade($grade_id)

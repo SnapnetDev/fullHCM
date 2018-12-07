@@ -228,7 +228,7 @@ public function getquarter(){
     
     //getquarter
     $review=\App\PerformanceSeason::value('reviewFreq');
-    
+
     return 12/$review;
     
   }
@@ -252,6 +252,14 @@ public function getquarter(){
             return 'N/A';
           }
         }
+    public function getEmployeeeJobAttribute(){
+        $getLattest=\App\EmployeeJob::where('user_id',$this->id)->orderBy('started','desc')->value('job_id');
+        return $getLattest;
+    }
+    public function getDepartmentAttribute(){
+        $getdept=\App\Job::where('id',$this->getEmployeeeJobAttribute())->value('department_id');
+        return $getdept;
+    }
 
     public function position()
     {

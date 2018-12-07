@@ -14,7 +14,7 @@
   <link rel="stylesheet" href="{{asset('global/vendor/bootstrap-table/bootstrap-table.css')}}">
 
   <link rel="stylesheet" href="{{asset('global/vendor/bootstrap-datepicker/bootstrap-datepicker.css')}}">
-  <link rel="stylesheet" type="text/css" href="{{asset('global/vendor/bootstrap-sweetalert/sweetalert.css')}}">
+  <link rel="stylesheet" type="text/css" href="{{asset('css/sweetalert.css')}}">
 
 @endsection
 @section('content')
@@ -128,11 +128,10 @@
                   @endif 
  
               	@if(Auth::user()->role->permissions->contains('constant', 'edit_performance'))
-              	OFF&nbsp;&nbsp;
+              	(On/Off)&nbsp;&nbsp;
               	 <li class="list-inline-item m-r-25 m-b-25">
                     <input id="perf_switch" disabled type="checkbox" data-plugin="switchery" {{$employee->performanceseason()==1 ? 'checked' : ''}} />
                   </li>
-                  ON
                   @endif
               </h3>
               <div class="panel-actions panel-actions-keep">
@@ -235,7 +234,7 @@
   <script src="{{asset('global/vendor/bootstrap-table/extensions/mobile/bootstrap-table-mobile.js')}}"></script>
     <script src="{{asset('global/vendor/bootstrap-datepicker/bootstrap-datepicker.js')}}"></script>
 
- <script src="{{asset('global/vendor/bootstrap-sweetalert/sweetalert.min.js')}}"></script>
+ <script src="{{asset('js/sweetalert.min.js')}}"></script>
   <script type="text/javascript">
 
     $(function(){
@@ -287,14 +286,26 @@ function unhide(){
     $('#addbtn').text('Modify Kpi');
     $('#addkpi').modal('show');
 
-  }
-
+  }  
  $('#kpiform').submit(function(){
                                   event.preventDefault();
                                   $deliverables=$('#deliverables').val();
                                   $targetweight=$('#targetweight').val();
                                   $targetamount=$('#targetamount').val();
                                   $comment=$('#comment').val();
+
+                                  $department_assigned=$('#department_assigned').val();
+
+                                    $Assigned=$('#assigned_to').val();
+ 
+                                  if($department_assigned=='this_employee'){
+                  
+                                    $department_assigned=0;
+                                  }
+                                  else{
+                                    $Assigned=0;
+                                   
+                                  }
                                   $type=sessionStorage.getItem('modify');
                                   $formid=sessionStorage.getItem('formid');
                                   if($formid==0){
@@ -303,7 +314,6 @@ function unhide(){
                                   else{
                                     $formid=$formid;
                                   }
-                                  $Assigned=$('#assigned_to').val();
                                   $quarter=$('#kpi_quarter').val();
 
                               $.post('{{url('performance')}}',{
@@ -316,6 +326,7 @@ function unhide(){
                                   formid:$formid,
                                   assignedto:$Assigned,
                                   quarter:$quarter,
+                                  department_id:$department_assigned, 
                                   type:'addKpi',
                                   _token:"{{csrf_token()}}"
 
@@ -334,7 +345,7 @@ function unhide(){
                                     },2000);
                                     return;
                                   }
-                                  toastr.error(data);
+                                  toastr.error(data.message);
 
                               })
 

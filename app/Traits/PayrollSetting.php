@@ -143,14 +143,16 @@ trait PayrollSetting
   }
   public function payslipDetailSettings(Request $request)
   {
-  		$payslip_detail=PayslipDetail::first();
+    $company_id=companyId();
+  		$payslip_detail=PayslipDetail::where('company_id',$company_id)->first();
   		if (!$payslip_detail) {
-  			$payslip_detail=PayslipDetail::create(['watermark_text'=>'']);
+  			$payslip_detail=PayslipDetail::create(['watermark_text'=>'','company_id'=>$company_id]);
   		}
   		return view('payrollsettings.payslip_detail',compact('payslip_detail'));
   }
   public function updatePayslipDetailSettings(Request $request)
   {	
+    $company_id=companyId();
   		$payslip_detail=PayslipDetail::first();
   		if ($payslip_detail) {
   			$payslip_detail->update(['watermark_text'=>$request->watermark_text]);
@@ -165,7 +167,7 @@ trait PayrollSetting
                     $payslip_detail->save();
                 }
   		}else{
-  			PayslipDetail::create(['watermark_text'=>$request->watermark_text]);
+  			PayslipDetail::create(['watermark_text'=>$request->watermark_text,'company_id'=>$company_id]);
   			if ($request->file('logo')) {
                     $path = $request->file('logo')->store('public');
                     if (Str::contains($path, 'public/')) {
@@ -194,7 +196,8 @@ trait PayrollSetting
   }
   public function saveSpecificSalaryComponent(Request $request)
   {
-   $sc=SpecificSalaryComponent::updateOrCreate(['id'=>$request->specific_salary_component_id],['name'=>$request->name,'gl_code'=>$request->gl_code,'project_code'=>$request->project_code,'type'=>$request->ssctype,'comment'=>$request->comment,'emp_id'=>$request->user_id,'duration'=>$request->duration,'grants'=>$request->grant,'status'=>0,'starts'=>$request->starts,'ends'=>$request->ends]);
+     $company_id=companyId();
+   $sc=SpecificSalaryComponent::updateOrCreate(['id'=>$request->specific_salary_component_id],['name'=>$request->name,'gl_code'=>$request->gl_code,'project_code'=>$request->project_code,'type'=>$request->ssctype,'comment'=>$request->comment,'emp_id'=>$request->user_id,'duration'=>$request->duration,'grants'=>$request->grant,'status'=>0,'starts'=>$request->starts,'ends'=>$request->ends,'company_id'=>$company_id]);
    
     return 'success';
   }
@@ -220,7 +223,8 @@ trait PayrollSetting
   }
   public function saveSalaryComponent(Request $request)
   {
-    $sc=SalaryComponent::updateOrCreate(['id'=>$request->salary_component_id],['name'=>$request->name,'gl_code'=>$request->gl_code,'project_code'=>$request->project_code,'type'=>$request->sctype,'comment'=>$request->comment,'constant'=>$request->constant,'formula'=>$request->formula]);
+    $company_id=companyId();
+    $sc=SalaryComponent::updateOrCreate(['id'=>$request->salary_component_id],['name'=>$request->name,'gl_code'=>$request->gl_code,'project_code'=>$request->project_code,'type'=>$request->sctype,'comment'=>$request->comment,'constant'=>$request->constant,'formula'=>$request->formula,'company_id'=>$company_id,'taxable'=>$request->taxable]);
     $no_of_exemptions=count($request->input('exemptions'));
     if($no_of_exemptions>0){
       $sc->exemptions()->detach();
@@ -274,25 +278,29 @@ trait PayrollSetting
   }
   public function payrollPolicySettings(Request $request)
   {
-     
-      $pp=PayrollPolicy::first();
+      $company_id=companyId();
+      $pp=PayrollPolicy::where('company_id',$company_id)->first();
        $workflows=Workflow::all();
-       $setting=Setting::where('name','use_lateness')->first();
-       $latenesspolicies=LatenessPolicy::all();
+       $setting=Setting::where(['name'=>'use_lateness','company_id'=>$company_id])->first();
+       if (!$setting) {
+        $setting=Setting::create(['name'=>'use_lateness','company_id'=>$company_id]);
+       }
+       $latenesspolicies=LatenessPolicy::where('company_id',$company_id)->get();
       if (!$pp) {
-        $pp=PayrollPolicy::create(['basic_pay_percentage'=>$request->basic_pay_percentage,'payroll_runs'=>$request->when,'user_id'=>Auth::user()->id]);
+        $pp=PayrollPolicy::create(['basic_pay_percentage'=>$request->basic_pay_percentage,'payroll_runs'=>$request->when,'user_id'=>Auth::user()->id,'company_id'=>$company_id]);
       }
     return view('payrollsettings.payroll_policy',compact('pp','workflows','setting','latenesspolicies'));
   }
   public function savePayrollPolicySettings(Request $request)
   {
       // return $request->all();
-      $pp=PayrollPolicy::first();
+    $company_id=companyId();
+      $pp=PayrollPolicy::where('company_id',$company_id)->first();
 
       if ($pp) {
         $pp->update(['basic_pay_percentage'=>$request->basic_pay_percentage,'payroll_runs'=>$request->when,'user_id'=>Auth::user()->id,'workflow_id'=>$request->workflow_id]);
       }else{
-        PayrollPolicy::create(['basic_pay_percentage'=>$request->basic_pay_percentage,'payroll_runs'=>$request->payroll_runs,'user_id'=>Auth::user()->id,'workflow_id'=>$request->workflow_id]);
+        PayrollPolicy::create(['basic_pay_percentage'=>$request->basic_pay_percentage,'payroll_runs'=>$request->payroll_runs,'user_id'=>Auth::user()->id,'workflow_id'=>$request->workflow_id,'company_id'=>$company_id]);
       }
     return 'success';
   }
@@ -306,7 +314,8 @@ trait PayrollSetting
   
 public function saveLatenessPolicy(Request $request)
   {
-    $lp=LatenessPolicy::updateOrCreate(['id'=>$request->lateness_policy_id],['policy_name'=>$request->policy_name,'late_minute'=>$request->late_minute,'deduction_type'=>$request->deduction_type,'deduction'=>$request->deduction]);
+    $company_id=companyId();
+    $lp=LatenessPolicy::updateOrCreate(['id'=>$request->lateness_policy_id],['policy_name'=>$request->policy_name,'late_minute'=>$request->late_minute,'deduction_type'=>$request->deduction_type,'deduction'=>$request->deduction,'company_id'=>$company_id]);
    
         
         return 'success';

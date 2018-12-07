@@ -71,13 +71,14 @@
     if(xhr.status==200){
       
        console.log(data);
-      window.location.reload();
+      window.location='{{url('home')}}';
        
     }
   }); 
     
     
   }
+
 
   </script>
 </head>
@@ -143,7 +144,7 @@
               @php
                 $companies=companies();
               @endphp
-              <option value="0"{{session('company_id')==0?'selected':''}}">All Companies</option>
+             
               @foreach($companies as $company)
              <option  value="{{$company->id}}"{{$company->id==session('company_id')?'selected':''}}>{{$company->name}}</option>
              @endforeach

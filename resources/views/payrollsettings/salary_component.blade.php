@@ -61,6 +61,7 @@
 		                    		<td>{{$salary_component->gl_code}}</td>
 		                    		<td>{{$salary_component->project_code}}</td>
 		                    		<td>{{$salary_component->comment}}</td>
+		                    		<td><span class="tag {{ $salary_component->taxable == 1 ? 'tag-success' : 'tag-dark' }}">{{ $salary_component->taxable == 1 ? 'Yes' : 'No' }}</span></td>
 		                    		<td><button class="btn sc-status btn-sm {{ $salary_component->status == 1 ? 'btn-success' : 'btn-warning' }}" title="{{ $salary_component->status == 1 ? 'Disable' : 'Enable' }}" id="{{$salary_component->id}}"><i class="fa fa-{{ $salary_component->status == 1 ? 'eye' : 'eye-slash' }}" ></i></button></td>
 		                    		<td>
 		                    			
@@ -187,17 +188,24 @@
 
   	$(function() {
   	$(document).on('click','.sc-status',function(event){
+  		
   		salary_component_id= $(this).attr('id');
   		
   		 $.get('{{ url('/payrollsettings/change_salary_component_status') }}/',{ salary_component_id: salary_component_id },function(data){
   		 	if (data==1) {
+
   		 		toastr.success("Salary Component Enabled",'Success');
+  		 		$(this).removeClass('btn-warning');
+  		 		$(this).addClass('btn-success');
   		 	}
   		 	if(data==2){
   		 		toastr.warning("Salary Component Disabled",'Success');
+  		 		$(this).addClass('btn-warning');
+  		 		$(this).removeClass('btn-success');
   		 	}
-  		 	$( "#ldr" ).load('{{url('payrollsettings/salary_components')}}');
+  		 	
   		 });
+  		 
   	});
   });
   	
@@ -208,6 +216,9 @@
      $('#editsccomment').val(data.comment);
      $('#editscformula').val(data.formula);
      $('#editscconstant').val(data.constant);
+      $('#editscgl_code').val(data.gl_code);
+       $('#editscproject_code').val(data.project_code);
+       $('#editsctaxable').val(data.taxable);
       $("#editscexemptions").find('option')
     .remove();
     console.log(data.type);

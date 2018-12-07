@@ -28,6 +28,13 @@
                       <input type="text" name="formula" class="form-control">
                     </div>
                     <div class="form-group">
+                      <label class="example-title" for="taxable">Taxable</label>
+                      
+                      <select required="" name="taxable" style="width:100%;" id="taxable" class="form-control " >
+                        <option selected value='0'>No</option>
+                        <option selected value='1'>Yes</option></select>
+                    </div>
+                    <div class="form-group">
                       <h4 class="example-title">Constant</h4>
                       <input type="text" name="constant" class="form-control">
                     </div>

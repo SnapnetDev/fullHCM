@@ -207,6 +207,7 @@ trait PayrollTrait{
         $pyear=date('Y',strtotime($date));
         // $company=Company::find($request->company_id);
          $company_id=companyId();
+         $basic_pay_percentage=intval(PayrollPolicy::where(['company_id'=>$company_id])->first()->basic_pay_percentage)/100;
          $users=User::has('promotionHistories.grade')->where('company_id',$company_id)->get();
         $payroll=Payroll::where(['month'=>$pmonth,'year'=>$pyear,'company_id'=>$company_id])->first();
         $pp=PayrollPolicy::first();
@@ -224,6 +225,7 @@ trait PayrollTrait{
                 $payroll['date']=$date;
                 $payroll['month']= $pmonth;
                 $payroll['month']=$pyear;
+                $payroll['company_id']=$company_id;
                 
             
                 if(date('m',strtotime($user->hiredate))==$pmonth &&date('Y',strtotime($user->hiredate))==$pyear){
@@ -261,7 +263,7 @@ trait PayrollTrait{
                 $payroll['ssc_serialize']['ssc_gl_code'] = $payroll['ssc_gl_code'];
                 $payroll['ssc_serialize'] = serialize($payroll['ssc_serialize']);
                      }
-                 $payroll_details=PayrollDetail::create(['payroll_id'=>$PR->id,'user_id'=>$payroll['user_id'],'annual_gross_pay'=>$payroll['gross_pay'],'gross_pay'=>$payroll['gross_pay']/12,'basic_pay'=>$payroll['basic_pay'],'deductions'=>$payroll['total_deductions'],'allowances'=>$payroll['total_allowances'],'sc_allowances'=>$payroll['sc_total_allowances'],'sc_deductions'=>$payroll['sc_total_deductions'],'ssc_allowances'=>$payroll['ssc_total_allowances'],'ssc_deductions'=>$payroll['ssc_total_deductions'],'working_days'=>$payroll['working_days'],'worked_days'=>$payroll['days_worked'],'details'=>$payroll['serialize'],'sc_details'=>$payroll['sc_serialize'],'ssc_details'=>$payroll['ssc_serialize'],'is_anniversary'=>$payroll['is_anniversary'],'taxable_income'=>$payroll['taxable_income'],'annual_paye'=>$payroll['annual_paye'],'paye'=>$payroll['paye']]);   
+                 $payroll_details=PayrollDetail::create(['payroll_id'=>$PR->id,'user_id'=>$payroll['user_id'],'annual_gross_pay'=>$payroll['gross_pay'],'gross_pay'=>$payroll['gross_pay']/12,'basic_pay'=>$payroll['basic_pay'],'deductions'=>$payroll['total_deductions'],'allowances'=>$payroll['total_allowances'],'sc_allowances'=>$payroll['sc_total_allowances'],'sc_deductions'=>$payroll['sc_total_deductions'],'ssc_allowances'=>$payroll['ssc_total_allowances'],'ssc_deductions'=>$payroll['ssc_total_deductions'],'working_days'=>$payroll['working_days'],'worked_days'=>$payroll['days_worked'],'details'=>$payroll['serialize'],'sc_details'=>$payroll['sc_serialize'],'ssc_details'=>$payroll['ssc_serialize'],'is_anniversary'=>$payroll['is_anniversary'],'taxable_income'=>$payroll['taxable_income'],'annual_paye'=>$payroll['annual_paye'],'paye'=>$payroll['paye'],'consolidated_allowance'=>$payroll['consolidated_allowance']]);   
                 $allp[]=$payroll;
 
               }  
@@ -284,11 +286,12 @@ trait PayrollTrait{
             $payroll['gross_pay']= ($payroll['gross_pay']/$payroll['working_days'])*$payroll['days_worked'];
 
 		
-		$payroll['basic_pay_percentage']=intval(Setting::where('name','basic_pay_percentage')->first()->value)/100;
-		$payroll['basic_pay']=$payroll['gross_pay']*0.4;
+		$payroll['basic_pay_percentage']=floatval(PayrollPolicy::where(['company_id'=>$payroll['company_id']])->first()->basic_pay_percentage)/100;
+		$payroll['basic_pay']=$payroll['gross_pay']*$payroll['basic_pay_percentage'];
 		$this->allowancesanddeductions($payroll);
 		$this->calculate_specific_salary_components($payroll);
-		$payroll['taxable_income']=$payroll['gross_pay']-$payroll['consolidated_allowance'];
+        
+		$payroll['taxable_income']= $payroll['gross_pay'] - $payroll['consolidated_allowance']-($payroll['deductions']['pension']*12) + ($payroll['ssc_total_allowances']*12);
 		$this->calculate_tax($payroll);
 		}else{
 
@@ -300,7 +303,7 @@ trait PayrollTrait{
 	public function allowancesanddeductions(&$payroll)
 	{
 		$user_id=$payroll['user_id'];
-		$components=SalaryComponent::where(['status'=>1])->whereDoesntHave('exemptions', function ($query) use ($user_id){
+		$components=SalaryComponent::where(['status'=>1,'company_id'=>$payroll['company_id']])->whereDoesntHave('exemptions', function ($query) use ($user_id){
 			$query->where('users.id',$user_id);
 			})->get();
 		
@@ -319,11 +322,11 @@ trait PayrollTrait{
 
             // calculate allowances and deductions
 
-            $net = ['basic_pay' => $payroll['basic_pay'], 'gross_salary' => $payroll['gross_pay']];
+            $net = ['basic_pay' => $payroll['basic_pay'],'basic_salary'=>$payroll['basic_pay'] ,'gross_salary' => $payroll['gross_pay'],'gross_pay'=>$payroll['gross_pay']];
 
-            $payroll['allowances'] = $payroll['deductions'] = [];
+            $payroll['allowances'] = $payroll['deductions'] =$payroll['component_names']=$payroll['sc_component_names']=  [];
              $payroll['sc_allowances'] = $payroll['sc_deductions'] =$payroll['sc_project_code'] = $payroll['sc_gl_code']= [];
-            $payroll['total_allowances']=$payroll['total_deductions']=0;
+            $payroll['total_allowances']=$payroll['total_deductions']= $payroll['not_taxable']=0;
              $payroll['sc_total_allowances']=$payroll['sc_total_deductions']=0;
 
             foreach ($components as $component) {
@@ -355,11 +358,15 @@ trait PayrollTrait{
                            $payroll['total_deductions'] += $value;
                            $payroll['sc_total_deductions'] += $value;
                         }
+                        if ($component->taxable==0) {
+                          $payroll['not_taxable']=number_format($value, 2, '.', '');
+                        }
                 
                     
                 }
             }
             $payroll['gross_pay']=$payroll['gross_pay']*12;
+            // $payroll['gross_tax']=($payroll['gross_pay']-$payroll['deductions']['pension'])*12;
              $payroll['consolidated_allowance'] = $this->consolidated_allowance($payroll['gross_pay']);
 
 	}
@@ -367,6 +374,7 @@ trait PayrollTrait{
 	private function consolidated_allowance($gross_salary) {
 
             $annual_gross = $gross_salary;
+
 
            return  $consolidated = ($annual_gross * (1 / 100)) > 200000 ?
                 (($annual_gross * (1 / 100)) + ($annual_gross * (20 / 100))):
@@ -589,11 +597,13 @@ trait PayrollTrait{
     }
     public function issuePayslip(Request $request)
     {
-        $payroll=Payroll::find($request->payroll_id);
+
+        $payroll=Payroll::where('id',$request->payroll_id);
        if ($payroll) {
-         $payroll->update(['payslip_issued'=>1]);
+         $payroll=$payroll->update(['payslip_issued'=>1]);
+          return 'success';
        }
-       return 'success';
+      
     }
     public function downloadPayslip(Request $request)
     {

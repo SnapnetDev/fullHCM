@@ -5,7 +5,7 @@
                           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">×</span>
                           </button>
-                           <h4 class="modal-title" id="modaltitle" style="text-transform: uppercase;">Add KPI</h4>
+                          <h4 class="modal-title" id="modaltitle">Add KPI</h4>
                         </div>
                         <div class="modal-body">
                         <form id="kpiform">
@@ -17,25 +17,40 @@
 
                                 </tr>
                                  <tr>
-                                    <td>Weight</td>
+                                    <td>Target Weight</td>
                                     <td> <input required type="number" min="0"  id="targetweight" class="form-control"></td>
-                                      <input type="hidden" id="assigned_to" value="{{$employee->id}}">
 
                                 </tr>
                                 <tr>
-                                    <td>Annual Target</td>
+                                    <td>Target Amount</td>
                                     <td> <input required type="number" min="0"   id="targetamount" class="form-control"></td>
 
                                 </tr>
                                  <tr>
                                     <td>Comment</td>
                                     <td><textarea required="" class="form-control" rows="3" id="comment" ></textarea></td>
-
+                                    <input type="hidden" id="assigned_to" value="{{$employee->id}}">
                                 </tr> 
-                                  <tr style="display: none;">
+
+                                  <tr>
+                                    <td>Assigned To  </td>
+                                    <td>
+
+                                      <select id="department_assigned" class="form-control">
+
+                                      <option value="this_employee">{{$employee->name}}</option>
+                                      @foreach($departments as $department)
+                                      <option {{ $employee->department == $department->id ? 'selected' : '' }} value="{{$department->id}}">{{$department->name}}</option>
+                                      @endforeach
+                                    </select> 
+                                    </td>
+                                    
+                                </tr> 
+
+                                 <tr  style="display: none;">
                                 <td>Quarter</td>
                                 <td>
-                                <select class="form-control" id="kpi_quarter" style="">
+                                <select class="form-control" id="kpi_quarter" style="display: none;">
                                   <option value="0">-Select Quarter-</option>
                                   @for($i = 1; $i <= $employee->getquarter(); $i++)
                                    <option value="{{$i}}"  @if(isset($_GET['quarter']) && $_GET['quarter']==$i)  selected @elseif(\Auth::user()->getquarter()==$i) selected @endif  >{{ $employee->quarterName($i) }} Quarter </option>    

@@ -50,16 +50,16 @@
       </style>
   </head>
   <body>
-    <center><h1 style="text-transform: uppercase;">Snapnet Limited</h1></center>
+    <center><h1 style="text-transform: uppercase;">{{companyInfo()->name}}</h1></center>
    <hr style="height:5px;background-color:#f00;">
     <table style="width:100%" id="header">
       <tr>
         <td style="width:33%">
-          1b Abayomi Shonuga Crescent <br>Off Dele Adedeji Street<br>Lekki Phase 1, Lagos
+          {{companyInfo()->address}}
        <br>
        08139248042
        <br>
-       tobe@snapnet.com.ng
+      {{ companyInfo()->email}}
        <br>
        www.snapnet.com.ng
         </td>
@@ -101,8 +101,8 @@
   <tbody>
     <tr>
       
-      <th style="width: 70%;">Basic Pay</th>
-      <td style="text-align: right">N{{number_format($detail->basic_pay,2)}}</td>
+      <th style="width: 70%;">Gross Pay</th>
+      <td style="text-align: right">N{{number_format($detail->gross_pay,2)}}</td>
       
     </tr>
   </tbody>
@@ -112,6 +112,12 @@
 <table class="table table-striped ">
   
   <tbody>
+    <tr>
+      
+      <th style="width: 70%;">Basic Pay</th>
+      <td style="text-align: right">N{{number_format($detail->basic_pay,2)}}</td>
+      
+    </tr>
     @foreach($pdetails['allowances'] as $key=>$allowance)
     <tr>
       

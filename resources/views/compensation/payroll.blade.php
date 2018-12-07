@@ -64,13 +64,16 @@
 	                  <li class="list-group-item">Deductions:&#8358;{{number_format( $deductions+$income_tax,2)}}</li>
 	                </ul>
 	                <div class="btn-group btn-group-justified">
+	                	@if($payroll->payslip_issued==0)
 	                    <div class="btn-group" role="group">
-	                      <a type="button" class="btn btn-primary btn-outline" href="{{ url('compensation/issuepayslip?payroll_id='.$payroll->id) }}">
+	                    	
+	                      <button type="button" id="payslipbtn" class="btn btn-primary btn-outline" onclick="issuePayslip({{$payroll->id}})">
 	                        <i class="icon fa fa-list-alt" aria-hidden="true"></i>
 	                        <br>
 	                        <span class="text-uppercase hidden-sm-down">Issue Payslip</span>
-	                      </a>
+	                      </button>
 	                    </div>
+	                    @endif
 	                    <div class="btn-group" role="group">
 	                      <button type="button" class="btn btn-info btn-outline">
 	                        <i class="icon fa fa-money" aria-hidden="true"></i>
@@ -290,5 +293,18 @@ function viewMore(detail_id)
     $('#userPayrollDetailsModal').modal();
   
 }
+@if($has_been_run==1)
+function issuePayslip(payroll__id){
+    $.get('{{ url('/compensation/issuepayslip') }}/',{ payroll_id: {{$payroll->id}}},function(data){
+      if (data=='success') {
+    toastr.success("Payslip Issued successfully",'Success');
+    location.reload();
+      }else{
+        toastr.error("Error issuing payslip",'Error');
+      }
+     
+    });
+  }
+  @endif
   </script>
 @endsection

@@ -5,13 +5,7 @@ function userCompanyName(){
 		$company=\App\Company::where('id',session('company_id'))->get()->first();
 		return $company->name;
 	}else{
-		if (\Auth::user()->company and \Auth::user()->role->permissions->contains('constant', 'group_access')) {
-		
-		
-		session(['company_id'=>0]);
-		return 'All Companies';
-		 
-	}elseif(\Auth::user()->company){
+		if(\Auth::user()->company){
 		$company=\App\Company::where('id',\Auth::user()->company_id)->get()->first();
 		session(['company_id'=>$company->id]);
 		return $company->name;
@@ -25,6 +19,27 @@ function userCompanyName(){
 		return $company->name;
 	}
 	}
+}
+
+	function companyInfo(){
+	if (session()->has('company_id')) {
+		$company=\App\Company::where('id',session('company_id'))->get()->first();
+		return $company;
+	}else{
+		if(\Auth::user()->company){
+		$company=\App\Company::where('id',\Auth::user()->company_id)->get()->first();
+		session(['company_id'=>$company->id]);
+		return $company;
+		 
+
+	}else{
+		
+		$company=\App\Company::where('is_parent',1)->get()->first();
+
+		session(['company_id'=>$company->id]);
+		return $company;
+	}
+	}
 
 	
 	
@@ -34,13 +49,7 @@ function companyId(){
 		
 		return session('company_id');
 	}else{
-		if (\Auth::user()->company and \Auth::user()->role->permissions->contains('constant', 'group_access')) {
-		
-		
-		session(['company_id'=>0]);
-		return 0;
-		 
-	}elseif (\Auth::user()->company) {
+		if (\Auth::user()->company) {
 		
 		$company=\App\Company::where('id',\Auth::user()->company_id)->get()->first();
 		session(['company_id'=>$company->id]);

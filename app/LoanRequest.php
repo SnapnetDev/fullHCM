@@ -3,6 +3,8 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Scopes\CompanyScope;
+
 
 class LoanRequest extends Model
 {
@@ -12,6 +14,12 @@ class LoanRequest extends Model
     public function user()
     {
     	return $this->belongsTo('App\User','user_id');
+    }
+    protected static function boot()
+    {
+        parent::boot();
+      
+        static::addGlobalScope(new CompanyScope);
     }
     public function approver()
     {

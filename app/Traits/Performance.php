@@ -95,19 +95,37 @@ trait Performance {
 	
 
 	private function addKpi(Request $request){
+		if(session()->has('company_id')){
+            $compid=session('company_id');
+        }
+        else{
+            $compid=\Auth::user()->company_id;
+        }
+			$checkTarget=\App\kpi::whereHas('kpiassignedto',function($query) use ($request){
+
+							$query->where(['user_id'=>$request->assignedto])
+									->whereYear('created_at',session('FY'));
+			})->selectRaw("SUM(targetweight) as weight")->value('weight');
+
+			if(($checkTarget+$request->targetweight)>100){
+				$diff=100-$checkTarget;
+				throw new \Exception("Sum of target weight must not be greater than 100. Please enter value not greater than $diff");		
+			}
 
 			 $kpi=\App\kpi::updateOrCreate(['id'=>$request->formid],
 			 	[
 			 	 'deliverable'=>$request->deliverables,
-			 	 'targetweight'=>$request->targetamount,
-			 	 'targetamount'=>$request->targetweight,
+			 	 'targetweight'=>$request->targetweight,
+			 	 'targetamount'=>$request->targetamount,
 			 	 'status'=>0,
-			 	 'quarter'=>$request->quarter,
+			 	 'company_id'=>$compid,
 			 	 'comment'=>$request->comment,
 			 	 'created_by'=>$request->user()->id,
 			 	 'created_at'=>date('Y-m-d H:i:s'),
-			 	 'assigned_to'=>$request->assignedto
+			 	 'assigned_to'=>$request->assignedto,
+			 	 'department_id'=>$request->department_id
 			 	]);
+
 			 $kpiassignedto=\App\kpiassignedto::updateOrCreate(['user_id'=>$request->assignedto,'kpi_id'=>$kpi->id],['user_id'=>$request->assignedto,'kpi_id'=>$kpi->id]);
 
 			 return response()->json(['status'=>'success','message'=>'Operation Successfull']);
@@ -230,7 +248,7 @@ trait Performance {
 		$pilots=\App\Goal::where('goal_cat_id',2)->whereYear('created_at',session('FY'))->get();
 		$companys=\App\Company::get();
 		$performanceSettings=\App\PerformanceSeason::where('company_id',$compid)->first();
-		$performancesettings= !is_null($performanceSettings) ? $performanceSettings->toArray() : [];
+		$performanceSettings =is_null($performanceSettings) ? [] : $performanceSettings->toArray();
 		// dd($performanceSettings);
 		// Notify All Employees
 		return view('settings.performancesettings.index',compact('pilots','published','performanceSettings','companys'));
@@ -287,22 +305,20 @@ trait Performance {
   	
      	$carasps= $this->goals(4,$request->id,$quarter,$date);
  	 	$kpis= $this->getkpis($request,$quarter);
-		return view('performance.employee',compact('employee','fiscal','lmGoals','pilots','yearquarter','carasps','idps','kpis')); 
+ 	 	$departments=\App\Department::get();
+		return view('performance.employee',compact('employee','fiscal','lmGoals','pilots','yearquarter','carasps','idps','kpis','departments')); 
 	}
 
 
 	   public function getkpis(Request $request,$quarter) {
-              
+              $userGetdept=\App\User::where('id',$request->id)->first();
+
                $kpis=\App\kpi::whereYear('created_at',date('Y')) 
-               					->where(function($query) use ($request){
-               					$query->where('assigned_to',0)
-               						   ->orwhereHas('kpiassignedto',function($query) use ($request){
+               					->where(function($query) use ($request,$userGetdept){
+               					$query->whereHas('kpiassignedto',function($query) use ($request){
                								$query->where('user_id',$request->id);
-               					});
-               		})->where('quarter',$quarter);
-               					
-               	 
-               	  $kpis=$kpis->paginate(10);
+               					})->orwhere('department_id',$userGetdept->department);
+               		 })->paginate(10);
                					  
 
             return $kpis;

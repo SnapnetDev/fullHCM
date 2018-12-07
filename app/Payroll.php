@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Payroll extends Model
 {
     //
-    protected $fillable=['month','year','company_id','workflow_id'];
+    protected $fillable=['month','year','company_id','workflow_id','paysilp_issued'];
     protected $table="payroll";
 
     public function company()
