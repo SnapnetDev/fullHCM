@@ -29,26 +29,26 @@
             <div class="page-aside-section">
               <h5 class="page-aside-title">Employment Status</h5>
               <div class="list-group">
-                <a class="list-group-item" href="javascript:void(0)">
-                  <span class="item-right">61</span><i class="icon md-check-square" aria-hidden="true"></i>Confirmed
+                <a class="list-group-item status-sort {{request()->status==1?'active':''}}" href="javascript:void(0)" id="1">
+                  <span class="item-right">{{$usersforcount->where('status',1)->count()}}</span><i class="icon md-check-square" aria-hidden="true"></i>Confirmed
                 </a>
-                <a class="list-group-item" href="javascript:void(0)">
-                  <span class="item-right">61</span><i class="icon md-square-o" aria-hidden="true"></i>Probation
+                <a class="list-group-item status-sort {{request()->status==2?'active':''}}" href="javascript:void(0)" id="2">
+                  <span class="item-right">{{$usersforcount->where('status',2)->count()}}</span><i class="icon md-square-o" aria-hidden="true"></i>Probation
                 </a>
-                 <a class="list-group-item" href="javascript:void(0)">
-                  <span class="item-right">61</span><i class="icon md-flight-takeoff" aria-hidden="true"></i>Leave
+                 <a class="list-group-item status-sort {{request()->status==3?'active':''}}" href="javascript:void(0)" id="3">
+                  <span class="item-right">{{$usersforcount->where('status',3)->count()}}</span><i class="icon md-flight-takeoff" aria-hidden="true"></i>Leave
                 </a>
-                <a class="list-group-item" href="javascript:void(0)">
-                  <span class="item-right">61</span><i class="icon md-close" aria-hidden="true"></i>Suspended
+                <a class="list-group-item status-sort {{request()->status==4?'active':''}}" href="javascript:void(0)" id="4">
+                  <span class="item-right">{{$usersforcount->where('status',4)->count()}}</span><i class="icon md-close" aria-hidden="true"></i>Suspended
                 </a>
-                <a class="list-group-item" href="javascript:void(0)">
-                  <span class="item-right">61</span><i class="icon md-minus-square" aria-hidden="true"></i>Resigned
+                <a class="list-group-item status-sort {{request()->status==5?'active':''}}" href="javascript:void(0)" id="5">
+                  <span class="item-right">{{$usersforcount->where('status',5)->count()}}</span><i class="icon md-minus-square" aria-hidden="true"></i>Resigned
                 </a>
-                <a class="list-group-item" href="javascript:void(0)">
-                  <span class="item-right">61</span><i class="icon md-archive" aria-hidden="true"></i>Retired
+                <a class="list-group-item status-sort {{request()->status==6?'active':''}}" href="javascript:void(0)" id="6">
+                  <span class="item-right">{{$usersforcount->where('status',6)->count()}}</span><i class="icon md-archive" aria-hidden="true"></i>Retired
                 </a>
-                <a class="list-group-item" href="javascript:void(0)">
-                  <span class="item-right">61</span><i class="icon md-delete" aria-hidden="true"></i>Disengaged
+                <a class="list-group-item status-sort {{request()->status==7?'active':''}}" href="javascript:void(0)" id="7">
+                  <span class="item-right">{{$usersforcount->where('status',7)->count()}}</span><i class="icon md-delete" aria-hidden="true"></i>Disengaged
                 </a>
               </div>
             </div>
@@ -184,6 +184,7 @@
                         <div class="row">
                         <div class="col-md-12"></div>
                         <input type="hidden" value="{{ request()->pagi }}" id="pagi" name="pagi">
+                        <input type="hidden" value="{{ request()->status }}" id="status" name="status">
                         <button type="submit" class="btn btn-primary pull-xs-right">Filter</button>
                       </div>
                     </form>
@@ -209,6 +210,7 @@
               </th>
               <th  data-priority="1" class="cell-300" scope="col" data-tablesaw-sortable-col data-tablesaw-priority="3">Name</th>
               <th data-priority="2" class="cell-300" scope="col" data-tablesaw-sortable-col data-tablesaw-priority="3">Staff ID</th>
+              <th data-priority="3"  class="cell-300" scope="col" data-tablesaw-sortable-col data-tablesaw-priority="4">Gender</th>
               <th data-priority="3"  class="cell-300" scope="col" data-tablesaw-sortable-col data-tablesaw-priority="4">Job</th>
               <th data-priority="4"  class="cell-300" scope="col" data-tablesaw-sortable-col data-tablesaw-priority="4">Email</th>
               <th data-priority="4"  class="cell-300" scope="col" data-tablesaw-sortable-col data-tablesaw-priority="4">Manager</th>
@@ -234,6 +236,7 @@
                 {{$user->name}}
               </td>
               <td class="cell-300" >{{$user->emp_num}}</td>
+               <td class="cell-300" >{{$user->sex=='M'?'Male':($user->sex=='F'?'Female':'')}}</td>
               <td >
               @if(count($user->jobs)>0)
               {{$user->jobs()->latest()->first()->title}}
@@ -443,6 +446,11 @@ if ($('.users-checkbox:checkbox:checked').length==0) {
 $(document).on('change','#pagi-change',function(event){
   event.preventDefault();
   $('#pagi').val($(this).val());
+  $('#filterForm').submit();
+    });
+$(document).on('click','.status-sort',function(event){
+  event.preventDefault();
+  $('#status').val($(this).id);
   $('#filterForm').submit();
     });
 

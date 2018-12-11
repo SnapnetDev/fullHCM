@@ -220,7 +220,7 @@
                     <form id="uplodaDocument">
                     <div class="col-xs-12 col-xl-12 form-group">
                         {{('Has Expiry ?')}} :<br>
-                        <select class="form-control" id="expirydecide">
+                        <select class="form-control" id="expirydecide" style="width: 100%">
                             <option value='1'> Yes </option>
                             <option value='2' selected> No </option>
                         </select>
@@ -228,7 +228,7 @@
                  @if(Auth::user()->role->permissions->contains('constant', 'upload_document'))
                     <div class="col-xs-12 col-xl-12 form-group">
                         {{('Upload For')}} :<br>
-                        <select   id="employeeid" name="user_id">
+                        <select class="form-control"   id="employeeid" name="user_id" style="width: 100%">
                             <option value="{{Auth::user()->id}}" selected> Myself </option>
                             
                         </select>
@@ -243,7 +243,7 @@
                       <div class="col-xs-12 col-xl-12 form-group">
 
                       <p>{{('Folder')}}</p>
-                      <select data-plugin="select2" id="upfolderid" name="type_id">
+                      <select class="form-control" data-plugin="select2" id="upfolderid" name="type_id" style="width: 100%">
                           <option value="" >--{{('Select Folder')}}--</option> 
                           @foreach($folders as $folder)
                        <option value="{{$folder->id}}" {{isset($_GET['folder_id']) && $_GET['folder_id']==$folder->id ? 'selected' : ''  }} >{{$folder->docname}}</option>

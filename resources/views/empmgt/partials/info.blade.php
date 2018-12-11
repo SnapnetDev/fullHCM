@@ -10,7 +10,7 @@
     </div>
     <div class="vertical-align-middle">
       <a class="avatar" href="javascript:void(0)">
-        <img src="{{asset('global/portraits/2.jpg')}}" alt="...">
+        <img src="{{ $user->image!=''?asset('storage/avatar'.$user->image):($user->sex=='M'?asset('global/portraits/male-user.png'):asset('global/portraits/female-user.png'))}}" alt="...">
       </a>
       <h3 class="name">{{$user->name}}</h3>
       <h4 class="name">({{$user->role->name}})</h4>
@@ -29,6 +29,15 @@
   <table class="user-info">
     <tbody>
       <tr>
+        <td class="info-label">Gender:</td>
+        <td>
+          <span> {{$user->sex=='M'?'Male':($user->sex=='F'?'Female':'')}}</span>
+          <div class="form-group form-material floating">
+            <input type="email" class="form-control empty" name="inputFloatingEmail" value="mazhesee@gmail.com">
+          </div>
+        </td>
+       </tr>
+        <tr>
         <td class="info-label">Email:</td>
         <td>
           <span>{{$user->email}}</span>
@@ -58,7 +67,9 @@
       <tr>
         <td class="info-label">Position:</td>
         <td>
-          {{-- <span>{{$user->job->title}}</span> --}}
+          <span> @if(count($user->jobs)>0)
+              {{$user->jobs()->latest()->first()->title}}
+              @endif</span>
           <div class="form-group form-material floating">
             <input type="text" class="form-control empty" name="inputFloatingBirthday" value="1990/2/15">
           </div>
@@ -67,7 +78,7 @@
       <tr>
         <td class="info-label">With Us Since:</td>
         <td>
-          <span{{$user->hiredate->diffForHumans()}}</span>
+          <span>{{\Carbon\Carbon::parse($user->hiredate)->diffForHumans()}}</span>
           <div class="form-group form-material floating">
             <input type="text" class="form-control empty" name="inputFloatingURL" value="http://amazingSurge.com">
           </div>

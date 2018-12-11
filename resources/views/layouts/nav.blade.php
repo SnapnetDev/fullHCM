@@ -76,6 +76,11 @@
                   </a>
                 </li>
                 <li class="site-menu-item ">
+                  <a class="animsition-link" href="{{ url('document/mydocument') }}">
+                    <span class="site-menu-title">My Documents </span>
+                  </a>
+                </li>
+                <li class="site-menu-item ">
                   <a class="animsition-link" href="#">
                     <span class="site-menu-title">My Expenses </span>
                   </a>

@@ -57,7 +57,7 @@
           </div>
 
           <div class="site-action" data-plugin="actionBtn">
-    <button type="button" class="site-action-toggle btn-raised btn btn-success btn-floating" data-toggle="">
+    <button type="button" class=" btn-raised btn btn-success btn-floating" data-toggle="modal" data-target="#addJoblistingModal">
       <i class="icon md-plus animation-scale-up" aria-hidden="true"></i>
       
     </button>
@@ -66,7 +66,8 @@
 
       	</div>
 </div>
-  <!-- End Page -->
+  <!-- End Page -->\
+  @include('recruit.modals.addJoblisting')
   
 @endsection
 @section('scripts')

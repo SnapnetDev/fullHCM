@@ -1054,7 +1054,7 @@
   }
 
   function deleteAcademicHistory(emp_academic_id){
-    $.get('{{ url('/userprofile/delete_academic_history') }}/',{ emp_academic_id: emp_academic_id },function(data){
+    $.get('{{ url('/userprofile/delete_academic_history') }}/',{ academic_history_id: emp_academic_id },function(data){
       if (data=='success') {
     toastr.success("Academic History deleted successfully",'Success');
     location.reload();

@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 
 
 trait Document {
-	public $allowed=['JPG','PNG','jpeg','png','gif','jpg'];
+	public $allowed=['JPG','PNG','jpeg','png','gif','jpg','pdf'];
 	public function processGet($route,Request $request){
 		switch ($route) {
 			case 'mydocument':
@@ -131,6 +131,7 @@ trait Document {
 	}
 
 	private function myDocument(Request $request){
+
 		$pageType='media';
 		$folders=\App\DocumentType::get();
 		return view('document.document',compact('pageType','folders'));

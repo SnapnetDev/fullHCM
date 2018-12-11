@@ -291,7 +291,7 @@ trait PayrollTrait{
 		$this->allowancesanddeductions($payroll);
 		$this->calculate_specific_salary_components($payroll);
         
-		$payroll['taxable_income']= $payroll['gross_pay'] - $payroll['consolidated_allowance']-($payroll['deductions']['pension']*12) + ($payroll['ssc_total_allowances']*12);
+		$payroll['taxable_income']= $payroll['gross_pay'] - $payroll['consolidated_allowance']-($payroll['not_taxable']*12) + ($payroll['ssc_total_allowances']*12);
 		$this->calculate_tax($payroll);
 		}else{
 

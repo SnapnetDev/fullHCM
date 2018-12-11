@@ -186,13 +186,13 @@
                 <p class="m-b-5 text-nowrap"><i title="User Role" class="icon fa fa-sign-in m-r-10" aria-hidden="true"></i>
                   <span class="text-break">{{Auth::user()->role->name}}</span>
                 </p>
-                <p class="m-b-5 text-nowrap"><i title="Gender" class="icon fa fa-star-o m-r-10" aria-hidden="true"></i>
+                {{-- <p class="m-b-5 text-nowrap"><i title="Gender" class="icon fa fa-star-o m-r-10" aria-hidden="true"></i> --}}
 
-                   @if(count(Auth::user()->promotionHistories())>0)
+                   {{-- @if(count(Auth::user()->promotionHistories()>0) --}}
             
             
-                  <span class="text-break">Level {{(Auth::user()->promotionHistories()->latest()->first()->grade)?Auth::user()->promotionHistories()->latest()->first()->grade->level:''}}</span>
-                  @endif
+                  {{-- <span class="text-break">Level {{(Auth::user()->promotionHistories()->latest()->first()->grade)?Auth::user()->promotionHistories()->latest()->first()->grade->level:''}}</span> --}}
+                  {{-- @endif --}}
                 </p>
               </div>
             </div>
@@ -212,8 +212,8 @@
                 </div>
                 <div class="col-xs-4">
                   <div class="counter">
-                    <span class="counter-number cyan-600">10.8K</span>
-                    <div class="counter-label">Followers</div>
+                    <span class="counter-number cyan-600">3</span>
+                    <div class="counter-label">Projects</div>
                   </div>
                 </div>
               </div>

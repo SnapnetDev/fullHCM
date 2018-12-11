@@ -34,7 +34,7 @@ class UserController extends Controller
         $company_id=companyId();
         if (count($request->all())==0) {
             if ($company_id>0) {
-                $users=User::where('company_id','!=',1)->paginate(10);
+                $users=User::where('company_id','=',$company_id)->paginate(10);
             }else{
                 $users=User::paginate(10);
             }
@@ -43,7 +43,7 @@ class UserController extends Controller
         $branches=$companies->first()->branches;
         $departments=$companies->first()->departments;
         $qualifications=Qualification::all();
-        $usersforcount=User::where('superadmin','!=',1)->get();
+        $usersforcount=User::where('company_id','=',$company_id)->get();
         $roles=Role::all();
         $competencies=Competency::all();
         $user_groups=UserGroup::all();
@@ -58,7 +58,7 @@ class UserController extends Controller
              $companies=Company::all();
         $branches=$companies->first()->branches;
         $departments=$companies->first()->departments;
-        $usersforcount=User::where('superadmin','!=',1)->get();
+        $usersforcount=User::where('company_id','=',$company_id)->get();
         $roles=Role::all();
         $competencies=Competency::all();
         $user_groups=UserGroup::all();

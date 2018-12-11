@@ -76,6 +76,7 @@ class WorkflowController extends Controller
            $no_of_stages=count($request->input('stagename'));
            $no_of_users=count($request->input('user_id'));
            $no_of_roles=count($request->input('role'));
+           $no_of_groups=count($request->input('group'));
            $no_of_users_used=0;
            $no_of_roles_used=0;
            $no_of_groups_used=0;
@@ -90,7 +91,7 @@ class WorkflowController extends Controller
               $stage=$wf->stages()->create(['name'=>$request->stagename[$i],'position'=>$i,'type'=>$request->type[$i],'role_id'=>$request->role[$no_of_roles_used]]);
               $no_of_roles_used++;
             }elseif($request->type[$i]==3)
-              $stage=$wf->stages()->create(['name'=>$request->stagename[$i],'position'=>$i,'type'=>$request->type[$i],'group_id'=>$request->role[$no_of_groups_used]]);
+              $stage=$wf->stages()->create(['name'=>$request->stagename[$i],'position'=>$i,'type'=>$request->type[$i],'group_id'=>$request->group[$no_of_groups_used]]);
               $no_of_groups_used++;
                  
              }

@@ -184,7 +184,7 @@ Route::resource('performance', 'PerformanceController')->middleware(['permission
 Route::resource('leave','LeaveController')->middleware(['auth']);
 Route::resource('document','DocumentController')->middleware(['auth']);
 Route::resource('projects','ProjectController')->middleware(['auth']);
-Route::resource('recruit','RecruitController')->middleware(['auth']);
+Route::resource('recruits','RecruitController')->middleware(['auth']);
 Route::resource('compensation','CompensationController')->middleware(['auth']);
 Route::resource('loan','LoanController')->middleware(['auth']);
 Route::get('jobs_departments','JobController@departments')->name('job_departments.view')->middleware(['auth']);
