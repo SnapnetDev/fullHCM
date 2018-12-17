@@ -238,7 +238,7 @@
         }]
       },
       'plugins': ['checkbox']
-    })
+    });
   })();
 
   // Example jstree use Contextmenu Plugin
@@ -267,7 +267,7 @@
         }]
       },
       'plugins': ['contextmenu']
-    })
+    });
   })();
 
   // Example jstree use Search Plugin

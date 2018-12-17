@@ -13,6 +13,10 @@
   border: 0;
 }
 
+.btn-group label.btn {
+  margin-bottom: 0;
+}
+
 @media (max-width: 991px) {
   #custom_view .panel-actions {
     position: relative;

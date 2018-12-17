@@ -124,41 +124,6 @@
   left: 3px;
 }
 
-.app-calendar .page {
-  margin-top: 30px;
-  margin-bottom: 30px;
-}
-
-@media (min-width: 1600px) {
-  .app-calendar .page {
-    max-width: 1540px;
-  }
-}
-
-@media (min-width: 1200px) and (max-width: 1599px) {
-  .app-calendar .page {
-    max-width: 1140px;
-  }
-}
-
-@media (min-width: 992px) and (max-width: 1199px) {
-  .app-calendar .page {
-    max-width: 932px;
-  }
-}
-
-@media (min-width: 768px) and (max-width: 991px) {
-  .app-calendar .page {
-    max-width: 708px;
-  }
-}
-
-@media (max-width: 767px) {
-  .app-calendar .page {
-    margin: 0;
-  }
-}
-
 @media (max-width: 991px) {
   .fc-toolbar {
     margin-bottom: 60px;

@@ -32,7 +32,7 @@ trait LeaveTrait
 		return $this->getRequest($request);
 		break;
 		case 'view_requests':
-		return $this->viewRequest($request);
+		return $this->viewRequests($request);
 		break;
 		case 'delete_request':
 		return $this->deleteRequest($request);
@@ -60,6 +60,10 @@ trait LeaveTrait
 				# code...
 				break;
 		}
+	}
+	public function viewRequests(Request $request)
+	{
+		# code...
 	}
 
 	public function myRequests(Request $request)
@@ -111,7 +115,8 @@ trait LeaveTrait
 	public function saveRequest(Request $request)
 	{
 		$leave_workflow_id=Setting::where('name','leave_workflow')->first()->value;
-		$leave_request=LeaveRequest::create(['leave_id'=>$request->leave_id,'user_id'=>Auth::user()->id,'start_date'=>date('Y-m-d',strtotime($request->start_date)),'end_date'=>date('Y-m-d',strtotime($request->end_date)),'reason'=>$request->reason,'workflow_id'=>$leave_workflow_id,'paystatus'=>$request->paystatus,'status'=>0,'priority'=>$request->priority]);
+		$company_id=companyId();
+		$leave_request=LeaveRequest::create(['leave_id'=>$request->leave_id,'user_id'=>Auth::user()->id,'start_date'=>date('Y-m-d',strtotime($request->start_date)),'end_date'=>date('Y-m-d',strtotime($request->end_date)),'reason'=>$request->reason,'workflow_id'=>$leave_workflow_id,'paystatus'=>$request->paystatus,'status'=>0,'priority'=>$request->priority,'company_id'=>$company_id]);
 		  $stage=Workflow::find($leave_request->workflow_id)->stages->first();
 		  if($stage->type==1){
 		  	$leave_request->leave_approvals()->create([

@@ -35,6 +35,10 @@
   color: #e0e0e0;
 }
 
+.app-taskboard .slidePanel-header .stage-name {
+  margin-top: 11px;
+}
+
 .app-taskboard .slidePanel-actions {
   min-height: 0;
 }

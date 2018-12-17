@@ -1,4 +1,13 @@
-<header class="slidePanel-header overlay" style="background-image: url('{{asset('global/photos/placeholder.png')}}')">
+<style type="text/css">
+  .bg-back{
+    background: #4c4c4c; /* Old browsers */
+background: -moz-linear-gradient(-45deg, #4c4c4c 0%, #595959 12%, #000000 16%, #000000 16%, #666666 25%, #000000 38%, #474747 47%, #2c2c2c 50%, #111111 71%, #2b2b2b 76%, #1c1c1c 91%, #131313 100%); /* FF3.6-15 */
+background: -webkit-linear-gradient(-45deg, #4c4c4c 0%,#595959 12%,#000000 16%,#000000 16%,#666666 25%,#000000 38%,#474747 47%,#2c2c2c 50%,#111111 71%,#2b2b2b 76%,#1c1c1c 91%,#131313 100%); /* Chrome10-25,Safari5.1-6 */
+background: linear-gradient(135deg, #4c4c4c 0%,#595959 12%,#000000 16%,#000000 16%,#666666 25%,#000000 38%,#474747 47%,#2c2c2c 50%,#111111 71%,#2b2b2b 76%,#1c1c1c 91%,#131313 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#4c4c4c', endColorstr='#131313',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
+  }
+</style>
+<header class="slidePanel-header overlay .bg-back" >
   <div class="overlay-panel overlay-background vertical-align">
     <div class="slidePanel-actions">
       <div class="btn-group btn-group-flat">

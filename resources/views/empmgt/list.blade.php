@@ -20,7 +20,7 @@
           <div data-role="content">
             <div class="page-aside-section">
               <div class="list-group">
-                <a class="list-group-item" href="javascript:void(0)">
+                <a class="list-group-item status-reset" href="javascript:void(0)">
                   <span class="item-right">{{$usersforcount->count()}}</span><i class="icon md-accounts-alt" aria-hidden="true"></i>All
                   Employee
                 </a>
@@ -32,23 +32,23 @@
                 <a class="list-group-item status-sort {{request()->status==1?'active':''}}" href="javascript:void(0)" id="1">
                   <span class="item-right">{{$usersforcount->where('status',1)->count()}}</span><i class="icon md-check-square" aria-hidden="true"></i>Confirmed
                 </a>
-                <a class="list-group-item status-sort {{request()->status==2?'active':''}}" href="javascript:void(0)" id="2">
-                  <span class="item-right">{{$usersforcount->where('status',2)->count()}}</span><i class="icon md-square-o" aria-hidden="true"></i>Probation
+                <a class="list-group-item status-sort {{request()->status==0?'active':''}}" href="javascript:void(0)" id="0">
+                  <span class="item-right">{{$usersforcount->where('status',0)->count()}}</span><i class="icon md-square-o" aria-hidden="true"></i>Probation
                 </a>
-                 <a class="list-group-item status-sort {{request()->status==3?'active':''}}" href="javascript:void(0)" id="3">
-                  <span class="item-right">{{$usersforcount->where('status',3)->count()}}</span><i class="icon md-flight-takeoff" aria-hidden="true"></i>Leave
+                 <a class="list-group-item status-sort {{request()->status==2?'active':''}}" href="javascript:void(0)" id="2">
+                  <span class="item-right">{{$usersforcount->where('status',2)->count()}}</span><i class="icon md-flight-takeoff" aria-hidden="true"></i>Leave
+                </a>
+                <a class="list-group-item status-sort {{request()->status==3?'active':''}}" href="javascript:void(0)" id="3">
+                  <span class="item-right">{{$usersforcount->where('status',3)->count()}}</span><i class="icon md-close" aria-hidden="true"></i>Suspended
                 </a>
                 <a class="list-group-item status-sort {{request()->status==4?'active':''}}" href="javascript:void(0)" id="4">
-                  <span class="item-right">{{$usersforcount->where('status',4)->count()}}</span><i class="icon md-close" aria-hidden="true"></i>Suspended
+                  <span class="item-right">{{$usersforcount->where('status',4)->count()}}</span><i class="icon md-minus-square" aria-hidden="true"></i>Resigned
                 </a>
                 <a class="list-group-item status-sort {{request()->status==5?'active':''}}" href="javascript:void(0)" id="5">
-                  <span class="item-right">{{$usersforcount->where('status',5)->count()}}</span><i class="icon md-minus-square" aria-hidden="true"></i>Resigned
+                  <span class="item-right">{{$usersforcount->where('status',5)->count()}}</span><i class="icon md-archive" aria-hidden="true"></i>Retired
                 </a>
                 <a class="list-group-item status-sort {{request()->status==6?'active':''}}" href="javascript:void(0)" id="6">
-                  <span class="item-right">{{$usersforcount->where('status',6)->count()}}</span><i class="icon md-archive" aria-hidden="true"></i>Retired
-                </a>
-                <a class="list-group-item status-sort {{request()->status==7?'active':''}}" href="javascript:void(0)" id="7">
-                  <span class="item-right">{{$usersforcount->where('status',7)->count()}}</span><i class="icon md-delete" aria-hidden="true"></i>Disengaged
+                  <span class="item-right">{{$usersforcount->where('status',6)->count()}}</span><i class="icon md-delete" aria-hidden="true"></i>Disengaged
                 </a>
               </div>
             </div>
@@ -66,7 +66,7 @@
           <form>
             <select class="form-control" id="pagi-change">
               <option value="all" {{ request()->pagi=='all'?'selected':'' }}>All</option>
-              <option value="10" {{ request()->pagi==10?'selected':'' }}>10</option>
+              <option value="10" {{ request()->pagi==10?'selected':(request()->pagi==''?'selected':'') }}>10</option>
               <option value="15" {{ request()->pagi==15?'selected':'' }}>15</option>
               <option value="25" {{ request()->pagi==25?'selected':'' }}>25</option>
               <option value="50" {{ request()->pagi==50?'selected':'' }}>50</option>
@@ -80,7 +80,8 @@
         <div class="page-content-actions">
           
           <div class="btn-group btn-group-flat">
-            <button class="btn  btn-success " title="Export to Excel"><i class="fa fa-file-excel-o" aria-hidden="true"></i></button>
+            <button class="btn  btn-success " title="Export to Excel" id="exporttoexcel"><i class="fa fa-file-excel-o" aria-hidden="true"></i>&nbsp; Current View</button>
+            <button class="btn  btn-success " title="Export to All Excel" id="exportalltoexcel"><i class="fa fa-file-excel-o" aria-hidden="true"> </i>&nbsp;All</button>
             <button class="btn  btn-danger " title="Export to PDF"><i class="fa fa-file-pdf-o" aria-hidden="true"></i></button>
           </div>
         </div>
@@ -185,6 +186,8 @@
                         <div class="col-md-12"></div>
                         <input type="hidden" value="{{ request()->pagi }}" id="pagi" name="pagi">
                         <input type="hidden" value="{{ request()->status }}" id="status" name="status">
+                        <input type="hidden" value="" id="excel" name="excel">
+                        <input type="hidden" value="" id="excelall" name="excelall">
                         <button type="submit" class="btn btn-primary pull-xs-right">Filter</button>
                       </div>
                     </form>
@@ -450,7 +453,25 @@ $(document).on('change','#pagi-change',function(event){
     });
 $(document).on('click','.status-sort',function(event){
   event.preventDefault();
-  $('#status').val($(this).id);
+  console.log($(this).attr("id"));
+  $('#status').val($(this).attr("id"));
+  $('#filterForm').submit();
+    });
+
+$(document).on('click','.status-reset',function(event){
+  event.preventDefault();
+  console.log($(this).attr("id"));
+  $('#status').val('');
+  $('#filterForm').submit();
+    });
+$(document).on('click','#exporttoexcel',function(event){
+  event.preventDefault();
+  $('#excel').val(true);
+  $('#filterForm').submit();
+    });
+$(document).on('click','#exportalltoexcel',function(event){
+  event.preventDefault();
+  $('#excelall').val(true);
   $('#filterForm').submit();
     });
 

@@ -39,6 +39,9 @@ class UserFilter
           if ($filters->filled('role')&&$filters->input('role')!=0) {
             $user->where('role_id','=' ,$filters->input('role'));
           }
+          if ($filters->filled('status')&&$filters->input('status')!='') {
+            $user->where('status','=' ,$filters->input('status'));
+          }
          
         // Search for a user based on their group date.
           if ($filters->filled('user_group')&&$filters->input('user_group')!=0) {
@@ -50,7 +53,7 @@ class UserFilter
        
              $company_id=companyId();
            if ($company_id>0) {
-                $user->where('company_id','!=',1)->paginate(10);
+                $user->where('company_id', $company_id)->paginate(10);
             }
         // Get the results and return them.
           if ($filters->filled('pagi')&&$filters->input('pagi')=='all') {

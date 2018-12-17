@@ -55,6 +55,7 @@
       api.close();
     });
 
+
     // Refresh
     var even = false;
     $('#exampleReplace').on('click', function() {

@@ -155,7 +155,7 @@
         if ($($checklistItems[i]).find('input').prop('checked')) {
           checkedLength++;
         }
-      };
+      }
       var percent = 100 * (checkedLength / allLength);
       $('.project-checklist [data-plugin="progress"]').asProgress('go', percent);
     });

@@ -9,15 +9,10 @@
   if (!window.localStorage) {
     return null;
   }
-
-  var settings = localStorage.getItem('remark.material.topmenu.skinTools');
-
-  if (!settings) {
-    return null;
-  }
-  if (settings[0] === "{") {
-    settings = JSON.parse(settings);
-  }
+  var layout = 'topbar';
+  // var levelPaht = layout;
+  var settingsName = 'remark.material.' + layout + '.skinTools';
+  var settings = localStorage.getItem(settingsName);
 
   function getLevel(url, tag) {
     var arr = url.split('/').reverse(),
@@ -28,57 +23,60 @@
         level = i;
       }
     }
-    for (var m = 0; m < level; m++) {
+    for (var m = 1; m < level; m++) {
       path += '../'
     }
+
     return path;
   }
 
-  if (settings['primary'] && settings['primary'] !== 'primary') {
-    var head = document.head,
-      link = document.createElement('link');
+  if (settings) {
+    if (settings[0] === "{") {
+      settings = JSON.parse(settings);
+    }
 
-    link.type = 'text/css';
-    link.rel = 'stylesheet';
-    link.href = getLevel(window.location.pathname, 'html') + 'assets/skins/' + settings['primary'] + '.css';
-    link.id = "skinStyle";
+    if (settings['primary'] && settings['primary'] !== 'primary') {
+      var head = document.head,
+        link = document.createElement('link');
 
-    head.appendChild(link)
-  }
+      link.type = 'text/css';
+      link.rel = 'stylesheet';
+      link.href = getLevel(window.location.pathname, layout) + 'assets/skins/' + settings['primary'] + '.css';
+      link.id = "skinStyle";
 
-  if (settings['sidebar'] && settings['sidebar'] === 'dark') {
-    var menubarFn = setInterval(function() {
-      var menubar = document.getElementsByClassName('site-menubar');
-      if (menubar.length > 0) {
-        clearInterval(menubarFn);
-        menubar[0].className += " site-menubar-dark";
+      head.appendChild(link)
+    }
+
+    if (settings['sidebar'] && settings['sidebar'] === 'light') {
+      var menubarFn = setInterval(function() {
+        var menubar = document.getElementsByClassName('site-menubar');
+        if (menubar.length > 0) {
+          clearInterval(menubarFn);
+          menubar[0].className += " site-menubar-light";
+        }
+      }, 5);
+    }
+
+    var navbarFn = setInterval(function() {
+      var navbar = document.getElementsByClassName('site-navbar');
+      if (navbar.length > 0) {
+        clearInterval(navbarFn);
+        if (settings.navbar && settings.navbar !== 'primary') {
+          navbar[0].className += " bg-" + settings.navbar + "-600";
+        }
+        if (settings['navbarInverse'] && settings['navbarInverse'] !== 'false') {
+          navbar[0].className += " navbar-inverse";
+        }
+
       }
     }, 5);
   }
 
-  var navbarFn = setInterval(function() {
-    var navbar = document.getElementsByClassName('site-navbar');
-    if (navbar.length > 0) {
-      clearInterval(navbarFn);
-
-      if (settings['navbarInverse'] && settings['navbarInverse'] !== 'false') {
-        navbar[0].className += " navbar-inverse";
-      }
-
-      if (settings['navbar'] && settings['navbar'] !== 'primary') {
-        navbar[0].className += (settings['navbar'] === 'yellow' ? ' bg-yellow-700' : ' bg-' + settings['navbar'] + '-600');
-      }
-    }
-  }, 5);
-
-})(window, document);
-
-if (document.addEventListener) {
-  document.addEventListener("DOMContentLoaded", function() {
-    (function(window, document, $) {
-      var $body = $(document.body),
-        $doc = $(document),
-        $win = $(window);
+  if (document.addEventListener) {
+    document.addEventListener("DOMContentLoaded", function() {
+      var $body = $(document.body);
+      // $doc = $(document),
+      // $win = $(window);
 
       var Storage = {
         set: function(key, value) {
@@ -130,7 +128,7 @@ if (document.addEventListener) {
           '<div role="tabpanel" id="skintoolsSidebar" class="tab-pane active"></div>' +
           '<div role="tabpanel" id="skintoolsNavbar" class="tab-pane"></div>' +
           '<div role="tabpanel" id="skintoolsPrimary" class="tab-pane"></div>' +
-          '<button class="btn btn-block btn-primary m-t-20" id="skintoolsReset" type="button">Reset</button>' +
+          '<button class="btn btn-block btn-primary margin-top-20" id="skintoolsReset" type="button">Reset</button>' +
           '</div>' +
           '</div>' +
           '</div>' +
@@ -140,7 +138,7 @@ if (document.addEventListener) {
         skintoolsNavbar: ['primary', 'blue', 'brown', 'cyan', 'green', 'grey', 'orange', 'pink', 'purple', 'red', 'teal', 'yellow'],
         navbarSkins: 'bg-primary-600 bg-blue-600 bg-brown-600 bg-cyan-600 bg-green-600 bg-grey-600 bg-orange-600 bg-pink-600 bg-purple-600 bg-red-600 bg-teal-600 bg-yellow-700',
         skintoolsPrimary: ['primary', 'blue', 'brown', 'cyan', 'green', 'grey', 'orange', 'pink', 'purple', 'red', 'teal', 'yellow'],
-        storageKey: 'remark.topmenu.skinTools',
+        storageKey: settingsName,
         defaultSettings: {
           'sidebar': 'light',
           'navbar': 'primary',
@@ -150,7 +148,7 @@ if (document.addEventListener) {
         init: function() {
           var self = this;
 
-          this.path = this.getLevel(window.location.pathname, 'html');
+          this.path = getLevel(window.location.pathname, layout);
           this.overflow = false;
 
           this.$siteSidebar = $('.site-menubar');
@@ -215,8 +213,7 @@ if (document.addEventListener) {
                   self.navbarImprove(v);
                   break;
                 case 'navbarInverse':
-                  var flag = (v === 'false' ? false : true);
-
+                  var flag = v === 'false' ? false : true;
                   $('input[value="inverse"]', self.$navbar).prop('checked', flag);
                   self.navbarImprove('inverse', flag);
                   break;
@@ -321,20 +318,6 @@ if (document.addEventListener) {
             $link.attr('href', href);
           }
         },
-        getLevel: function(url, tag) {
-          var arr = url.split('/').reverse(),
-            level, path = '';
-
-          $.each(arr, function(i, n) {
-            if (n === tag) {
-              level = i;
-            }
-          });
-          for (var m = 0; m < level; m++) {
-            path += '../'
-          }
-          return path;
-        },
         reset: function() {
           localStorage.clear();
           this.initLocalStorage();
@@ -342,6 +325,7 @@ if (document.addEventListener) {
       };
 
       Skintools.init();
-    })(window, document, jQuery);
-  });
-}
+    });
+  }
+
+})(window, document);

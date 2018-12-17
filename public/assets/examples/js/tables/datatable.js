@@ -51,7 +51,7 @@
         initComplete: function() {
           this.api().columns().every(function() {
             var column = this;
-            var select = $('<select class="form-control width-full"><option value=""></option></select>')
+            var select = $('<select class="form-control w-full"><option value=""></option></select>')
               .appendTo($(column.footer()).empty())
               .on('change', function() {
                 var val = $.fn.dataTable.util.escapeRegex(
@@ -64,7 +64,7 @@
               });
 
             column.data().unique().sort().each(function(d, j) {
-              select.append('<option value="' + d + '">' + d + '</option>')
+              select.append('<option value="' + d + '">' + d + '</option>');
             });
           });
         }

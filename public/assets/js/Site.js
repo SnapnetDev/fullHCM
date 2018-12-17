@@ -1,16 +1,16 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define('/Site', ['exports', 'jquery', 'Config', 'Base', 'Menubar', 'Sidebar', 'PageAside'], factory);
+    define('/Site', ['exports', 'jquery', 'Base', 'Menubar', 'Sidebar', 'PageAside'], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require('jquery'), require('Config'), require('Base'), require('Menubar'), require('Sidebar'), require('PageAside'));
+    factory(exports, require('jquery'), require('Base'), require('Menubar'), require('Sidebar'), require('PageAside'));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.jQuery, global.Config, global.Base, global.SectionMenubar, global.SectionSidebar, global.SectionPageAside);
+    factory(mod.exports, global.jQuery, global.Base, global.SectionMenubar, global.SectionSidebar, global.SectionPageAside);
     global.Site = mod.exports;
   }
-})(this, function (exports, _jquery, _Config, _Base2, _Menubar, _Sidebar, _PageAside) {
+})(this, function (exports, _jquery, _Base2, _Menubar, _Sidebar, _PageAside) {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
@@ -19,8 +19,6 @@
   exports.getInstance = exports.run = exports.Site = undefined;
 
   var _jquery2 = babelHelpers.interopRequireDefault(_jquery);
-
-  var Config = babelHelpers.interopRequireWildcard(_Config);
 
   var _Base3 = babelHelpers.interopRequireDefault(_Base2);
 
@@ -59,8 +57,6 @@
         this.setupFullScreen();
         this.setupMegaNavbar();
         this.setupWave();
-        this.setupTour();
-
         // Dropdown menu setup
         // ===================
         this.$el.on('click', '.dropdown-menu-media', function (e) {
@@ -239,7 +235,7 @@
           Waves.init();
           Waves.attach('.site-menu-item > a', ['waves-classic']);
           Waves.attach(".site-navbar .navbar-toolbar a", ["waves-light", "waves-round"]);
-          Waves.attach('.btn', ['waves-light', 'waves-round']);
+          Waves.attach('.btn');
         }
       }
     }, {
@@ -256,48 +252,9 @@
           loading: true,
           loadingClass: 'loader-overlay',
           loadingParentElement: 'html',
-          loadingInner: '\n      <div class="loader-content">\n        <img src="' + Config.get('assets') + '/images/logo@2x.png">\n        <h2>HCMatrix</h2>\n        <div class="loader-index">\n          <div></div>\n          <div></div>\n          <div></div>\n          <div></div>\n          <div></div>\n          <div></div>\n        </div>\n      </div>',
+          loadingInner: '\n      <div class="loader-content">\n        <img src="' + Config.get('assets') + '/images/logo@2x.png">\n        <h2>Remark</h2>\n        <div class="loader-index">\n          <div></div>\n          <div></div>\n          <div></div>\n          <div></div>\n          <div></div>\n          <div></div>\n        </div>\n      </div>',
           onLoadEvent: true
         });
-      }
-    }, {
-      key: 'setupTour',
-      value: function setupTour(flag) {
-        var _this3 = this;
-
-        if (typeof this.tour === 'undefined') {
-          var _ret2 = function () {
-            if (typeof introJs === 'undefined') {
-              return {
-                v: void 0
-              };
-            }
-            var overflow = (0, _jquery2.default)('body').css('overflow'),
-                self = _this3,
-                tourOptions = Config.get('tour');
-
-            _this3.tour = introJs();
-
-            _this3.tour.onbeforechange(function () {
-              (0, _jquery2.default)('body').css('overflow', 'hidden');
-            });
-
-            _this3.tour.oncomplete(function () {
-              (0, _jquery2.default)('body').css('overflow', overflow);
-            });
-
-            _this3.tour.onexit(function () {
-              (0, _jquery2.default)('body').css('overflow', overflow);
-            });
-
-            _this3.tour.setOptions(tourOptions);
-            (0, _jquery2.default)('.site-tour-trigger').on('click', function () {
-              self.tour.start();
-            });
-          }();
-
-          if ((typeof _ret2 === 'undefined' ? 'undefined' : babelHelpers.typeof(_ret2)) === "object") return _ret2.v;
-        }
       }
     }]);
     return Site;

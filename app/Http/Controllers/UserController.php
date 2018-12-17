@@ -66,6 +66,34 @@ class UserController extends Controller
         $managers=User::whereHas('role',function ($query)  {
                 $query->where('manages','dr');
             })->get();
+
+        if ($request->excel==true) {
+            $view='empmgt.list-excel';
+                // return view('compensation.d365payroll',compact('payroll','allowances','deductions','income_tax','salary','date','has_been_run'));
+                 return     \Excel::create("export", function($excel) use ($users,$view) {
+
+            $excel->sheet("export", function($sheet) use ($users,$view) {
+                $sheet->loadView("$view",compact('users'))
+                ->setOrientation('landscape');
+            });
+
+        })->export('xlsx');
+            # code...
+        }
+        if ($request->excelall==true) {
+            $view='empmgt.list-excel';
+            $users=User::where('company_id','=',$company_id)->get();
+                // return view('compensation.d365payroll',compact('payroll','allowances','deductions','income_tax','salary','date','has_been_run'));
+                 return     \Excel::create("export", function($excel) use ($users,$view) {
+
+            $excel->sheet("export", function($sheet) use ($users,$view) {
+                $sheet->loadView("$view",compact('users'))
+                ->setOrientation('landscape');
+            });
+
+        })->export('xlsx');
+            # code...
+        }
             return view('empmgt.list',['users'=>$users,'usersforcount'=>$usersforcount,'companies'=>$companies,'branches'=>$branches,'departments'=>$departments,'roles'=>$roles,'user_groups'=>$user_groups,'managers'=>$managers,'competencies'=>$competencies]);
 
       }

@@ -201,7 +201,7 @@
         width: 50,
         align: "center",
         itemTemplate: function(value) {
-          return $("<div>").addClass("rating text-nowrap").append(Array(value + 1).join('<i class="icon md-star orange-600 m-r-3"></i>'));
+          return $("<div>").addClass("rating text-nowrap").append(new Array(value + 1).join('<i class="icon md-star orange-600 m-r-3"></i>'));
         }
       }, {
         name: "Price",
@@ -394,7 +394,7 @@
       },
 
       rowRenderer: function(item) {
-        //var user = item.user;
+
         var $photo = $("<div>").addClass("media-left").append(
           $('<a>').addClass('avatar avatar-lg').attr('href', 'javascript:void(0)').append(
             $("<img>").attr("src", item.picture.medium)

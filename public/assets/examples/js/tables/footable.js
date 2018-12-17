@@ -30,7 +30,7 @@
     });
     $('#exampleExpandBtn').on('click', function() {
       fooColExp.trigger('footable_expand_all');
-    })
+    });
   })();
 
   // Accordion
