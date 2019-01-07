@@ -24,6 +24,7 @@ Route::get('/', function () {
 Auth::routes();
 //user routes
 Route::get('/home', 'HomeController@index')->name('home');
+Route::resource('import','ImportController')->middleware(['auth']);
 
 Route::get('users/modal/{user_id}','UserController@modal')->name('users.modal');
 Route::get('users/assignrole','UserController@assignRole')->name('users.assignrole');

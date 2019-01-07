@@ -191,7 +191,7 @@ class UserController extends Controller
         }
         //build LGA
         $lga=\App\LocalGovernment::find($request->lga);
-        if (!$lga) {
+        if (!$lga and $request->lga!='') {
             $lga=\App\LocalGovernment::create(['name'=>$request->lga,'state_id'=>$request->state]);
         }
         //end build LGA

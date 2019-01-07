@@ -186,7 +186,7 @@
                 <span class="site-menu-title">More</span>
                 <span class="site-menu-arrow"></span>
               </a>
-              <ul class="dropdown-menu site-menu-sub site-menu-section-wrap blocks-md-3">
+              <ul class="dropdown-menu site-menu-sub site-menu-section-wrap blocks-md-3" >
                  @if(Auth::user()->role->permissions->contains('constant', 'view_hr_reports')||Auth::user()->role->permissions->contains('constant', 'view_attendance_report')||Auth::user()->role->permissions->contains('constant', 'view_leave_report'))
                 <li class="site-menu-section site-menu-item has-sub">
                   <header>
@@ -298,7 +298,45 @@
                       <i class="site-menu-icon  fa fa-list" aria-hidden="true"></i>
                     <span class="site-menu-title">Project Management</span>
                  
-                   </header>
+                  </a>
+                </li>
+                 <li class="site-menu-section site-menu-item has-sub" style="z-index: 9999999999;">
+                  <header>
+                    <i class="site-menu-icon md-view-compact" aria-hidden="true"></i>
+                    <span class="site-menu-title">Import Data</span>
+                    <span class="site-menu-arrow"></span>
+                  </header>
+                  <div class="site-menu-scroll-wrap is-section">
+                    <div>
+                      <div>
+                        <ul class="site-menu-sub site-menu-section-list">
+                           
+                            <li class="site-menu-item ">
+                              <a class="animsition-link" href="{{url('import/employees')}}">
+                                <span class="site-menu-title">Import Employees</span>
+                              </a>
+                            </li>
+                            <li class="site-menu-item ">
+                              <a class="animsition-link" href="{{url('import/branches')}}">
+                                <span class="site-menu-title">Import Branches</span>
+                              </a>
+                            </li>
+                           
+                            <li class="site-menu-item ">
+                              <a class="animsition-link" href="{{url('import/departments')}}">
+                                <span class="site-menu-title">Import Departments</span>
+                              </a>
+                            </li>
+                            <li class="site-menu-item ">
+                              <a class="animsition-link" href="{{url('import/jobroles')}}">
+                                <span class="site-menu-title">Import Jobroles</span>
+                              </a>
+                            </li>
+                            
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
                 </li>
 
               </ul>
