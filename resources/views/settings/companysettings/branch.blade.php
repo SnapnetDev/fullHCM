@@ -56,7 +56,7 @@
 	                    	@forelse($branches as $branch)
 	                    	<tr>
 	                    		<td>{{$branch->name}}</td>
-	                    		<td>{{$branch->manager->name}}</td>
+	                    		<td>{{$branch->manager?$branch->manager->name:''}}</td>
 	                    		<td>{{$branch->address}}</td>
 	                    		<td>{{$branch->email}}</td>
 	                    		<td>
