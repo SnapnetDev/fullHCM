@@ -63,7 +63,7 @@ class EmployeeDesignationSettingController extends Controller
 	}
 	public function saveStaffCategory(Request $request)
 	{
-		StaffCategory::updateOrCreate(['id'=>$request->staffcategory_id],['name'=>$request->name]);
+		StaffCategory::updateOrCreate(['id'=>$request->staffcategory_id],['name'=>$request->name,'payroll_type'=>$request->payroll_type]);
 		return  response()->json('success',200);
 	}
 	public function getStaffCategory($staffcategory_id)

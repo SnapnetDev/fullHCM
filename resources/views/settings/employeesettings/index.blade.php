@@ -38,7 +38,7 @@
 		            
 	                  <table id="rolestable" data-toggle="table" 
 		                  data-query-params="queryParams" data-mobile-responsive="true"
-		                  data-height="400" data-pagination="true" data-search="true" class="table table-striped" >
+		                  data-height="400" data-pagination="true" data-search="true" class="table table-striped datatable" >
 		                    <thead>
 		                      <tr>
 		                        <th style="width: 80%">Role:</th>
@@ -83,12 +83,13 @@
 		            
 	                  <table id="exampleTablePagination" data-toggle="table" 
 		                  data-query-params="queryParams" data-mobile-responsive="true"
-		                  data-height="400" data-pagination="true" data-search="true" class="table table-striped">
+		                  data-height="400" data-pagination="true" data-search="true" class="table table-striped datatable">
 		                    <thead>
 		                      <tr>
-		                        <th style="width: 25%">Level:</th>
-		                        <th style="width: 25%">Basic Pay:</th>
-		                        <th style="width: 30%">Leave Length:</th>
+		                        <th style="width: 20%">Level:</th>
+		                        <th style="width: 20%">Grade Category</th>
+		                        <th style="width: 20%">Monthly Gross:</th>
+		                        <th style="width: 20%">Leave Length:</th>
 		                        <th style="width: 20%">Action</th>
 		                      </tr>
 		                    </thead>
@@ -96,6 +97,7 @@
 		                    	@forelse($grades as $grade)
 		                    	<tr>
 		                    		<td>{{$grade->level}}</td>
+		                    		<td>{{$grade->grade_category?$grade->grade_category->name:''}}</td>
 		                    		<td>{{$grade->basic_pay}}</td>
 		                    		<td>{{$grade->leave_length}}</td>
 		                    		<td>
@@ -107,6 +109,50 @@
 				                    <div class="dropdown-menu" aria-labelledby="exampleIconDropdown1" role="menu">
 				                      <a class="dropdown-item" id="{{$grade->id}}" onclick="prepareEditData(this.id)"><i class="fa fa-pencil" aria-hidden="true"></i>&nbsp;Edit Grade</a>
 				                       <a class="dropdown-item" id="{{$grade->id}}" onclick="deleteGrade(this.id)"><i class="fa fa-pencil" aria-hidden="true"></i>&nbsp;Delete Grade</a>
+				                      
+				                    </div>
+				                  </div></td>
+		                    	</tr>
+		                    	@empty
+		                    	@endforelse
+		                    	
+		                    </tbody>
+	                  </table>
+	          		</div>
+	          		
+		          </div>
+		          <div class="panel panel-info panel-line">
+		            <div class="panel-heading">
+		              <h3 class="panel-title">Grade Nomenclatue</h3>
+		              <div class="panel-actions">
+                			<button class="btn btn-info" data-toggle="modal" data-target="#addGradeCategoryModal">Add Grade Nomenclature</button>
+
+              			</div>
+		            	</div>
+		            <div class="panel-body">
+		            
+	                  <table id="exampleTablePagination" data-toggle="table" 
+		                  data-query-params="queryParams" data-mobile-responsive="true"
+		                  data-height="400" data-pagination="true" data-search="true" class="table table-striped datatable">
+		                    <thead>
+		                      <tr>
+		                        <th style="width: 80%">Name:</th>
+		                        <th style="width: 20%">Action</th>
+		                      </tr>
+		                    </thead>
+		                    <tbody>
+		                    	@forelse($grade_categories as $grade_category)
+		                    	<tr>
+		                    		<td>{{$grade_category->name}}</td>
+		                    		<td>
+		                    			<div class="btn-group" role="group">
+					                    <button type="button" class="btn btn-primary dropdown-toggle" id="exampleIconDropdown1"
+					                    data-toggle="dropdown" aria-expanded="false">
+					                      Action
+					                    </button>
+				                    <div class="dropdown-menu" aria-labelledby="exampleIconDropdown1" role="menu">
+				                      <a class="dropdown-item" id="{{$grade_category->id}}" onclick="prepareEditGCData(this.id)"><i class="fa fa-pencil" aria-hidden="true"></i>&nbsp;Edit Grade Nomeclature</a>
+				                       <a class="dropdown-item" id="{{$grade_category->id}}" onclick="deleteGradeCategory(this.id)"><i class="fa fa-pencil" aria-hidden="true"></i>&nbsp;Delete Grade Nomenclature</a>
 				                      
 				                    </div>
 				                  </div></td>
@@ -178,6 +224,10 @@
 	   @include('settings.employeesettings.modals.addgrade')
 	  {{-- edit grade modal --}}
 	   @include('settings.employeesettings.modals.editgrade')
+	    {{-- Add Grade Modal --}}
+	   @include('settings.employeesettings.modals.addgradecategory')
+	  {{-- edit grade modal --}}
+	   @include('settings.employeesettings.modals.editgradecategory')
 	   {{-- Add Qualification Modal --}}
 	   @include('settings.employeesettings.modals.addqualification')
 	  {{-- edit Qualification modal --}}
@@ -185,10 +235,11 @@
 	  <!-- End Page -->
 	    <script type="text/javascript">
   	$(function() {
-  
+  $('.datatable').DataTable();
 
   	$(document).on('submit','#addGradeForm',function(event){
 		 event.preventDefault();
+		console.log(1);
 		 var form = $(this);
 		    var formdata = false;
 		    if (window.FormData){
@@ -202,7 +253,7 @@
 		        processData : false,
 		        type        : 'POST',
 		        success     : function(data, textStatus, jqXHR){
-
+		        	console.log(2);
 		            toastr.success("Changes saved successfully",'Success');
 		           $('#addGradeModal').modal('toggle');
 					$( "#ldr" ).load('{{route('employeesettings')}}');
@@ -218,6 +269,70 @@
 		    });
       
 		});
+
+  	$(document).on('submit','#addGradeCategoryForm',function(event){
+		 event.preventDefault();
+		 var form = $(this);
+		    var formdata = false;
+		    if (window.FormData){
+		        formdata = new FormData(form[0]);
+		    }
+		    $.ajax({
+		        url         : '{{route('grade_categories.store')}}',
+		        data        : formdata ? formdata : form.serialize(),
+		        cache       : false,
+		        contentType : false,
+		        processData : false,
+		        type        : 'POST',
+		        success     : function(data, textStatus, jqXHR){
+
+		            toastr.success("Changes saved successfully",'Success');
+		           $('#addGradeCategoryModal').modal('toggle');
+					$( "#ldr" ).load('{{route('employeesettings')}}');
+
+		        },
+		        error:function(data, textStatus, jqXHR){
+		        	 jQuery.each( data['responseJSON'], function( i, val ) {
+							  jQuery.each( val, function( i, valchild ) {
+							  toastr.error(valchild[0]);
+							});  
+							});
+		        }
+		    });
+      
+		});
+
+  		$(document).on('submit','#editGradeCategoryForm',function(event){
+		 event.preventDefault();
+		 var form = $(this);
+		    var formdata = false;
+		    if (window.FormData){
+		        formdata = new FormData(form[0]);
+		    }
+		    $.ajax({
+		        url         : '{{route('grade_categories.store')}}',
+		        data        : formdata ? formdata : form.serialize(),
+		        cache       : false,
+		        contentType : false,
+		        processData : false,
+		        type        : 'POST',
+		        success     : function(data, textStatus, jqXHR){
+
+		            toastr["success"]("Changes saved successfully",'Success');
+		            $('#editGradeCategoryModal').modal('toggle');
+					$( "#ldr" ).load('{{route('employeesettings')}}');
+		        },
+		        error:function(data, textStatus, jqXHR){
+		        	 jQuery.each( data['responseJSON'], function( i, val ) {
+							  jQuery.each( val, function( i, valchild ) {
+							  toastr["error"](valchild[0]);
+							});  
+							});
+		        }
+		    });
+      
+		});
+
   });
   	$(function() {
   	$(document).on('submit','#editGradeForm',function(event){
@@ -251,6 +366,9 @@
       
 		});
   });
+
+
+
 $(function() {
   	$(document).on('submit','#addQualificationForm',function(event){
 		 event.preventDefault();
@@ -316,6 +434,7 @@ $(function() {
       
 		});
   	});
+
   	function addRole() {
   		$( "#ldr" ).load('{{route('roles.create')}}');
   	}
@@ -326,6 +445,7 @@ $(function() {
     $.get('{{ url('/settings/grades') }}/'+grade_id,function(data){
     	console.log(data);
      $('#editlevel').val(data.level);
+     $('#editgc').val(data.grade_category_id);
      $('#editbasic_pay').val(data.basic_pay);
      $('#editleave_length').val(data.leave_length);
      $('#editid').val(data.id);
@@ -339,6 +459,26 @@ $(function() {
  		$( "#ldr" ).load('{{route('employeesettings')}}');
     	}else{
     		toastr["error"]("Error deleting grade",'Success');
+    	}
+     
+    });
+  }
+
+  function prepareEditGCData(grade_category_id){
+    $.get('{{ url('/settings/grade_categories') }}/'+grade_category_id,function(data){
+    	console.log(data);
+     $('#editgcname').val(data.name);
+     $('#editgcid').val(data.id);
+    });
+    $('#editGradeCategoryModal').modal();
+  }
+  function deleteGradeCategory(grade_category_id){
+    $.get('{{ url('/settings/grade_categories/delete') }}/'+grade_category_id,function(data){
+    	if (data=='success') {
+ 		toastr["success"]("Grade Nomenclature deleted successfully",'Success');
+ 		$( "#ldr" ).load('{{route('employeesettings')}}');
+    	}else{
+    		toastr["error"]("Error deleting grade Nomenclature",'Success');
     	}
      
     });

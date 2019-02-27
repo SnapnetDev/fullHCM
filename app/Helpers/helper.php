@@ -89,3 +89,12 @@ function time_to_seconds($time) {
     foreach (array_reverse(explode(':', $time)) as $k => $v) $sec += pow(60, $k) * $v;
     return $sec;
 }
+
+function bscweight($department_id,$grade_category_id,$metric_id){
+	$weight=\App\BscWeight::where(['department_id'=>$department_id,'grade_category_id'=>$grade_category_id,'metric_id'=>$metric_id])->first();
+	if ($weight) {
+		return $weight;
+	}elseif(!$weight){
+		return $weight=\App\BscWeight::create(['department_id'=>$department_id,'grade_category_id'=>$grade_category_id,'metric_id'=>$metric_id,'percentage'=>25]);
+	}
+}

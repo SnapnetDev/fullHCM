@@ -1,6 +1,6 @@
 <!-- Modal -->
                   <div class="modal fade modal-success" id="addUserForm" aria-hidden="false" aria-labelledby="addUserForm"
-                  role="dialog" tabindex="-1">
+                  role="dialog" >
                     <div class="modal-dialog  modal-top modal-lg">
                       <div class="modal-content">
                         <div class="modal-header">
@@ -9,8 +9,9 @@
                           </button>
                           <h4 class="modal-title" id="exampleFillInModalTitle">New Employee</h4>
                         </div>
+                         <form id="addNewUserForm" method="POST">
                         <div class="modal-body">
-                          <form>
+                         @csrf
                             <div class="row">
                               <div class="col-xs-12 col-xl-6 form-group">
                                 <div class="form-group " >
@@ -26,6 +27,8 @@
                                    required />
                                 </div>
                               </div>
+                            </div>
+                            <div class="row">
                               <div class="col-xs-12 col-xl-6 form-group">
                                 <div class="form-group " >
                                   <label class="form-control-label" for="email">Email</label>
@@ -40,39 +43,52 @@
                                    required />
                                 </div>
                               </div>
+                              </div>
+                            <div class="row">
                                <div class="col-xs-12 col-xl-6 form-group">
                                 <div class="form-group " >
                                   <label class="form-control-label" for="sex">Sex</label>
-                                  <select class="form-control" id="sex" name="sex">
+                                  <select class="form-control" id="sex" name="sex" required>
                                     <option>Male</option>
                                     <option>Female</option>
                                   </select>
                                 </div>
                               </div>
                               <div class="col-xs-12 col-xl-6 form-group">
+                                <div class="form-group">
+                                  <h4 class="example-title">Date of Birth</h4>
+                                   <input type="text"  required placeholder="Date of Birth" name="dob"   class="form-control datepicker">
+                                </div>
+                              </div>
+                              </div>
+                            <div class="row">
+                              <div class="col-xs-12 col-xl-6 ">
+                               <div class="form-group " >
+                                  <label class="form-control-label" for="grade">Role</label>
+                                 <select id="grade_id" name="role_id" class="form-control select2" required style="width: 100%">
+                                  @foreach($roles as $role)
+                                <option value="{{$role->id}}">{{$role->name}}</option> 
+                                  @endforeach 
+                                </select>
+                                </div>
+                              </div>
+                              <div class="col-xs-12 col-xl-6 ">
                                <div class="form-group " >
                                   <label class="form-control-label" for="grade">Grade</label>
-                                  <input type="text" class="form-control" id="grade"  name="grade" placeholder="Grade"
-                                   required />
+                                 <select id="grade_id" name="grade_id" class="form-control select2" required style="width: 100%">
+                                  @foreach($grades as $grade)
+                                <option value="{{$grade->id}}">{{$grade->level}}</option> 
+                                  @endforeach 
+                                </select>
                                 </div>
                               </div>
-                              <div class="col-xs-12 col-xl-6 form-group">
-                                <div class="form-group " >
-                                  <label class="form-control-label" for="company_id">Company</label>
-                                  <select class="form-control" id="company_id" name="company_id" required onchange="getDepartmentBranchesNew(this.value);">
-                                    @forelse($companies as $company)
-                                    <option value="{{$company->id}}" {{$company->is_parent==1?'selected':''}}>{{$company->name}}</option>
-                                    @empty
-                                    <option value="0">Please Create a company</option>
-                                    @endforelse
-                                  </select>
-                                </div>
                               </div>
+                            <div class="row">
                               <div class="col-xs-12 col-xl-6 form-group">
                                <div class="form-group " >
                                   <label class="form-control-label" for="branch_id">Branch</label>
-                                  <select class="form-control" id="branch_id" name="branch_id" required>
-                                     @forelse($branches as $branch)
+                                  <select class="form-control select2"  name="branch_id"  style="width: 100%">
+                                     @forelse($ncompany->branches as $branch)
                                     <option value="{{$branch->id}}" >{{$branch->name}}</option>
                                     @empty
                                     <option value="0">Please Create a branch</option>
@@ -83,8 +99,8 @@
                               <div class="col-xs-12 col-xl-6 form-group">
                                 <div class="form-group " >
                                   <label class="form-control-label" for="department_id">Department</label>
-                                  <select class="form-control" id="department_id" name="department_id" required>
-                                    @forelse($departments as $department)
+                                  <select class="form-control select2" name="department_id" onchange="departmentChange(this.value);" required style="width: 100%">
+                                    @forelse($ncompany->departments as $department)
                                     <option value="{{$department->id}}" >{{$department->name}}</option>
                                     @empty
                                     <option value="0">Please Create a department</option>
@@ -92,22 +108,35 @@
                                   </select>
                                 </div>
                               </div>
+                              </div>
+                            <div class="row">
                               <div class="col-xs-12 col-xl-6 form-group">
-                               <div class="form-group " >
-                                  <label class="form-control-label" for="job_id">Job Role</label>
-                                  <select class="form-control" id="job_id" name="job_id">
-                                    <option>Branch 1</option>
-                                    <option>Branch 2</option>
+                               <div class=" form-group">
+                                <div class="form-group " >
+                                  <label class="form-control-label" for="jobroles">Job Role</label>
+                                  <select class="form-control select2" id="jobroles" name="job_id" required style="width: 100%">
+                                    
+                                    <option value="0">Please select department</option>
+                                    
                                   </select>
                                 </div>
                               </div>
+                              </div>
+                               <div class="col-xs-12 col-xl-6 form-group">
+                                <div class="form-group">
+                                  <h4 class="example-title">Started</h4>
+                                   <input type="text"  required placeholder="Started" name="started"   class="form-control datepicker">
+                                </div>
+                              </div>
                             </div>
-                          </form>
+                          
                         </div>
                         <div class="modal-footer">
+                          <input type="hidden" name="company_id" value="{{$ncompany->id}}">
                           <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                          <button type="button" class="btn btn-success">Save changes</button>
+                          <button type="submit" class="btn btn-success">Save changes</button>
                         </div>
+                        </form>
                       </div>
                     </div>
                   </div>

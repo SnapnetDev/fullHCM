@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\AvaJob;
 use App\Traits\RecruitTrait as Rt;
+use App\Company;
+use App\Department;
+use App\JobListing;
 
 class RecruitController extends Controller
 {
@@ -16,9 +19,13 @@ class RecruitController extends Controller
      */
     public function index()
     {
-        
+        $company_id=companyId();
+        $company=Company::find($company_id);
+        $departments=$company->departments;
+         $jobs=$company->departments()->first()->jobs;
+         $joblistings=JobListing::all();
 
-        return view('recruit.listing');
+        return view('recruit.listing',compact('company','departments','jobs','joblistings'));
     }
 
     /**

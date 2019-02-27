@@ -65,8 +65,10 @@
 		                    		<td>{{$salary_component->project_code}}</td>
 		                    		<td>{{$salary_component->duration}}</td>
 		                    		<td>{{$salary_component->grants}}</td>
-		                    		<td>{{'Completed'}}</td>
-		                    		<td><button class="btn sc-status btn-sm {{ $salary_component->status == 1 ? 'btn-success' : 'btn-warning' }}" title="{{ $salary_component->status == 1 ? 'Pause' : 'Resume' }}" id="{{$salary_component->id}}" on><i class="fa fa-{{ $salary_component->status == 1 ? 'play' : 'pause' }}" ></i></button></td>
+		                    		<td>{{$salary_component->completed==1?'Completed':'Not Completed'}}</td>
+		                    		<td><input type="checkbox" class="active-toggle sc-status" id="{{$salary_component->id}}" {{$salary_component->status == 1?'checked':''}} {{$salary_component->completed==1?'disabled':''}} data-size="mini">
+		            				
+		                    		</td>
 		                    		
 		                    		
 		                    		<td>
@@ -107,6 +109,12 @@
 	    <script type="text/javascript">
 	    	 $(document).ready( function () {
     $('#dataTable').DataTable();
+    $('.sc-status').bootstrapToggle({
+      on: 'on',
+      off: 'off',
+      onstyle:'info',
+      offstyle:'default'
+    });
 } );
   	$(function() {
   
@@ -145,21 +153,21 @@
   });
 
 
-  	$(function() {
-  	$(document).on('click','.sc-status',function(event){
-  		salary_component_id= $(this).attr('id');
+  // 	$(function() {
+  // 	$(document).on('click','.sc-status',function(event){
+  // 		salary_component_id= $(this).attr('id');
   		
-  		 $.get('{{ url('/payrollsettings/change_specific_salary_component_status') }}/',{ specific_salary_component_id: salary_component_id },function(data){
-  		 	if (data==1) {
-  		 		toastr.success("Salary Component Activated",'Success');
-  		 	}
-  		 	if(data==2){
-  		 		toastr.warning("Salary Component Paused",'Success');
-  		 	}
-  		 	$( "#ldr" ).load('{{url('payrollsettings/specific_salary_components')}}');
-  		 });
-  	});
-  });
+  // 		 $.get('{{ url('/payrollsettings/change_specific_salary_component_status') }}/',{ specific_salary_component_id: salary_component_id },function(data){
+  // 		 	if (data==1) {
+  // 		 		toastr.success("Salary Component Activated",'Success');
+  // 		 	}
+  // 		 	if(data==2){
+  // 		 		toastr.warning("Salary Component Paused",'Success');
+  // 		 	}
+  // 		 	$( "#ldr" ).load('{{url('payrollsettings/specific_salary_components')}}');
+  // 		 });
+  // 	});
+  // });
   	
 
 
@@ -198,5 +206,21 @@
 	});
   
   });
+
+ $(function() {
+  	 $('.sc-status').on('change', function() {
+  		salary_component_id= $(this).attr('id');
+  		
+  		  $.get('{{ url('/payrollsettings/change_specific_salary_component_status') }}/',{ specific_salary_component_id: salary_component_id },function(data){
+  		 	if (data==1) {
+  		 		toastr.success("Salary Component Activated",'Success');
+  		 	}
+  		 	if(data==2){
+  		 		toastr.warning("Salary Component Paused",'Success');
+  		 	}
+  		 	$( "#ldr" ).load('{{url('payrollsettings/specific_salary_components')}}');
+  		 });
+  	});
+  	 	});
   </script>
 

@@ -46,6 +46,9 @@
                 <a class="list-group-item setting-linker" href="{{ url('payrollsettings/payroll_policy') }}">
                  <i class="icon oi-law setting-linker" aria-hidden="true"></i>{{__('Payroll Policy Settings')}}
                 </a>
+                <a class="list-group-item setting-linker" href="{{ url('payrollsettings/loan_policy') }}">
+                 <i class="icon oi-law setting-linker" aria-hidden="true"></i>{{__('Loan Policy Settings')}}
+                </a>
                 <a class="list-group-item" href="javascript:void(0)">
                  <i class="icon pe-wallet setting-linker" aria-hidden="true"></i>{{__('Payroll Wallet Settings')}}
                 </a>

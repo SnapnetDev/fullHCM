@@ -690,4 +690,20 @@ class AttendanceController extends Controller
 			return response()->json("Error:$ex");
 		}
 	}
+	public function saveAttendance(Request $request)
+    {
+        $user=User::where(['emp_num'=>$request->empnum])->first();
+        $attendance=Attendance::firstOrCreate(['date'=>date('Y-m-d',strtotime($request->time)),'shift_id'=>$request->shift,'emp_num'=>$request->empnum]);
+        if($request->type==1){
+        	AttendanceDetail::create(['clock_in'=>date('H:i:s',strtotime($request->time))]);
+        }elseif($request->type==0)
+        {
+        	$ad=$attendance->attendancedetails()->latest()->first();
+        	$ad->update(['clock_out'=>date('H:i:s',strtotime($request->time))])
+        }
+
+        return "success";
+         
+            
+    }
 }

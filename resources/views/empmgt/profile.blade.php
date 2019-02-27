@@ -68,6 +68,8 @@
                   role="tab">Work Experience</a></li>
                   <li class="nav-item" role="presentation"><a class="nav-link" data-toggle="tab" href="#history" aria-controls="messages"
                   role="tab">Promotion History</a></li>
+                  <li class="nav-item" role="presentation"><a class="nav-link" data-toggle="tab" href="#job_history" aria-controls="messages"
+                  role="tab">Job History</a></li>
                   <li class="nav-item" role="presentation"><a class="nav-link" data-toggle="tab" href="#managers" aria-controls="messages"
                   role="tab">Managers</a></li>
                    <li class="nav-item" role="presentation"><a class="nav-link" data-toggle="tab" href="#direct_reports" aria-controls="messages"
@@ -86,7 +88,7 @@
                     <div class="col-md-4 col-lg-4">
                       <div class="form-group">
                   <label>Upload Image</label>
-                  <img class="img-circle img-bordered img-bordered-blue text-center" width="150" height="150" src="{{ $user->image!=''?asset('storage/avatar'.$user->image):($user->sex=='M'?asset('global/portraits/male-user.png'):asset('global/portraits/female-user.png'))}}" alt="..." id='img-upload'>
+                  <img class="img-circle img-bordered img-bordered-blue text-center" width="150" height="150" src="{{ File::exists('storage/avatar'.$user->image)?asset('storage/avatar'.$user->image):($user->sex=='M'?asset('global/portraits/male-user.png'):asset('global/portraits/female-user.png'))}}" alt="..." id='img-upload'>
                 
                   <div class="input-group">
                       <span class="input-group-btn">
@@ -104,6 +106,9 @@
                     </div>
 
                     <br>
+                    @if (Auth::user()->role->permissions->contains('constant', 'edit_user_advanced'))
+                      {{-- expr --}}
+                    @endif
                     <div class="col-md-4">
                   <div class="form-group form-material" data-plugin="formMaterial">
                     <label class="form-control-label" for="inputText">Name</label>
@@ -166,19 +171,28 @@
                       </div>
                     </div>
                     <div class="row">
-                      <div class="col-md-12">
+                      <div class="col-md-8">
                     <div class="form-group form-material" data-plugin="formMaterial">
                        <label class="form-control-label" for="inputText">Address</label>
                      <textarea class="form-control" id="address" name="address" rows="3">{{$user->address}}</textarea>
                     </div>
                       </div>
-                      
+                      <div class="col-md-4">
+                    <div class="form-group form-material" data-plugin="formMaterial">
+                      <label class="form-control-label" for="select">Staff Category</label>
+                      <select class="form-control" id="staff_category" name="staff_category_id">
+                        @foreach($staff_categories as $staff_category)
+                        <option value="{{$staff_category->id}}" {{$user->staff_category_id==$staff_category->id?'selected':''}}>{{$staff_category->name}}</option>
+                        @endforeach
+                      </select>
+                    </div>
+                      </div>
                     </div>
                     <div class="row">
                       <div class="col-md-4">
                     <div class="form-group form-material" data-plugin="formMaterial">
                       <label class="form-control-label" for="select">Country</label>
-                      <select class="form-control " id="country" name="country"  required>
+                      <select class="form-control " id="country" name="country"  multiple>
                         @if($user->lga)
                         <option value="{{$user->lga->state->country->id}}">{{$user->lga->state->country->name}}</option>
                         @endif
@@ -188,7 +202,7 @@
                       <div class="col-md-4">
                         <div class="form-group form-material" data-plugin="formMaterial">
                       <label class="form-control-label" for="select">State/Region</label>
-                      <select class="form-control " id="state" name="state"  required>
+                      <select class="form-control " id="state" name="state"  >
                          @if($user->lga)
                          <option value="{{$user->lga->state->id}}">{{$user->lga->state->name}}</option>
                            @endif
@@ -198,7 +212,7 @@
                       <div class="col-md-4">
                         <div class="form-group form-material" data-plugin="formMaterial">
                       <label class="form-control-label" for="select">LGA/ District</label>
-                      <select class="form-control " id="lga" name="lga" required>
+                      <select class="form-control " id="lga" name="lga" >
                          @if($user->lga)
                          <option value="{{$user->lga->id}}">{{$user->lga->name}}</option>
                           @endif
@@ -266,7 +280,7 @@
                       <div class="col-md-4">
                     <div class="form-group form-material" data-plugin="formMaterial">
                       <label class="form-control-label" for="select">Grade</label>
-                      <input type="text" class="form-control " disabled  id="inputText" name="inputText" placeholder="{{$user->promotionHistories()?$user->promotionHistories()->latest()->first()->grade->level:''}}" 
+                      <input type="text" class="form-control " disabled  id="inputText" name="inputText" placeholder="{{count($user->promotionHistories)>0?$user->promotionHistories()->latest()->first()->grade->level:''}}" 
                         />
                     </div>
                       </div>
@@ -311,6 +325,9 @@
                     <div class="form-group form-material" data-plugin="formMaterial">
                       <label class="form-control-label" for="select">Relationship</label>
                       <select class="form-control" id="nok_relationship" required name="nok_relationship" >
+                         <option value="spouse">Spouse</option>
+                          <option value="husband">Husband</option>
+                           <option value="wife">Wife</option>
                          <option value="father">Father</option>
                         <option value="mother">Mother</option>
                         <option value="brother">Brother</option>
@@ -517,6 +534,8 @@
                   </table>
                 </div>
                 <div class="tab-pane animation-slide-left" id="history" role="tabpanel">
+                  <br>
+                  <button class="btn btn-primary " data-target="#changeGradeModal" data-toggle="modal">Change Grade</button>
                   <table id="exampleTablePagination" data-toggle="table" 
                   data-query-params="queryParams" data-mobile-responsive="true"
                   data-height="400" data-pagination="true" data-search="true" class="table table-striped">
@@ -531,10 +550,52 @@
                     <tbody>
                       @forelse($user->promotionHistories as $phistory)
                       <tr>
-                        <td>{{$phistory->oldgrade->level}}</td>
-                        <td>{{$phistory->grade->level}}</td>
-                        <td>{{$phistory->approver->name}}</td>
+
+                        <td>{{$phistory->oldgrade?$phistory->oldgrade->level:''}}</td>
+                        <td>{{$phistory->grade?$phistory->grade->level:''}}</td>
+                        <td>{{$phistory->approver?$phistory->approver->name:''}}</td>
                         <td>{{date("F j, Y", strtotime($phistory->approved_on))}}</td>
+                      </tr>
+                      @empty
+                      @endforelse
+                      
+                    </tbody>
+                  </table>
+                </div>
+                <div class="tab-pane animation-slide-left" id="job_history" role="tabpanel">
+                  <br>
+                  <button class="btn btn-primary " data-target="#assignJobRoleModal" data-toggle="modal">Assign New Job</button>
+                  <table id="exampleTablePagination" data-toggle="table" 
+                  data-query-params="queryParams" data-mobile-responsive="true"
+                  data-height="400" data-pagination="true" data-search="true" class="table table-striped">
+                    <thead>
+                      <tr>
+                        <th >Job Role:</th>
+                        <th >Department:</th>
+                        <th >Started on</th>
+                        <th >Ended</th>
+                        <th >Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @forelse($user->jobs as $job)
+                      <tr>
+
+                        <td>{{$job->title}}</td>
+                        <td>{{$job->department->name}}</td>
+                        <td>{{$job->pivot->started?date("F j, Y", strtotime($job->pivot->started)):''}}</td>
+                        <td>{{$job->pivot->ended?date("F j, Y", strtotime($job->pivot->ended)):''}}</td>
+                        <td> <div class="btn-group" role="group">
+                              <button type="button" class="btn btn-primary btn-sm dropdown-toggle" id="exampleIconDropdown1"
+                              data-toggle="dropdown" aria-expanded="false">
+                                Action
+                              </button>
+                            <div class="dropdown-menu" aria-labelledby="exampleIconDropdown1" role="menu">
+                             
+                               <a class="dropdown-item" id="{{$job->id}}" onclick="deleteJob(this.id)"><i class="fa fa-trash" aria-hidden="true"></i>&nbsp;Remove Job</a>
+                              
+                            </div>
+                          </div></td>
                       </tr>
                       @empty
                       @endforelse
@@ -550,6 +611,7 @@
                       <tr>
                         <th >Name:</th>
                         <th >Email:</th>
+                        <th >Type:</th>
                         <th >Action</th>
                       </tr>
                     </thead>
@@ -558,7 +620,22 @@
                       <tr>
                         <td>{{$manager->name}}</td>
                         <td>{{$manager->email}}</td>
-                        <td></td>
+                        <td class="{{$manager->id==$user->line_manager_id?"text-primary":""}}">{{$manager->id==$user->line_manager_id?"Primary Manager":"Secondary Manager"}}</td>
+                        <td>
+                          <div class="btn-group" role="group">
+                              <button type="button" class="btn btn-primary btn-sm dropdown-toggle" id="exampleIconDropdown1"
+                              data-toggle="dropdown" aria-expanded="false">
+                                Action
+                              </button>
+                            <div class="dropdown-menu" aria-labelledby="exampleIconDropdown1" role="menu">
+                              @if($manager->id!=$user->line_manager_id)
+                              <a class="dropdown-item" id="{{$manager->id}}" onclick="makePrimaryManager(this.id,{{$user->id}})"><i class="fa fa-pencil" aria-hidden="true"></i>&nbsp;Make Primary Line Manager</a>
+                              @endif
+                               <a class="dropdown-item" id="{{$manager->id}}" onclick="removeManager(this.id,{{$user->id}})"><i class="fa fa-trash" aria-hidden="true"></i>&nbsp;Remove Manager</a>
+                              
+                            </div>
+                          </div>
+                        </td>
                       </tr>
                       @empty
                       @endforelse
@@ -574,6 +651,7 @@
                       <tr>
                         <th >Name:</th>
                         <th >Email:</th>
+                        <th >Type:</th>
                         <th >Action</th>
                       </tr>
                     </thead>
@@ -582,7 +660,22 @@
                       <tr>
                         <td>{{$employee->name}}</td>
                         <td>{{$employee->email}}</td>
-                        <td></td>
+                        <td class=" {{$employee->line_manager_id==$user->id?"text-primary":""}}">{{$employee->line_manager_id==$user->id?"Primary Manager":"Secondary Manager"}}</td>
+                        <td>
+                          <div class="btn-group" role="group">
+                              <button type="button" class="btn btn-primary btn-sm dropdown-toggle" id="exampleIconDropdown1"
+                              data-toggle="dropdown" aria-expanded="false">
+                                Action
+                              </button>
+                            <div class="dropdown-menu" aria-labelledby="exampleIconDropdown1" role="menu">
+                              @if($employee->line_manager_id!=$user->id)
+                              <a class="dropdown-item" id="{{$employee->id}}" onclick="makePrimaryManager({{$user->id}},this.id)"><i class="fa fa-pencil" aria-hidden="true"></i>&nbsp;Make Primary Line Manager</a>
+                              @endif
+                               <a class="dropdown-item" id="{{$employee->id}}" onclick="removeManager({{$user->id}},this.id)"><i class="fa fa-trash" aria-hidden="true"></i>&nbsp;Remove Direct report</a>
+                              
+                            </div>
+                          </div>
+                        </td>
                       </tr>
                       @empty
                       @endforelse
@@ -632,6 +725,8 @@
   @include('empmgt.modals.editqualification')
   @include('empmgt.modals.editskill')
   @include('empmgt.modals.editworkexperience')
+  @include('empmgt.modals.changeGrade')
+  @include('empmgt.modals.assignjobrole')
 @endsection
 @section('scripts')
 	<script src="{{asset('global/vendor/bootstrap-datepicker/bootstrap-datepicker.js')}}"></script>
@@ -971,6 +1066,40 @@
      
     });
   }
+  function makePrimaryManager(manager_id,user_id){
+    $.get('{{ url('/userprofile/primary_manager') }}/',{ manager_id:manager_id,user_id:user_id },function(data){
+      if (data=='success') {
+    toastr.success("Success",'Success');
+    location.reload();
+      }else{
+        toastr.error("Error Encountered",'Error');
+      }
+     
+    });
+  }
+  function removeManager(manager_id,user_id){
+    $.get('{{ url('/userprofile/remove_manager') }}/',{ manager_id: manager_id,user_id:user_id },function(data){
+      if (data=='success') {
+    toastr.success("Manager removed successfully",'Success');
+    location.reload();
+      }else{
+        toastr.error("Error Removing Manager",'Error');
+      }
+     
+    });
+  }
+  function deleteJob(job_id){
+    $.get('{{ url('/userprofile/delete_job_history') }}/',{ job_id: job_id,user_id:{{$user->id}} },function(data){
+      if (data=='success') {
+    toastr.success("Job History deleted successfully",'Success');
+    location.reload();
+      }else{
+        toastr.error("Error Deleting Job History",'Error');
+      }
+     
+    });
+  }
+ 
      $(function() {
     $(document).on('submit','#addQualificationForm',function(event){
      event.preventDefault();
@@ -1023,6 +1152,39 @@
 
                 toastr.success("Changes saved successfully",'Success');
                 $('#editQualificationModal').modal('toggle');
+                location.reload();
+            },
+            error:function(data, textStatus, jqXHR){
+               jQuery.each( data['responseJSON'], function( i, val ) {
+                jQuery.each( val, function( i, valchild ) {
+                toastr["error"](valchild[0]);
+              });  
+              });
+            }
+        });
+      
+    });
+  });
+
+     $(function() {
+    $(document).on('submit','#assignJobRoleForm',function(event){
+     event.preventDefault();
+     var form = $(this);
+        var formdata = false;
+        if (window.FormData){
+            formdata = new FormData(form[0]);
+        }
+        $.ajax({
+            url         : '{{route('userprofile.store')}}',
+            data        : formdata ? formdata : form.serialize(),
+            cache       : false,
+            contentType : false,
+            processData : false,
+            type        : 'POST',
+            success     : function(data, textStatus, jqXHR){
+
+                toastr.success("Changes saved successfully",'Success');
+                $('#assignJobRoleModal').modal('toggle');
                 location.reload();
             },
             error:function(data, textStatus, jqXHR){
@@ -1129,6 +1291,16 @@
         });
       
     });
+
+    $(document).on('click','#changeGrade',function(event){
+    event.preventDefault();    
+    grade=$("#grade_id").val();
+    $.get('{{ url('/userprofile/changegrade') }}/',{ grade_id: grade,user_id:{{$user->id}} },function(data){
+      toastr.success("Grade Changed Successfully",'Success');
+      $('#changeGradeModal').modal('toggle');
+      location.reload();
+    });
+    });
   });
 
     
@@ -1159,7 +1331,24 @@
  
 
      
-     function companyChange(company_id){
+     function departmentChange(department_id){
+    event.preventDefault();
+    $.get('{{ url('/users/department/jobroles') }}/'+department_id,function(data){
+      
+      
+      if (data.jobs=='') {
+         $("#jobroles").empty();
+        $('#jobroles').append($('<option>', {value:0, text:'Please Create a Jobrole in Department'}));
+      }else{
+        $("#jobroles").empty();
+        jQuery.each( data.jobroles, function( i, val ) {       
+               $('#jobroles').append($('<option>', {value:val.id, text:val.title}));  
+              });
+      }
+      
+     });
+  }
+  function companyChange(company_id){
     event.preventDefault();
     $.get('{{ url('/users/company/departmentsandbranches') }}/'+company_id,function(data){
       

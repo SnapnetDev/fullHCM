@@ -65,7 +65,7 @@
 
                   <div class="form-group">
                     <label for="">Title</label>
-                    <input type="text" class="form-control" id="title" name="tile" placeholder="" required>
+                    <input type="text" class="form-control" id="title" name="title" placeholder="" required>
                     @if ($errors->has('title'))
                                         <span class="help-block">
                                             <strong>{{ $errors->first('title') }}</strong>

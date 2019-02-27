@@ -136,7 +136,7 @@
          		<td>{{date("F j, Y", strtotime($leave_request->end_date))}}</td>
          		<td><span class=" tag tag-outline  {{$leave_request->priority==0?'tag-success':($leave_request->priority==1?'tag-warning':'tag-danger')}}">{{$leave_request->priority==0?'normal':($leave_request->priority==1?'medium':'high')}}</span></td>
          		<td>{{$leave_request->reason}}</td>
-         		<td><span class=" tag   {{$leave_request->status==0?'tag-warning':($leave_request->statusS==1?'tag-success':'tag-danger')}}">{{$leave_request->status==0?'pending':($leave_request->status==1?'approved':'rejected')}}</span></td>
+         		<td><span class=" tag   {{$leave_request->status==0?'tag-warning':($leave_request->status==1?'tag-success':'tag-danger')}}">{{$leave_request->status==0?'pending':($leave_request->status==1?'approved':'rejected')}}</span></td>
          		<td>{{$leave_request->paystatus==0?'without pay':'with pay'}}</td>
          		<td>
               <div class="btn-group" role="group">
@@ -145,7 +145,7 @@
                     Action
                   </button>
                 <div class="dropdown-menu" aria-labelledby="exampleIconDropdown1" role="menu">
-                  <a style="cursor:pointer;"class="dropdown-item" id="{{$leave_request->id}}" onclick="viewRequestApproval()"><i class="fa fa-eye" aria-hidden="true"></i>&nbsp;View Approval</a>
+                  <a style="cursor:pointer;"class="dropdown-item" id="{{$leave_request->id}}" onclick="viewRequestApproval(this.id)"><i class="fa fa-eye" aria-hidden="true"></i>&nbsp;View Approval</a>
                   
                 </div>
               </div>
@@ -169,6 +169,32 @@
 </div>
   <!-- End Page -->
    @include('leave.modals.addrequest')
+   {{-- Leave Request Details Modal --}}
+   <div class="modal fade in modal-3d-flip-horizontal modal-info" id="leaveDetailsModal" aria-hidden="true" aria-labelledby="leaveDetailsModal" role="dialog" tabindex="-1">
+      <div class="modal-dialog modal-lg" >
+        <div class="modal-content">        
+          <div class="modal-header" >
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <h4 class="modal-title" id="training_title">Leave Request Details</h4>
+          </div>
+            <div class="modal-body">         
+                <div class="row row-lg col-xs-12">            
+                  <div class="col-xs-12" id="detailLoader"> 
+                    
+                  </div>
+                  <div class="clearfix hidden-sm-down hidden-lg-up"></div>            
+                </div>        
+            </div>
+            <div class="modal-footer">
+              <div class="col-xs-12">
+                
+                  
+                  <!-- End Example Textarea -->
+                </div>
+             </div>
+         </div>
+      </div>
+    </div>
 @endsection
 @section('scripts')
 <script src="{{asset('global/vendor/bootstrap-table/bootstrap-table.min.js')}}"></script>
@@ -211,6 +237,14 @@
       
 		});
     });
+      function viewRequestApproval(leave_request_id)
+{
+   $(document).ready(function() {
+      $("#detailLoader").load('{{ url('/leave/getdetails') }}?leave_request_id='+leave_request_id);
+    $('#leaveDetailsModal').modal();
+  });
+  
+}
 
   </script>
 @endsection

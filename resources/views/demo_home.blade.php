@@ -167,7 +167,7 @@
           <div class="card">
             <div class="card-header white bg-cyan-600 p-30 clearfix">
               <a class="avatar avatar-100 pull-xs-left m-r-20" href="javascript:void(0)">
-                <img src="{{ Auth::user()->image!=''?asset('storage/avatar'.Auth::user()->image):(Auth::user()->sex=='M'?asset('global/portraits/male-user.png'):asset('global/portraits/female-user.png'))}}" alt="">
+                <img src="{{ File::exists('storage/avatar'.Auth::user()->image)?asset('storage/avatar'.Auth::user()->image):(Auth::user()->sex=='M'?asset('global/portraits/male-user.png'):asset('global/portraits/female-user.png'))}}" alt="">
               </a>
               <div class="pull-xs-left">
                 <div class="font-size-20 m-b-15">{{Auth::user()->name}}</div>

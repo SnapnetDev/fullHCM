@@ -15,6 +15,14 @@
                   		<input type="text" name="level" class="form-control">
                   	</div>
                     <div class="form-group">
+                      <h4 class="example-title">Grade Category</h4>
+                      <select class="form-control" name="grade_category_id" >
+                        @foreach($grade_categories as $grade_category)
+                        <option value="{{$grade_category->id}}">{{$grade_category->name}}</option>
+                        @endforeach
+                      </select>
+                    </div>
+                    <div class="form-group">
                       <h4 class="example-title">Basic Pay</h4>
                       <input type="text" name="basic_pay" class="form-control">
                     </div>

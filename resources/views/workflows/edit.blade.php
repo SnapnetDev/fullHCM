@@ -106,7 +106,12 @@
                               <label for="">Users</label>
                               <select class="form-control users" name="user_id[]" >
                                 @forelse ($users as $user)
+                                @if ($stage->user)
                                   <option value="{{$user->id}}" {{ $user->id==$stage->user->id? 'selected':'' }}>{{$user->name}}</option>
+                                @else
+                                <option value="{{$user->id}}" >{{$user->name}}</option>
+                                @endif
+                                  
                                 @empty
                                   <option value="">No Users Created</option>
                                 @endforelse

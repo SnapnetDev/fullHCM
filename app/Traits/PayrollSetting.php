@@ -6,6 +6,7 @@ use App\Bank;
 use App\CompanyAccountDetail;
 use App\PayslipDetail;
 use App\PayrollPolicy;
+use App\LoanPolicy;
 use App\SalaryComponent;
 use App\SpecificSalaryComponent;
 use App\Workflow;
@@ -15,6 +16,8 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Auth;
 use Excel;
+use Illuminate\Validation\Rule;
+use Validator;
 /**
  *
  */
@@ -34,6 +37,10 @@ trait PayrollSetting
       case 'payroll_policy':
       # code...
       return $this->payrollPolicySettings($request);
+      break;
+      case 'loan_policy':
+      # code...
+      return $this->loanPolicySettings($request);
       break;
       case 'salary_components':
       # code...
@@ -62,6 +69,10 @@ trait PayrollSetting
        case 'change_specific_salary_component_status':
       # code...
       return $this->changeSpecificSalaryComponentStatus($request);
+      break;
+      case 'change_salary_component_taxable':
+      # code...
+      return $this->changeSalaryComponentTaxable($request);
       break;
        case 'delete_specific_salary_component':
       # code...
@@ -105,6 +116,10 @@ trait PayrollSetting
        case 'payroll_policy':
       # code...
       return $this->savePayrollPolicySettings($request);
+      break;
+      case 'loan_policy':
+      # code...
+      return $this->saveLoanPolicySettings($request);
       break;
        case 'salary_component':
       # code...
@@ -224,6 +239,22 @@ trait PayrollSetting
   public function saveSalaryComponent(Request $request)
   {
     $company_id=companyId();
+
+    $validator=Validator::make($request->all(), [
+    'constant' => [
+        'required',
+        Rule::unique('salary_components')->where(function ($query) use($company_id,$request) {
+    return $query->where('company_id', $company_id)
+    ->where('id','!=',$request->salary_component_id);
+})
+          ],
+      ]);
+    if ($validator->fails()) {
+            return response()->json([
+                    $validator->errors()
+                    ],401);
+        }
+   
     $sc=SalaryComponent::updateOrCreate(['id'=>$request->salary_component_id],['name'=>$request->name,'gl_code'=>$request->gl_code,'project_code'=>$request->project_code,'type'=>$request->sctype,'comment'=>$request->comment,'constant'=>$request->constant,'formula'=>$request->formula,'company_id'=>$company_id,'taxable'=>$request->taxable]);
     $no_of_exemptions=count($request->input('exemptions'));
     if($no_of_exemptions>0){
@@ -269,6 +300,18 @@ trait PayrollSetting
     $sc->update(['status'=>1]);
     return 1;
    }
+ }
+
+   public function changeSalaryComponentTaxable(Request $request)
+  {
+   $sc=SalaryComponent::find($request->salary_component_id);
+   if ($sc->taxable==1) {
+     $sc->update(['taxable'=>0]);
+      return 2;
+   }elseif($sc->taxable==0){
+    $sc->update(['taxable'=>1]);
+    return 1;
+   }
    
   
   }
@@ -281,15 +324,15 @@ trait PayrollSetting
       $company_id=companyId();
       $pp=PayrollPolicy::where('company_id',$company_id)->first();
        $workflows=Workflow::all();
-       $setting=Setting::where(['name'=>'use_lateness','company_id'=>$company_id])->first();
-       if (!$setting) {
-        $setting=Setting::create(['name'=>'use_lateness','company_id'=>$company_id]);
-       }
+       // $setting=Setting::where(['name'=>'use_lateness','company_id'=>$company_id])->first();
+       // if (!$setting) {
+       //  $setting=Setting::create(['name'=>'use_lateness','company_id'=>$company_id]);
+       // }
        $latenesspolicies=LatenessPolicy::where('company_id',$company_id)->get();
       if (!$pp) {
         $pp=PayrollPolicy::create(['basic_pay_percentage'=>$request->basic_pay_percentage,'payroll_runs'=>$request->when,'user_id'=>Auth::user()->id,'company_id'=>$company_id]);
       }
-    return view('payrollsettings.payroll_policy',compact('pp','workflows','setting','latenesspolicies'));
+    return view('payrollsettings.payroll_policy',compact('pp','workflows','latenesspolicies'));
   }
   public function savePayrollPolicySettings(Request $request)
   {
@@ -301,6 +344,31 @@ trait PayrollSetting
         $pp->update(['basic_pay_percentage'=>$request->basic_pay_percentage,'payroll_runs'=>$request->when,'user_id'=>Auth::user()->id,'workflow_id'=>$request->workflow_id]);
       }else{
         PayrollPolicy::create(['basic_pay_percentage'=>$request->basic_pay_percentage,'payroll_runs'=>$request->payroll_runs,'user_id'=>Auth::user()->id,'workflow_id'=>$request->workflow_id,'company_id'=>$company_id]);
+      }
+    return 'success';
+  }
+   public function loanPolicySettings(Request $request)
+  {
+      $company_id=companyId();
+      $lp=LoanPolicy::where('company_id',$company_id)->first();
+       $workflows=Workflow::all();
+       
+       
+      if (!$lp) {
+        $lp=LoanPolicy::create(['annual_interest'=>0,'maximum_allowed'=>0,'user_id'=>Auth::user()->id,'company_id'=>$company_id,'workflow_id'=>0]);
+      }
+    return view('payrollsettings.loan_policy',compact('lp','workflows'));
+  }
+  public function saveLoanPolicySettings(Request $request)
+  {
+      // return $request->all();
+    $company_id=companyId();
+       $lp=LoanPolicy::where('company_id',$company_id)->first();
+
+      if ($lp) {
+        $lp->update(['annual_interest'=>$request->annual_interest,'maximum_allowed'=>$request->maximum_allowed,'user_id'=>Auth::user()->id,'workflow_id'=>$request->workflow_id]);
+      }else{
+        LoanPolicy::create(['annual_interest'=>$request->annual_interest,'maximum_allowed'=>$request->maximum_allowed,'user_id'=>Auth::user()->id,'workflow_id'=>$request->workflow_id,'company_id'=>$company_id]);
       }
     return 'success';
   }
@@ -346,12 +414,13 @@ public function saveLatenessPolicy(Request $request)
   }
   public function switchLatenessPolicy(Request $request)
   {
-    $setting=Setting::where('name','use_lateness')->first();
-    if ($setting->value==1) {
-     $setting->update(['value'=>0]);
+    $company_id=companyId();
+    $pp=PayrollPolicy::where('company_id',$company_id)->first();
+    if ($pp->use_lateness==1) {
+     $pp->update(['use_lateness'=>0]);
       return 2;
-    }elseif($setting->value==0){
-      $setting->update(['value'=>1]);
+    }elseif($pp->use_lateness==0){
+      $pp->update(['use_lateness'=>1]);
        return 1;
     }
   }

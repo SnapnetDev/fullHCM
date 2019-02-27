@@ -28,19 +28,22 @@ Route::resource('import','ImportController')->middleware(['auth']);
 
 Route::get('users/modal/{user_id}','UserController@modal')->name('users.modal');
 Route::get('users/assignrole','UserController@assignRole')->name('users.assignrole');
+Route::get('users/alterstatus','UserController@alterStatus')->name('users.alterstatus');
 Route::get('users/assignmanager','UserController@assignManager')->name('users.assignmanager');
 Route::get('users/assigngroup','UserController@assignGroup')->name('users.assigngroup');
 Route::get('users/search','UserController@search')->name('users.search');
+Route::post('users/new','UserController@saveNew')->name('users.savenew');
 Route::resource('userprofile','UserProfileController')->middleware(['auth']); 
 Route::resource('users', 'UserController')->middleware(['permission:edit_settings','auth']);
 Route::get('users/company/departmentsandbranches/{company_id}','UserController@getCompanyDepartmentsBranches')->name('users.companydepartmentsandbranches')->middleware(['permission:edit_settings','auth']);
+Route::get('users/department/jobroles/{department_id}','UserController@getDepartmentJobroles')->middleware(['permission:edit_settings','auth']);
 Route::resource('groups', 'UserGroupController',['names'=>['create'=>'groups.create','index'=>'groups','store'=>'groups.save','edit'=>'groups.edit','update'=>'groups.update','show'=>'groups.view','destroy'=>'groups.delete']])->middleware(['auth']);
 Route::get('setfy/{year}','HomeController@setfy');
 Route::get('setcpny/{company_id}','HomeController@setcpny');
 //end user routes
 //settings routes
 Route::get('/settings', 'GlobalSettingController@index')->name('settings')->middleware(['permission:edit_settings','auth'])->middleware(['permission:edit_settings','auth']);
-
+Route::get('/deviceclockin', 'AttendanceController@saveAttendance')->name('attendance.sync');
 Route::get('/settings/companies', 'CompanySettingController@companies')->name('companies')->middleware(['permission:edit_settings','auth']);
 Route::post('/settings/companies', 'CompanySettingController@saveCompany')->name('companies.store')->middleware(['permission:edit_settings','auth']);
 Route::get('/settings/companies/{company_id}', 'CompanySettingController@getCompany')->name('companies.show')->middleware(['permission:edit_settings','auth']);
@@ -72,6 +75,9 @@ Route::get('/settings/employee', 'EmployeeSettingController@index')->name('emplo
 Route::post('/settings/grades', 'EmployeeSettingController@saveGrade')->name('grades.store')->middleware(['permission:edit_settings','auth']);
 Route::get('/settings/grades/{grade_id}', 'EmployeeSettingController@getGrade')->name('grades.show')->middleware(['permission:edit_settings','auth']);
 Route::get('/settings/grades/delete/{grade_id}', 'EmployeeSettingController@deleteGrade')->name('grades.delete')->middleware(['permission:edit_settings','auth']);
+Route::post('/settings/grade_categories', 'EmployeeSettingController@saveGradeCategory')->name('grade_categories.store')->middleware(['permission:edit_settings','auth']);
+Route::get('/settings/grade_categories/{grade_category_id}', 'EmployeeSettingController@getGradeCategory')->name('grade_categories.show')->middleware(['permission:edit_settings','auth']);
+Route::get('/settings/grade_categories/delete/{grade_category_id}', 'EmployeeSettingController@deleteGradeCategory')->name('grade_categories.delete')->middleware(['permission:edit_settings','auth']);
 Route::post('/settings/qualifications', 'EmployeeSettingController@saveQualification')->name('qualifications.store')->middleware(['permission:edit_settings','auth']);
 Route::get('/settings/qualifications/{qualification_id}', 'EmployeeSettingController@getQualification')->name('qualifications.show')->middleware(['permission:edit_settings','auth']);
 Route::get('/settings/qualifications/delete/{qualification_id}', 'EmployeeSettingController@deleteQualification')->name('qualifications.delete')->middleware(['permission:edit_settings','auth']);
@@ -79,8 +85,8 @@ Route::get('/settings/qualifications/delete/{qualification_id}', 'EmployeeSettin
 //employee settings end
 //leave settings
 Route::get('/settings/leave', 'LeaveSettingController@index')->name('leavesettings')->middleware(['permission:edit_settings','auth']);
-Route::get('/settings/leaves/switch_includes_holiday', 'LeaveSettingController@switchLeaveIncludesHoliday')->middleware(['permission:edit_settings','auth']);
-Route::get('/settings/leaves/switch_includes_weekend', 'LeaveSettingController@switchLeaveIncludesWeekend')->middleware(['permission:edit_settings','auth']);
+Route::post('/settings/leaves/save_policy', 'LeaveSettingController@savePolicy')->middleware(['permission:edit_settings','auth'])->name('leave_policy.store');
+
 Route::post('/settings/holidays', 'LeaveSettingController@saveHoliday')->name('holidays.store')->middleware(['permission:edit_settings','auth']);
 Route::get('/settings/holiday/{holiday_id}', 'LeaveSettingController@getHoliday')->name('holidays.show')->middleware(['permission:edit_settings','auth']);
 Route::get('/settings/holidays/delete/{holiday_id}', 'LeaveSettingController@deleteHoliday')->name('holidays.delete')->middleware(['permission:edit_settings','auth']);
@@ -178,6 +184,7 @@ Route::resource('payrollsettings', 'PayrollSettingController')->middleware(['per
 Route::get('/people_analytics', 'HomeController@executiveView')->name('executive_view')->middleware(['permission:view_hr_reports','auth']);
 Route::get('/people_analytics_leave', 'HomeController@executiveViewLeave')->name('executive_view_leave')->middleware(['permission:view_leave_report','auth']);
 Route::get('/people_analytics_attendance', 'HomeController@executiveViewAttendance')->name('executive_view_attendance')->middleware(['permission:view_attendance_report','auth']);
+Route::get('/bi-report', 'ReportController@getReport')->name('bi_report')->middleware(['permission:view_attendance_report','auth']);
 // end of executive view
 Route::resource('roles', 'RoleController')->middleware(['permission:edit_settings','auth']);
 Route::resource('performances', 'PerformanceController')->middleware(['permission:edit_settings','auth']);
@@ -195,6 +202,7 @@ Route::get('job_qualification_search','JobController@qualification_search')->mid
 Route::get('joblist/{department_id}', 'JobController@list')->name('job_list.view')->middleware(['auth']);
 Route::get('jobs/department/{department_id}','JobController@index')->middleware(['auth']);
 Route::get('jobs/create/{department_id}','JobController@create')->middleware(['auth'])->name('jobs.create');
+Route::get('jobs/delete/{job_id}','JobController@delete')->middleware(['auth'])->name('jobs.delete');
 Route::get('job_search','JobController@job_search')->middleware(['auth']);
 Route::resource('jobs', 'JobController',['names'=>['store'=>'jobs.save','edit'=>'jobs.edit','update'=>'jobs.update','show'=>'jobs.view','destroy'=>'jobs.delete']])->except([
     'index', 'create'])->middleware('auth');
@@ -202,8 +210,16 @@ Route::get('location/country','HomeController@countries')->middleware(['auth']);
 Route::get('location/state/{country_id}','HomeController@states')->middleware(['auth']);
 Route::get('location/lga/{state_id}','HomeController@lgas')->middleware(['auth']);
 
+//OAuth 
+Route::get('/auth/microsoft', 'MicrosoftController@redirectToProvider');
+Route::get('/auth/microsoft/callback', 'MicrosoftController@callbackurl');
 
-
+Route::resource('bscsettings', 'BSCController')->middleware(['auth']);
+Route::get('bsc/usersearch', 'BSCEvaluationController@usersearch')->middleware(['auth']);
+Route::resource('bsc', 'BSCEvaluationController')->middleware(['auth']);
+Route::resource('e360settings', 'E360SettingController')->middleware(['auth']);
+Route::get('e360/usersearch', 'E360Controller@usersearch')->middleware(['auth']);
+Route::resource('e360', 'E360Controller')->middleware(['auth']);
 
 
 /*************Payroll Module Start******************/

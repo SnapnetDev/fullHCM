@@ -16,4 +16,10 @@ class LeaveApproval extends Model
     {
     	return $this->belongsTo('App\User','approver_id');
     }
+     public function stage()
+    {
+    	return $this->belongsTo('App\Stage','stage_id');
+    }
+
+    
 }

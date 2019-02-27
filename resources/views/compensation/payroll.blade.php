@@ -54,7 +54,7 @@
 	                  </div>
 	                  </form>
 	      		</div>
-	      		<div class="col-md-5">
+	      		<div class="col-md-7">
 	      			
 	                <ul class="list-group list-group-dividered ">
 	            	<li class="list-group-item"><strong>Payroll For:	{{date('M-Y',strtotime($date))}}</strong></li>
@@ -82,11 +82,18 @@
 	                      </button>
 	                    </div>
 	                    <div class="btn-group" role="group">
-	                      <button type="button" class="btn btn-success btn-outline">
+	                      <button type="button" class="btn btn-danger btn-outline" onclick="rollbackPayroll({{$payroll->id}})">
+	                        <i class="icon fa fa-refresh" aria-hidden="true"></i>
+	                        <br>
+	                        <span class="text-uppercase hidden-sm-down">Rollback Payroll</span>
+	                      </button>
+	                    </div>
+	                    <div class="btn-group" role="group">
+	                      <a type="button" class="btn btn-success btn-outline" href="{{ url('compensation/exportforexcel?payroll_id='.$payroll->id) }}">
 	                        <i class="icon fa fa-file-excel-o" aria-hidden="true"></i>
 	                        <br>
 	                        <span class="text-uppercase hidden-sm-down">Export Payroll</span>
-	                      </button>
+	                      </a>
 	                    </div>
 	                    <div class="btn-group" role="group">
 	                      <a type="button" class="btn btn-success btn-outline" href="{{ url('compensation/exportford365?payroll_id='.$payroll->id) }}">
@@ -294,13 +301,24 @@ function viewMore(detail_id)
   
 }
 @if($has_been_run==1)
-function issuePayslip(payroll__id){
+function issuePayslip(payroll_id){
     $.get('{{ url('/compensation/issuepayslip') }}/',{ payroll_id: {{$payroll->id}}},function(data){
       if (data=='success') {
     toastr.success("Payslip Issued successfully",'Success');
     location.reload();
       }else{
         toastr.error("Error issuing payslip",'Error');
+      }
+     
+    });
+  }
+  function rollbackPayroll(payroll_id){
+    $.get('{{ url('/compensation/rollback') }}/',{ payroll_id: {{$payroll->id}}},function(data){
+      if (data=='success') {
+    toastr.success("Rollback Successful",'Success');
+    location.reload();
+      }else{
+        toastr.error("Error Rolling Back",'Error');
       }
      
     });

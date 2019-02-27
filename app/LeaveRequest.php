@@ -29,4 +29,8 @@ class LeaveRequest extends Model
     {
     	return $this->belongsTo('App\User','user_id');
     }
+    public function workflow()
+    {
+        return $this->belongsTo('App\Workflow','workflow_id');
+    }
 }

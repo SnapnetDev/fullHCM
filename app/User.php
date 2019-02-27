@@ -17,7 +17,7 @@ class User extends Authenticatable
      *
      * @var array
      */
-    protected $fillable = ['name', 'email', 'password','emp_num','sex','dob','phone','marital_status','password','company_id','branch_id','job_id','hiredate','role_id','image','remember_token','created_at','updated_at','address','lga_id','employment_status_id','superadmin','bank_id','bank_account_no','state_id','country_id'];
+    protected $fillable = ['name', 'email', 'password','emp_num','sex','dob','phone','marital_status','password','company_id','branch_id','job_id','hiredate','role_id','image','remember_token','created_at','updated_at','address','lga_id','employment_status_id','superadmin','bank_id','bank_account_no','state_id','country_id','grade_id','line_manager_id'];
     protected $dates=['hiredate'];
     /**
      * The attributes that should be hidden for arrays.
@@ -125,6 +125,10 @@ class User extends Authenticatable
     {
         return $this->belongsTo('App\Department');
     }
+    public function job()
+    {
+        return $this->belongsTo('App\Job');
+    }
     public function company()
     {
         return $this->belongsTo('App\Company');
@@ -133,10 +137,10 @@ class User extends Authenticatable
     {
         return $this->belongsTo('App\Bank');
     }
-    public function subsidiary()
-    {
-        return $this->belongsTo('App\Subsidiary');
-    }
+    // public function subsidiary()
+    // {
+    //     return $this->belongsTo('App\Subsidiary');
+    // }
     //Nok is the next of kin
     public function nok()
     {
@@ -187,9 +191,13 @@ class User extends Authenticatable
     {
         return $this->belongsTo('App\EmploymentStatus');
     }
-    public function grades()
+    // public function grades()
+    // {
+    //     return $this->hasManyThrough('App\Grade','App\PromotionHistory');
+    // }
+    public function grade()
     {
-        return $this->hasManyThrough('App\Grade','App\PromotionHistory');
+        return $this->belongsTo('App\Grade');
     }
     public function performanceseason(){
          $checkseason= \App\PerformanceSeason::select('reviewStart')->value('reviewStart');
@@ -222,6 +230,14 @@ class User extends Authenticatable
     }
   public function progressreport(){
         return $this->hasMany('App\ProgressReport','emp_id');
+    }
+    public function myreviews()
+    {
+        return $this->hasMany('App\E360Evaluation','evaluator_id');
+    }
+    public function othersreviews()
+    {
+        return $this->hasMany('App\E360Evaluation','user_id');
     }
 
 public function getquarter(){
@@ -348,6 +364,40 @@ public function getquarter(){
     public function lga($value='')
     {
        return $this->belongsTo('App\LocalGovernment');
+    }
+    public function getDRLeaveApprovals()
+    {
+        $lm_id=$this->id;
+
+        return \App\LeaveApproval::whereHas('leave_request',function($query) use ($lm_id){
+                     $query->whereHas('user',function($query) use ($lm_id){
+                                $query->whereHas('managers',function($query) use ($lm_id){
+                                        $query->where('manager_id',$lm_id);
+                                });
+                        });
+                })
+                ->whereHas('stage.role',function($query) use($lm_id){
+                $query->where('manages','dr');
+                
+                 })
+                ->get();
+        # code...
+    }
+    public function evaluators()
+    {
+        return $this->belongsToMany('App\User','e360_evaluator_evaluatee','evaluatee_id','evaluator_id');
+    }
+    public function evaluatees()
+    {
+        return $this->belongsToMany('App\User','e360_evaluator_evaluatee','evaluator_id','evaluatee_id');
+    }
+    public function applications()
+    {
+        return $this->morphMany('App\JobApplication', 'applicable');
+    }
+    public function favorites()
+    {
+        return $this->morphMany('App\JobFavorite', 'favorable');
     }
 
 }

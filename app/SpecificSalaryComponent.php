@@ -15,6 +15,10 @@ class SpecificSalaryComponent extends Model
     {
         return $this->belongsTo('App\User','emp_id');
     }
+    public function payrolls()
+    {
+        return $this->belongsToMany('App\Payroll','payroll_specific_salary_component','specific_salary_component_id','payroll_id');
+    }
     protected static function boot()
     {
         parent::boot();

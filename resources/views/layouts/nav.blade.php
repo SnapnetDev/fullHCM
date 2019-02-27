@@ -157,14 +157,19 @@
                             <span class="site-menu-title">Payroll</span>
                           </a>
                         </li>
+                        <li class="site-menu-item ">
+                          <a class="animsition-link" href="{{ url('compensation') }}">
+                            <span class="site-menu-title">TMSA Schedule</span>
+                          </a>
+                        </li>
                         @endif
-                         @if(Auth::user()->role->permissions->contains('constant', 'view_loan_request'))
+                        {{--  @if(Auth::user()->role->permissions->contains('constant', 'view_loan_request'))
                         <li class="site-menu-item ">
                           <a class="animsition-link" href="{{ url('loan/loan_requests') }}">
                             <span class="site-menu-title">Loan Requests</span>
                           </a>
                         </li>
-                        @endif
+                        @endif --}}
                       </ul>
                     </div>
                   </div>
@@ -173,13 +178,75 @@
             </li>
             @endif
             @if(Auth::user()->role->permissions->contains('constant', 'edit_performance'))
-            <li class="site-menu-item ">
-              <a href="{{ url('performances') }}" dropdown-tag="false">
+             <li class="dropdown site-menu-item has-sub">
+              <a data-toggle="dropdown" href="javascript:void(0)" data-dropdown-toggle="false">
                 <i class="site-menu-icon fa fa-area-chart" aria-hidden="true"></i>
                 <span class="site-menu-title">Performance</span>
+                <span class="site-menu-arrow"></span>
               </a>
+              <div class="dropdown-menu">
+                <div class="site-menu-scroll-wrap is-list">
+                  <div>
+                    <div>
+                      <ul class="site-menu-sub site-menu-normal-list">
+                       
+                        <li class="site-menu-item ">
+                          <a class="animsition-link" href="{{ url('performances') }}">
+                            <span class="site-menu-title">Perfomance</span>
+                          </a>
+                        </li>
+                        <li class="site-menu-item ">
+                          <a class="animsition-link" href="{{ url('bsc')}}">
+                            <span class="site-menu-title">Balance Scorecard</span>
+                          </a>
+                        </li>
+                     
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </li>
             @endif
+           
+             <li class="dropdown site-menu-item has-sub">
+              <a data-toggle="dropdown" href="javascript:void(0)" data-dropdown-toggle="false">
+                <i class="site-menu-icon fa fa-circle-o-notch" aria-hidden="true"></i>
+                <span class="site-menu-title">Review 360</span>
+                <span class="site-menu-arrow"></span>
+              </a>
+              <div class="dropdown-menu">
+                <div class="site-menu-scroll-wrap is-list">
+                  <div>
+                    <div>
+                      <ul class="site-menu-sub site-menu-normal-list">
+                       @if(Auth::user()->role->permissions->contains('constant', 'upload_review_questions'))
+                        <li class="site-menu-item ">
+                          <a class="animsition-link" href="{{ url('e360settings/template') }}">
+                            <span class="site-menu-title">Department Review Questions</span>
+                          </a>
+                        </li>
+                        @endif
+                       
+                        @if(Auth::user()->role->permissions->contains('constant', 'view_review_report'))
+                        <li class="site-menu-item ">
+                          <a class="animsition-link" href="{{ url('e360/select_report_department')}}">
+                            <span class="site-menu-title">Employee Review Report</span>
+                          </a>
+                        </li>
+                        @endif
+                      <li class="site-menu-item ">
+                          <a class="animsition-link" href="{{ url('e360/select_department')}}">
+                            <span class="site-menu-title">Employee Review</span>
+                          </a>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </li>
+            
             <li class="dropdown site-menu-item has-section has-sub">
               <a data-toggle="dropdown" href="javascript:void(0)" data-dropdown-toggle="false">
                 <i class="site-menu-icon fa fa-ellipsis-h" aria-hidden="true"></i>
@@ -199,7 +266,12 @@
                       <div>
                         <ul class="site-menu-sub site-menu-section-list">
                           <li class="site-menu-item">
-                            <a class="animsition-link" href="uikit/buttons.html">
+                            <a class="animsition-link" href="{{url('jobs_departments')}}">
+                              <span class="site-menu-title">Jobs</span>
+                            </a>
+                          </li>
+                          <li class="site-menu-item">
+                            <a class="animsition-link" href="{{url('recruits')}}">
                               <span class="site-menu-title">Recruit</span>
                             </a>
                           </li>
@@ -266,21 +338,35 @@
                         <ul class="site-menu-sub site-menu-section-list">
                            @if(Auth::user()->role->permissions->contains('constant', 'view_hr_reports'))
                             <li class="site-menu-item ">
-                              <a class="animsition-link" href="{{route('executive_view')}}">
+                              <a class="animsition-link" href="{{url('bi-report')}}?page=hr">
                                 <span class="site-menu-title">HR</span>
                               </a>
                             </li>
                             @endif
                             @if(Auth::user()->role->permissions->contains('constant', 'view_attendance_report'))
                             <li class="site-menu-item ">
-                              <a class="animsition-link" href="{{route('executive_view_attendance')}}">
-                                <span class="site-menu-title">Attendance</span>
+                              <a class="animsition-link" href="{{url('bi-report')}}?page=demographics">
+                                <span class="site-menu-title">Employee</span>
                               </a>
                             </li>
                             @endif
                             @if(Auth::user()->role->permissions->contains('constant', 'view_leave_report'))
                             <li class="site-menu-item ">
-                              <a class="animsition-link" href="{{route('executive_view_leave')}}">
+                              <a class="animsition-link" href="{{url('bi-report')}}?page=job_roles">
+                                <span class="site-menu-title">Job Roles</span>
+                              </a>
+                            </li>
+                            @endif
+                             @if(Auth::user()->role->permissions->contains('constant', 'view_leave_report'))
+                            <li class="site-menu-item ">
+                              <a class="animsition-link" href="{{url('bi-report')}}?page=payroll">
+                                <span class="site-menu-title">Payroll</span>
+                              </a>
+                            </li>
+                            @endif
+                             @if(Auth::user()->role->permissions->contains('constant', 'view_leave_report'))
+                            <li class="site-menu-item ">
+                              <a class="animsition-link" href="{{url('bi-report')}}?page=loan_request">
                                 <span class="site-menu-title">Leave</span>
                               </a>
                             </li>

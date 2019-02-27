@@ -138,7 +138,7 @@
                               <label for="">Competencies</label> 
                               <select class="form-control roles" name="competency_id[]" > 
                               @forelse ($competencies as $competency)
-                                 <option value="{{$competency->id}}" {{$skill->pivot->competency_id==$competency->id}} >{{$competency->proficiency}}</option>
+                                 <option value="{{$competency->id}}" {{$skill->pivot->competency_id==$competency->id?'selected':''}} >{{$competency->proficiency}}</option>
                                  @empty
                                   <option value="">No Competencies Created</option>
                                @endforelse 
@@ -158,6 +158,7 @@
                     <button type="button" id="addSkill" name="button" class="btn btn-primary">New Skill</button>
                   </div>
                   </div>
+                  <input type="hidden" name="department_id" value="{{$job->department->id}}">
                   <button type="submit" class="btn btn-primary">
                       Save Changes
                   </button>

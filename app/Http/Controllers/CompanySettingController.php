@@ -26,15 +26,15 @@ class CompanySettingController extends Controller
 	}
 	public function saveCompany(Request $request)
 	{
-		$validator = Validator::make($request->all(), ['name'=>'required|min:3','user_id'=>'required','email' => [
-            'required',
-            Rule::unique('companies')->ignore($request->company_id)
-        ]]);
-       if ($validator->fails()) {
-            return response()->json([
-                    $validator->errors()
-                    ],401);
-        }
+		// $validator = Validator::make($request->all(), ['name'=>'required|min:3','user_id'=>'required','email' => [
+  //           'required',
+  //           Rule::unique('companies')->ignore($request->company_id)
+  //       ]]);
+  //      if ($validator->fails()) {
+  //           return response()->json([
+  //                   $validator->errors()
+  //                   ],401);
+  //       }
         // return $request->all();
 		Company::updateOrCreate(['id'=>$request->company_id],['name'=>$request->name,'email'=>$request->email,'address'=>$request->address,'user_id'=>$request->user_id]);
 		return  response()->json(['success'],200);
@@ -86,7 +86,7 @@ class CompanySettingController extends Controller
 	{
 		$department=Department::find($department_id);
 		// return $department->users;
-		if ($department->users->count()>0) {
+		if ($department->jobs->count()>0) {
 			return 'Department has users and cannot be deleted';
 		}
 		$department->delete();

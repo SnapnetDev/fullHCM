@@ -30,7 +30,9 @@
 	</div>
     
       <div class="page-content container-fluid">
-      	<iframe width="100%" height="800" src="https://app.powerbi.com/view?r=eyJrIjoiODQxNTM1ZjAtZWY3My00MDMyLTljNTktM2YzMGM5ZDZlNTIyIiwidCI6ImJhMTMwZWNhLTMwMzAtNDhlMS05MDg5LWM5NzkyOTNhZWI3MCIsImMiOjh9" frameborder="0" allowFullScreen="true"></iframe>
+      	{{-- <iframe width="100%" height="800" src="https://app.powerbi.com/view?r=eyJrIjoiODQxNTM1ZjAtZWY3My00MDMyLTljNTktM2YzMGM5ZDZlNTIyIiwidCI6ImJhMTMwZWNhLTMwMzAtNDhlMS05MDg5LWM5NzkyOTNhZWI3MCIsImMiOjh9" frameborder="0" allowFullScreen="true"></iframe> --}}
+      	<button class="btn btn-primary" id="printData">Print Current View</button>
+      	 <div id="reportContainer" style="height: 900px;"></div>
 
     </div>
   	
@@ -40,4 +42,65 @@
 @section('scripts')
 <script src="{{asset('global/vendor/bootstrap-table/bootstrap-table.min.js')}}"></script>
   <script src="{{asset('global/vendor/bootstrap-table/extensions/mobile/bootstrap-table-mobile.js')}}"></script>
+  <script src="{{asset('global/vendor/powerbi/dist/powerbi.js')}}"></script>
+  <script type="text/javascript">
+    function loadUrl(url)
+    {
+        window.location=url;
+    }
+
+  $(function()
+  {
+        // Get models. models contains enums that can be used.
+        var models = window['powerbi-client'].models;
+
+        @if(isset($_GET['page']) && $_GET['page']=='quickinsight')
+        var config= 
+        {
+            type: 'qna',
+            tokenType: models.TokenType.Embed,
+            accessToken: '{{$accessToken}}',
+            embedUrl: 'https://app.powerbi.com/qnaEmbed?groupId={{$groupId}}',
+            datasetIds: ['{{$dataSetId}}'],
+            viewMode: models.QnaMode['Interactive']
+        };
+
+        // Get a reference to the embedded QNA HTML element
+        var qnaContainer = $('#reportContainer')[0];
+        // Embed the QNA and display it within the div container.
+        var qna = powerbi.embed(qnaContainer, config);
+        // qna.off removes a given event handler if it exists.
+        qna.off("loaded");
+        @else
+
+        var embedConfiguration = 
+        {
+              type: 'report',
+
+              id: '{{$reportId}}',
+              embedUrl: 'https://app.powerbi.com/reportEmbed?reportId={{$reportId}}&groupId={{$groupId}}',
+              tokenType: models.TokenType.Aad,
+              accessToken: '{{$accessToken}}',
+               settings: 
+               {
+                    filterPaneEnabled: false,
+                    navContentPaneEnabled: false                   
+               }
+        };
+
+        var $reportContainer = $('#reportContainer');
+        var report = powerbi.embed($reportContainer.get(0), embedConfiguration);
+        @endif
+
+        $('#printData').click(function()
+        {
+            var report = powerbi.get($reportContainer.get(0));
+            report.print()              
+        });
+
+  });
+
+
+</script>
+
 @endsection

@@ -12,10 +12,9 @@
                   	@csrf
                   	<div class="form-group">
                   		<h4 class="example-title">Status</h4>
-                  		<select id="roles" name="role_id" class="form-control">
-                        @foreach($roles as $role)
-                      <option value="{{$role->id}}">{{$role->name}}</option> 
-                        @endforeach 
+                  		<select id="status_id" name="role_id" class="form-control">
+                       <option value="0" >Probation</option>
+                        <option value="1" >Confirmed</option>
                       </select>
                   	</div>
                   	

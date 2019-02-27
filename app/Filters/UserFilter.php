@@ -5,6 +5,7 @@ namespace App\Filters;
 use App\User;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Auth;
 
 class UserFilter
 {
@@ -60,6 +61,13 @@ class UserFilter
             return $user->get();
           } elseif($filters->filled('pagi')&&($filters->input('pagi')==10||$filters->input('pagi')==15||$filters->input('pagi')==25||$filters->input('pagi')==50)){
            return $user->paginate($filters->input('pagi'));
+          }
+
+          if (Auth::User()->role->manages=="dr") {
+            $manager=Auth::User();
+            $user->whereHas('managers',function ($query) use($manager) {
+                $query->where('users.id',$manager->id);
+            });
           }
 
         return $user->paginate(10);

@@ -4,6 +4,9 @@
  <link rel="stylesheet" href="{{ asset('global/vendor/datatables-bootstrap/dataTables.bootstrap.css') }}">
  <link rel="stylesheet" href="{{ asset('global/vendor/morris/morris.css')}}">
  <link rel="stylesheet" href="{{ asset('assets/examples/css/apps/work.css')}}">
+<link rel="stylesheet" href="{{ asset('global/vendor/bootstrap-toggle/css/bootstrap-toggle.min.css')}}">
+  <link rel="stylesheet" href="{{ asset('global/vendor/summernote/summernote.css') }}">
+   <link href="{{ asset('global/vendor/select2/select2.min.css') }}" rel="stylesheet" />
 @endsection
 @section('content')
 <!-- Page -->
@@ -33,41 +36,116 @@
 	</div>
     
 		<div class="page-content">
-
+       <div class="row">
+        <div class="col-md-8">
+      @foreach($joblistings as $joblisting)
       	<div class="panel panel-bordered">
             <div class="panel-heading">
-              <h3 class="panel-title">Job Title</h3>
-              {{-- <div class="panel-actions">
-              	<a href="#" class=" panel-action btn btn-info"><i class="icon md-edit"></i>Edit</a>
-              </div> --}}
+              <h3 class="panel-title">{{$joblisting->job?$joblisting->job->title:''}}</h3>
+              <div class="panel-actions">
+                <button id="{{ $joblisting->id}}" type="button" class="btn btn-info  fav-btn waves-effect waves-light waves-round " onclick="prepareEditData(this.id)">
+                        Edit Job Listing
+                        </button>
+              	<input type="checkbox" class="active-toggle enable_job" id="{{$joblisting->id}}" {{$joblisting->status == 1?'checked':''}} >
+              </div>
             </div>
             <div class="panel-body">
-            	<div class="ribbon ribbon-clip ribbon-reverse ribbon-primary">
-                        <span class="ribbon-inner"><a href="#">Ribbon</a></span>
+            	<div class="ribbon ribbon-clip ribbon-reverse ribbon-danger">
+                        <span class="ribbon-inner"><a href="#" id="{{$joblisting->id}}" onclick="deleteJobListing(this.id)" style="color: #fff;">Delete</a></span>
                       </div>
-                      <div class="ribbon ribbon-clip">
-                        <span class="ribbon-inner"><a href="#">Ribbon</a></span>
+                      <div class="ribbon ribbon-clip ribbon-primary">
+                        <span class="ribbon-inner"><a href="{{url('recruits/view_job_listing').'?listing_id='.$joblisting->id}}" style="color: #fff;">View</a></span>
                       </div>
-              <h4><i class="icon md-graduation-cap"></i>Minimum Educational Qualification</h4>
-              <p>Easily add a heading container to your panel with <code>.panel-heading</code>.
-                You may also include any <code>&lt;h1&gt;</code>-<code>&lt;h6&gt;</code>                with a <code>.panel-title</code> class to add a pre-styled heading.</p>
-              <p>For proper link coloring, be sure to place links in headings within
-                <code>.panel-title</code>.</p>
+              
             </div>
+            <ul class="list-group list-group-bordered list-group-full">
+                    <li class="list-group-item bg-grey-300">Description</li>
+                  <li class="list-group-item ">
+                    {!! $joblisting->job->description !!}
+                  </li>
+                </ul>
+              <ul class="list-group list-group-bordered list-group-full">
+                <li class="list-group-item bg-grey-300">Minimum Educational Qualification</li>
+              <li class="list-group-item ">
+                {{$joblisting->job->qualification?$joblisting->job->qualification->name:''}}
+              </li>
+            </ul>
+              <ul class="list-group list-group-bordered list-group-full">
+                    <li class="list-group-item bg-grey-300">Expires</li>
+                  <li class="list-group-item ">
+                     {{date("F j, Y",strtotime($joblisting->expires))}}({{\Carbon\Carbon::parse($joblisting->expires)->diffForHumans()}})
+                  </li>
+                </ul>
           </div>
-
+          @endforeach
           <div class="site-action" data-plugin="actionBtn">
-    <button type="button" class=" btn-raised btn btn-success btn-floating" data-toggle="modal" data-target="#addJoblistingModal">
-      <i class="icon md-plus animation-scale-up" aria-hidden="true"></i>
-      
-    </button>
-    </div>
-		</div> 
+          <button type="button" class=" btn-raised btn btn-success btn-floating" data-toggle="modal" data-target="#addJoblistingModal">
+            <i class="icon md-plus animation-scale-up" aria-hidden="true"></i>
+            
+          </button>
+              </div>
+    		</div>
+        <div class="col-md-4">
+                 <div class="panel panel-info panel-line">
+              <div class="panel-heading main-color-bg">
+                <h3 class="panel-title">Filters</h3>
+                
+              </div>
+              <form class="" action="{{url('recruits')}}" method="get" >
 
+
+              <div class="panel-body">
+                <div class="form-group">
+                  <label for="">Job Title Contains</label>
+
+                  <input type="text" name="name_contains" class="form-control col-lg-6" id="email_t" placeholder="" value="{{ request()->name_contains }}">
+
+                </div>
+                <div class="form-group">
+                  <label for="">Departments</label>
+                  <select class="select2 form-control" name="userftype">
+                    <option value="or">OR</option>
+                    <option value="and">AND</option>
+                  </select>
+                  <select id="role_f" class=" select2 form-control col-lg-6" name="user[]" multiple>
+                    @forelse ($departments as $department)
+                      <option value="{{$department->id}}">{{$department->name}}</option>
+                    @empty
+                      <option value="">No Departments Created</option>
+                    @endforelse
+                  </select>
+
+
+                </div>
+                <div class="form-group">
+                  <label for="">Created At</label>
+                  <div class="input-daterange input-group" id="datepicker">
+                    <input type="text" class="input-sm form-control" name="created_from" placeholder="From date" value="{{ request()->created_from }}"/>
+                    <span class="input-group-addon">to</span>
+                    <input type="text" class="input-sm form-control" name="created_to" placeholder="To date" value="{{ request()->created_to }}"/>
+                </div>
+                </div>
+                <div class="form-group">
+                  <label for="">Updated At</label>
+                  <div class="input-daterange input-group" id="datepicker">
+                    <input type="text" class="input-sm form-control" name="created_from" placeholder="From date" value="{{ request()->updated_from }}"/>
+                    <span class="input-group-addon">to</span>
+                    <input type="text" class="input-sm form-control" name="created_to" placeholder="To date" value="{{ request()->updated_to }}"/>
+                </div>
+                </div>
+                <button type="submit" class="btn btn-info" >Filter</button>
+                <button type="reset" class="btn btn-warning pull-right" >Clear Filters</button>
+              </div>
+              </form>
+              </div>
+        </div> 
+      </div>
+    </div>
       	</div>
 </div>
-  <!-- End Page -->\
+  <!-- End Page -->
   @include('recruit.modals.addJoblisting')
+   @include('recruit.modals.editJoblisting')
   
 @endsection
 @section('scripts')
@@ -77,16 +155,158 @@
   <script src="{{ asset('global/vendor/datatables/jquery.dataTables.js') }}"></script>
   <script src="{{ asset('global/vendor/datatables-fixedheader/dataTables.fixedHeader.js') }}"></script>
   <script src="{{ asset('global/vendor/datatables-bootstrap/dataTables.bootstrap.js') }}"></script>
+
+  <script type="text/javascript" src="{{ asset('global/vendor/bootstrap-toggle/js/bootstrap-toggle.min.js')}}"></script>
   <script src="{{ asset('global/vendor/raphael/raphael-min.js')}}"></script>
   <script src="{{ asset('global/vendor/morris/morris.min.js')}}"></script>
+<script src="{{asset('global/vendor/summernote/summernote.min.js')}}"></script>
+<script src="{{asset('global/vendor/select2/select2.min.js')}}"></script>
   <script type="text/javascript">
   	  $(document).ready(function() {
+        $('#requirements').summernote();
+        $('.select2').select2();
     $('.datepicker').datepicker({
     autoclose: true,
-    format:'mm-yyyy',
-     viewMode: "months", 
-    minViewMode: "months"
+    format:'yyyy-mm-dd'
 });
+
+     $('.enable_job').bootstrapToggle({
+      on: 'Enabled',
+      off: 'Disabled',
+      onstyle:'info',
+      offstyle:'default'
     });
+ $('.enable_job').on('change', function() {
+      listing_id= $(this).attr('id');
+      
+       $.get('{{ url('/recruits/change_listing_status') }}/',{ listing_id: listing_id },function(data){
+        if (data==1) {
+          toastr.success("Job Listing is now Enabled",'Success');
+        }
+        if(data==2){
+          toastr.warning("Job Listing is Disabled",'Success');
+        }
+        
+       });
+    });
+
+
+
+
+
+   
+
+    $(document).on('submit','#addJobListingForm',function(event){
+     event.preventDefault();
+     var form = $(this);
+        var formdata = false;
+        if (window.FormData){
+            formdata = new FormData(form[0]);
+        }
+        $.ajax({
+            url         : '{{route('recruits.store')}}',
+            data        : formdata ? formdata : form.serialize(),
+            cache       : false,
+            contentType : false,
+            processData : false,
+            type        : 'POST',
+            success     : function(data, textStatus, jqXHR){
+
+                toastr.success("Changes saved successfully",'Success');
+               $('#addJoblistingModal').modal('toggle');
+         
+
+            },
+            error:function(data, textStatus, jqXHR){
+               jQuery.each( data['responseJSON'], function( i, val ) {
+                jQuery.each( val, function( i, valchild ) {
+                toastr.error(valchild[0]);
+              });  
+              });
+            }
+        });
+      
+    });
+    $(document).on('submit','#editJobListingForm',function(event){
+     event.preventDefault();
+     var form = $(this);
+        var formdata = false;
+        if (window.FormData){
+            formdata = new FormData(form[0]);
+        }
+        $.ajax({
+            url         : '{{route('recruits.store')}}',
+            data        : formdata ? formdata : form.serialize(),
+            cache       : false,
+            contentType : false,
+            processData : false,
+            type        : 'POST',
+            success     : function(data, textStatus, jqXHR){
+
+                toastr.success("Changes saved successfully",'Success');
+               $('#editJobListingModal').modal('toggle');
+         
+
+            },
+            error:function(data, textStatus, jqXHR){
+               jQuery.each( data['responseJSON'], function( i, val ) {
+                jQuery.each( val, function( i, valchild ) {
+                toastr.error(valchild[0]);
+              });  
+              });
+            }
+        });
+      
+    });
+  
+
+    });
+
+       function prepareEditData(listing_id){
+    $.get('{{ url('/recruits/get_job_listing_info') }}/',{ listing_id: listing_id },function(data){
+     
+     $('#editjtype').val(data.type);
+     $('#editjlevel').val(data.level);
+     $('#editjsalary_from').val(data.salary_from);
+     $('#editjsalary_to').val(data.salary_to);
+      $('#editjexperience_from').val(data.experience_from);
+       $('#editjexperience_to').val(data.experience_to);
+       $('#editjexpires').val(data.expires);
+        $('#editjrequirements').val(data.requirements);
+        $('#editjlid').val(data.id);
+        $('#editjobid').val(data.job_id);
+       
+    $('#editJobListingModal').modal();
+  });
+  }
+
+      function departmentChange(department_id){
+    event.preventDefault();
+    $.get('{{ url('/users/department/jobroles') }}/'+department_id,function(data){
+      
+      
+      if (data.jobs=='') {
+         $("#jobroles").empty();
+        $('#jobroles').append($('<option>', {value:0, text:'Please Create a Jobrole in Department'}));
+      }else{
+        $("#jobroles").empty();
+        jQuery.each( data.jobroles, function( i, val ) {       
+               $('#jobroles').append($('<option>', {value:val.id, text:val.title}));  
+              });
+      }
+      
+     });
+  }
+
+  function deleteJobListing(listing_id){
+    $.get('{{ url('/recruits/delete_job_listing') }}/',{ listing_id: listing_id },function(data){
+      if (data=='success') {
+    toastr.success("Job Listing deleted successfully",'Success');
+      }else{
+        toastr.error("Error deleting Salary Component",'Success');
+      }
+     
+    });
+  }
   </script>
 @endsection

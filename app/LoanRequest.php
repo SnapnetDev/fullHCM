@@ -25,4 +25,12 @@ class LoanRequest extends Model
     {
     	return $this->belongsTo('App\User','approved_by');
     }
+    public function approval()
+    {
+        return $this->hasMany('App\LoanApproval','loan_request_id');
+    }
+    public function payrolls()
+    {
+        return $this->belongsToMany('App\Payroll','payroll_loan_request','loan_request_id','payroll_id');
+    }
 }

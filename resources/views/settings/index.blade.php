@@ -8,6 +8,7 @@
   <link rel="stylesheet" type="text/css" href="{{ asset('global/vendor/datatables/datatables.min.css')}}">
    <link rel="stylesheet" href="{{ asset('global/vendor/switchery/switchery.css')}}">
    <link rel="stylesheet" href="{{ asset('global/vendor/bootstrap-datepicker/bootstrap-datepicker.min.css')}}">
+   <link rel="stylesheet" href="{{ asset('global/vendor/editable-table/editable-table.css')}}">
   <style type="text/css">
   	 .btn[disabled]{
   	 	pointer-events: none;
@@ -67,6 +68,12 @@
                  <a class="list-group-item setting-linker" href="{{ url('performances')}}/settings">
                  <i class="icon fa fa-wrench" aria-hidden="true"></i>{{__('Performance Settings')}}
                 </a>
+                <a class="list-group-item setting-linker" href="{{ url('bscsettings')}}">
+                 <i class="icon fa fa-wrench" aria-hidden="true"></i>{{__('Balance Score Card Settings')}}
+                </a>
+                <a class="list-group-item setting-linker" href="{{ url('e360settings')}}">
+                 <i class="icon fa fa-circle-o-notch" aria-hidden="true"></i>{{__('360 Review Settings')}}
+                </a>
                 
                
               </div>
@@ -102,12 +109,15 @@
   <script src="{{ asset('global/vendor/clockpicker/bootstrap-clockpicker.min.js')}}"></script>
   <script src="{{ asset('global/vendor/switchery/switchery.min.js')}}"></script>
   <script type="text/javascript" src="{{ asset('global/vendor/bootstrap-datepicker/bootstrap-datepicker.min.js')}}"></script>
+    <script src="{{ asset('global/vendor/editable-table/mindmup-editabletable.js')}}"></script>
+  <script src="{{ asset('global/vendor/editable-table/numeric-input-example.js')}}"></script>
 <script type="text/javascript">
 	
 	$(function(){
 
 
 		$('#rolestable').DataTable();
+    
 		$( "#ldr" ).load( "{{route('companies')}}" );
 
 	});

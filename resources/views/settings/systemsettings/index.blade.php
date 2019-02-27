@@ -25,7 +25,7 @@
       <div class="page-content container-fluid">
       	<div class="row">
         	<div class="col-md-12 col-xs-12">
-        		<div class="panel panel-info panel-line">
+        		{{-- <div class="panel panel-info panel-line">
 		            <div class="panel-heading">
 		              <h3 class="panel-title">Has Subsidiaries</h3>
 		              <div class="panel-actions">
@@ -38,7 +38,7 @@
 	                  
 	          		</div>
 	          		
-		          </div>
+		          </div> --}}
 		          <div class="panel panel-info panel-line">
 		            <div class="panel-heading">
 		              <h3 class="panel-title">Use Parent Company Settings Across</h3>

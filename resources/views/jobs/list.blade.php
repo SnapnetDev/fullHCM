@@ -4,6 +4,7 @@
   <link href="{{ asset('global/vendor/select2/select2.min.css') }}" rel="stylesheet" />
     <link rel="stylesheet" href="{{asset('global/vendor/bootstrap-datepicker/bootstrap-datepicker.css')}}">
       <link rel="stylesheet" href="{{ asset('global/vendor/bootstrap-toggle/css/bootstrap-toggle.min.css')}}">
+        <link rel="stylesheet" href="{{ asset('global/vendor/alertify/alertify.min.css') }}">
       <link href="{{ asset('global/vendor/select2/select2.min.css') }}" rel="stylesheet" />
   <style media="screen">
     .form-cont{
@@ -91,7 +92,7 @@
                             <div class="dropdown-menu" aria-labelledby="exampleIconDropdown1" role="menu">
                                <a class="dropdown-item"  href="{{ route('jobs.view',$job->id) }}"><i class="fa fa-eye" aria-hidden="true"></i>&nbsp;View Job Details</a>
                               <a class="dropdown-item"   href="{{ route('jobs.edit',$job->id) }}"><i class="fa fa-pencil" aria-hidden="true"></i>&nbsp;Edit Job Details</a>
-                               <a class="dropdown-item"  ><i class="fa fa-trash" aria-hidden="true"></i>&nbsp;Delete Job</a>
+                               <a class="dropdown-item" id="{{$job->id}}" onclick="deleteJob(this.id);"><i class="fa fa-trash" aria-hidden="true"></i>&nbsp;Delete Job</a>
                               
                             </div>
                           </div></td>
@@ -124,6 +125,7 @@
 <script src="{{asset('global/vendor/bootstrap-table/bootstrap-table.min.js')}}"></script>
 <script type="text/javascript" src="{{ asset('global/vendor/bootstrap-toggle/js/bootstrap-toggle.min.js')}}"></script>
 <script type="text/javascript" src="{{ asset('global/vendor/bootstrap-datepicker/bootstrap-datepicker.min.js')}}"></script>
+  <script type="text/javascript" src="{{ asset('global/vendor/alertify/alertify.js') }}"></script>
   <script type="text/javascript">
   $(document).ready(function() {
     $('.input-daterange').datepicker({
@@ -147,5 +149,22 @@ $('.select2').select2();
         $(this).toggleClass('selected');
     }); --}}
 } );
+  function deleteJob(job_id){
+  
+  alertify.confirm('Are you sure you want to delete this job ?', function(){ 
+  $.get('{{ url('jobs/delete') }}/'+job_id, 
+    function(data, status){
+        if(data=="success"){
+           toastr.success('Job Deleted Successfully');
+           setTimeout(function(){
+            window.location.reload();
+           },2000);
+           return; 
+        }
+        toastr.error(data);
+    });
+    });
+
+}
   </script>
 @endsection

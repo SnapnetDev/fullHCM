@@ -8,7 +8,7 @@ use App\Scopes\CompanyScope;
 class PayrollPolicy extends Model
 {
     protected $table='payroll_policies';
-    protected $fillable=['payroll_runs','basic_pay_percentage','user_id','workflow_id','company_id'];
+    protected $fillable=['payroll_runs','basic_pay_percentage','user_id','workflow_id','company_id','use_lateness'];
 
     public function editor()
     {
