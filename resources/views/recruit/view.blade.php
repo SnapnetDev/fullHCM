@@ -7,6 +7,11 @@
 <link rel="stylesheet" href="{{ asset('global/vendor/bootstrap-toggle/css/bootstrap-toggle.min.css')}}">
   <link rel="stylesheet" href="{{ asset('global/vendor/summernote/summernote.css') }}">
   <link rel="stylesheet" href="{{ asset('assets/examples/css/charts/chartjs.css') }}">
+   <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+   <style type="text/css">
+     #selectable .ui-selecting { background: #FECA40; }
+  #selectable .ui-selected { background: #F39814; color: white; }
+   </style>
 @endsection
 @section('content')
 <!-- Page -->
@@ -37,7 +42,7 @@
     
 		<div class="page-content">
       <div class="row">
-      <div class="col-md-9">
+      <div class="col-md-7">
       	<div class="panel panel-bordered">
             <div class="panel-heading">
               <h3 class="panel-title">{{$joblisting->job?$joblisting->job->title:''}}</h3>
@@ -52,26 +57,69 @@
                       <div class="ribbon ribbon-clip ribbon-primary">
                         <span class="ribbon-inner"><a href="#" onclick="prepareEditData({{$joblisting->id}});" style="color: #fff;">Edit</a></span>
                       </div>
-               <h4><i class="icon md-graduation-cap"></i>Description</h4>
-              {!! $joblisting->job->description !!}
-              <h4><i class="icon md-graduation-cap"></i>Minimum Educational Qualification</h4>
-              {{$joblisting->job->qualification?$joblisting->job->qualification->name:''}}
-              <h4><i class="icon md-graduation-cap"></i>Expires</h4>
-              {{date("F j, Y",strtotime($joblisting->expires))}}({{\Carbon\Carbon::parse($joblisting->expires)->diffForHumans()}})
-              <h4><i class="icon md-graduation-cap"></i>Salary</h4>
-              {{$joblisting->salary_from}} - {{$joblisting->salary_to}}
-              <h4><i class="icon md-graduation-cap"></i>Experience</h4>
-              {{$joblisting->experience_from}} - {{$joblisting->experience_to}} Years
-              <h4><i class="icon md-graduation-cap"></i>Level</h4>
-              @if($joblisting->level==1)Graduate Trainee @elseif($joblisting->level==2)Entry Level @elseif($joblisting->level==3)Non- Manager @elseif($joblisting->level==4) Manager @endif
-               <h4><i class="icon md-graduation-cap"></i>Skills</h4>
-               @if($joblisting->job->skills)
-               <ul class="list-group list-group-dividered list-group-full">
+               
+            </div>
+            <ul class="list-group list-group-bordered list-group-full">
+                <li class="list-group-item bg-grey-300">Company</li>
+              <li class="list-group-item ">
+                {!! $joblisting->job->department->company->name !!}
+              </li>
+            </ul>
+            <ul class="list-group list-group-bordered list-group-full">
+                <li class="list-group-item bg-grey-300">Department</li>
+              <li class="list-group-item ">
+                {!! $joblisting->job->department->name !!}
+              </li>
+            </ul>
+             <ul class="list-group list-group-bordered list-group-full">
+                <li class="list-group-item bg-grey-300">Description</li>
+              <li class="list-group-item ">
+                {!! $joblisting->job->description !!}
+              </li>
+            </ul>
+            <ul class="list-group list-group-bordered list-group-full">
+                <li class="list-group-item bg-grey-300">Minimum Educational Qualification</li>
+              <li class="list-group-item ">
+                {{$joblisting->job->qualification?$joblisting->job->qualification->name:''}}
+              </li>
+            </ul>
+            <ul class="list-group list-group-bordered list-group-full">
+                <li class="list-group-item bg-grey-300">Expires</li>
+              <li class="list-group-item ">
+                 {{date("F j, Y",strtotime($joblisting->expires))}}({{\Carbon\Carbon::parse($joblisting->expires)->diffForHumans()}})
+              </li>
+            </ul>
+            <ul class="list-group list-group-bordered list-group-full">
+                <li class="list-group-item bg-grey-300">Salary</li>
+              <li class="list-group-item ">
+                 {{$joblisting->salary_from}} - {{$joblisting->salary_to}}
+              </li>
+            </ul>
+             <ul class="list-group list-group-bordered list-group-full">
+                <li class="list-group-item bg-grey-300">Experience</li>
+              <li class="list-group-item ">
+                 {{$joblisting->experience_from}} - {{$joblisting->experience_to}} Years
+              </li>
+            </ul>
+            <ul class="list-group list-group-bordered list-group-full">
+                <li class="list-group-item bg-grey-300">Level</li>
+              <li class="list-group-item ">
+                @if($joblisting->level==1)Graduate Trainee @elseif($joblisting->level==2)Entry Level @elseif($joblisting->level==3)Non- Manager @elseif($joblisting->level==4) Manager @endif
+              </li>
+            </ul>
+             <ul class="list-group list-group-bordered list-group-full">
+                <li class="list-group-item bg-grey-300">Extra Requirements</li>
+              <li class="list-group-item ">
+                {!! $joblisting->requirements !!}
+              </li>
+             </ul>
+             @if($joblisting->job->skills)
+               <ul class="list-group list-group-bordered list-group-full">
                 @php
                   $sn=1;
                 @endphp
                  
-               
+               <li class="list-group-item bg-grey-300">Skills</li>
                @foreach($joblisting->job->skills as $skill)
                 <li class="list-group-item ">{{$sn}}.  {{strtoupper($skill->name)}} - {{$skill->pivot->competency->proficiency}}</li>
               @php
@@ -80,21 +128,40 @@
               @endforeach
                </ul>
               @endif
-              <h4><i class="icon md-graduation-cap"></i>Extra Requirements</h4>
-              {!! $joblisting->requirements !!}
-            </div>
           </div>
          </div>
-         <div class="col-md-3">
+         <div class="col-md-5">
            <div class="panel panel-bordered">
             <div class="panel-heading">
               <h3 class="panel-title">Skills</h3>
             </div>
             <div class="panel-body">
              <div class="example text-xs-center max-width">
-                  <canvas id="skillChart" height="350"></canvas>
+                  <canvas id="skillChart" height="200"></canvas>
                 </div>
             </div>
+          </div>
+          <div class="panel panel-bordered">
+            <div class="panel-heading">
+              <h3 class="panel-title">Applicants</h3>
+            </div>
+            
+               @if($joblisting->jobapplications)
+               <ul  class="list-group list-group-bordered list-group-full">
+                @php
+                  $sn=1;
+                @endphp
+                 
+              
+               @foreach($joblisting->jobapplications as $application)
+                <li id="{{$application->applicable->id}}" class="list-group-item ">{{$sn}}.  {{strtoupper($application->applicable->name)}} <button class="btn btn-info pull-right btn-sm" onclick="viewApplicantSummary({{$application->applicable->id}},{{$joblisting->id}});">View Summary</button></li>
+              @php
+                $sn++;
+              @endphp
+              @endforeach
+               </ul>
+              @endif
+            
           </div>
          </div>
 
@@ -105,9 +172,11 @@
   <!-- End Page -->
 
    @include('recruit.modals.editJoblisting')
-  
+   <div class="modal fade " id="appSummaryModal" aria-labelledby="exampleModalTabs" role="dialog" tabindex="-1" aria-hidden="true" style="display: none;">
+     </div>
 @endsection
 @section('scripts')
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <script src="{{asset('global/vendor/bootstrap-table/bootstrap-table.min.js')}}"></script>
   <script src="{{asset('global/vendor/bootstrap-table/extensions/mobile/bootstrap-table-mobile.js')}}"></script>
   <script type="text/javascript" src="{{ asset('global/vendor/bootstrap-datepicker/bootstrap-datepicker.min.js')}}"></script>
@@ -123,6 +192,7 @@
   <script type="text/javascript">
   	  $(document).ready(function() {
         $('#requirements').summernote();
+        $( "#selectable" ).selectable();
     $('.datepicker').datepicker({
     autoclose: true
 });
@@ -147,8 +217,7 @@
        });
     });
 
-
-     $(document).on('submit','#addSalaryComponentForm',function(event){
+    $(document).on('submit','#editJobListingForm',function(event){
      event.preventDefault();
      var form = $(this);
         var formdata = false;
@@ -156,7 +225,7 @@
             formdata = new FormData(form[0]);
         }
         $.ajax({
-            url         : '{{route('payrollsettings.store')}}',
+            url         : '{{route('recruits.store')}}',
             data        : formdata ? formdata : form.serialize(),
             cache       : false,
             contentType : false,
@@ -165,8 +234,8 @@
             success     : function(data, textStatus, jqXHR){
 
                 toastr.success("Changes saved successfully",'Success');
-               $('#addSalaryComponentModal').modal('toggle');
-          $( "#ldr" ).load('{{url('payrollsettings/salary_components')}}');
+               $('#editJobListingModal').modal('toggle');
+         
 
             },
             error:function(data, textStatus, jqXHR){
@@ -181,6 +250,14 @@
     });
 
     });
+
+      function viewApplicantSummary(user_id,listing_id)
+      {
+        
+            $("#appSummaryModal").load('{{ url('/recruits/applicant_summary') }}/?user_id='+user_id+'&listing_id='+listing_id);
+          $('#appSummaryModal').modal();
+        
+      }
 
       function departmentChange(department_id){
     event.preventDefault();
@@ -210,34 +287,22 @@
      
     });
   }
-      function prepareEditData(listing_id){
-    $.get('{{ url('/recruits/get_job_listing_info') }}/',{ listing_id: listing },function(data){
-      
+       function prepareEditData(listing_id){
+    $.get('{{ url('/recruits/get_job_listing_info') }}/',{ listing_id: listing_id },function(data){
+     
      $('#editjtype').val(data.type);
      $('#editjlevel').val(data.level);
-     $('#editscformula').val(data.formula);
-     $('#editscconstant').val(data.constant);
-      $('#editscgl_code').val(data.gl_code);
-       $('#editscproject_code').val(data.project_code);
-       $('#editsctaxable').val(data.taxable);
-      $("#editscexemptions").find('option')
-    .remove();
-    console.log(data.type);
-    if (data.type==1) {
-      $("#editscallowance").prop("checked", true);
-      $("#editscdeduction").prop("checked", false);
-    }else{
-      $("#editscdeduction").prop("checked", true);
-      $("#editscallowance").prop("checked", false);
-    }
-    
-     jQuery.each( data.exemptions, function( i, val ) {
-       $("#editscexemptions").append($('<option>', {value:val.id, text:val.name,selected:'selected'}));
-       // console.log(val.name);
-              }); 
-     $('#editscid').val(data.id);
-    });
-    $('#editSalaryComponentModal').modal();
+     $('#editjsalary_from').val(data.salary_from);
+     $('#editjsalary_to').val(data.salary_to);
+      $('#editjexperience_from').val(data.experience_from);
+       $('#editjexperience_to').val(data.experience_to);
+       $('#editjexpires').val(data.expires);
+        $('#editjrequirements').val(data.requirements);
+        $('#editjlid').val(data.id);
+        $('#editjobid').val(data.job_id);
+       
+    $('#editJobListingModal').modal();
+  });
   }
 
   var ctx = document.getElementById('skillChart').getContext('2d');
@@ -273,5 +338,16 @@ var chart = new Chart(ctx, {
         }
     }
 });
+
+ $(function() {
+           $( "#selectable" ).selectable({
+      stop: function() {
+       
+        $( ".ui-selected", this ).each(function() {
+         console.log($(this).attr('id'));
+        });
+      }
+    });
+         });
   </script>
 @endsection

@@ -117,9 +117,9 @@
            <div class="col-xl-3 col-md-6 col-xs-12 info-panel marg">
             <div class="card card-shadow card-shadow1">
               <div class="card-block bg-white p-30">
-                <button onclick="url('https://snapnet.hcmatrix.com/employee/performance')" type="button" class="btn btn-floating btn-sm btn-info">
+                <a href="{{url('recruits/myjobs')}}" type="button" class="btn btn-floating btn-sm btn-info">
                   <i class="icon md-accounts-list"></i>
-                </button>
+                </a>
                 <span class="m-l-15 font-weight-400 text-info">Job Openings</span>
                 <div class="content-text text-xs-center m-b-0">
 
@@ -127,7 +127,7 @@
               </div>
               </div>
           </div>
-          <div class="col-xl-3 col-md-6 col-xs-12 info-panel marg">
+          {{-- <div class="col-xl-3 col-md-6 col-xs-12 info-panel marg">
             <div class="card card-shadow card-shadow1">
               <div class="card-block bg-white p-30">
                 <button onclick="url('https://snapnet.hcmatrix.com/employee/performance')" type="button" class="btn btn-floating btn-sm  btn-danger">
@@ -139,7 +139,7 @@
                 </div>
               </div>
               </div>
-          </div>
+          </div> --}}
       </div>
       <div class="row">
         <div class="col-md-4">

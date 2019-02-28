@@ -7,6 +7,7 @@
 <link rel="stylesheet" href="{{ asset('global/vendor/bootstrap-toggle/css/bootstrap-toggle.min.css')}}">
   <link rel="stylesheet" href="{{ asset('global/vendor/summernote/summernote.css') }}">
   <link rel="stylesheet" href="{{ asset('assets/examples/css/charts/chartjs.css') }}">
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 <style type="text/css">
  .applied{
   background: #3d8b40;
@@ -31,7 +32,7 @@ color: #fff;
 <!-- Page -->
   <div class="page ">
   	<div class="page-header">
-  		<h1 class="page-title">{{__('Recruit')}}</h1>
+  		<h1 class="page-title">{{__('Job Details')}}</h1>
 		  <ol class="breadcrumb">
 		    <li class="breadcrumb-item"><a href="{{url('/')}}">{{__('Home')}}</a></li>
 		    <li class="breadcrumb-item active">{{__('Recruit')}}</li>
@@ -183,6 +184,7 @@ color: #fff;
   
 @endsection
 @section('scripts')
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <script src="{{asset('global/vendor/bootstrap-table/bootstrap-table.min.js')}}"></script>
   <script src="{{asset('global/vendor/bootstrap-table/extensions/mobile/bootstrap-table-mobile.js')}}"></script>
   <script type="text/javascript" src="{{ asset('global/vendor/bootstrap-datepicker/bootstrap-datepicker.min.js')}}"></script>
@@ -289,7 +291,7 @@ var chart = new Chart(ctx, {
             data: [ @foreach($joblisting->job->skills as $skill){{$skill->pivot->competency->id}}, @endforeach],
         },
          {
-        label: "{{Auth::user()->name}} Skills",
+        label: "My Skills",
         pointRadius: 4,
         borderDashOffset: 2,
         backgroundColor: "rgba(250,122,122,0.25)",

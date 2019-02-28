@@ -17,4 +17,8 @@ class JobListing extends Model
     {
     	return $this->hasMany('App\JobApplication');
     }
+     public function jobfavorites()
+    {
+        return $this->hasMany('App\JobFavorite');
+    }
 }

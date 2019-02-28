@@ -6,6 +6,7 @@
  <link rel="stylesheet" href="{{ asset('assets/examples/css/apps/work.css')}}">
 <link rel="stylesheet" href="{{ asset('global/vendor/bootstrap-toggle/css/bootstrap-toggle.min.css')}}">
   <link rel="stylesheet" href="{{ asset('global/vendor/summernote/summernote.css') }}">
+   <link href="{{ asset('global/vendor/select2/select2.min.css') }}" rel="stylesheet" />
    <style type="text/css">
 
 .applied{
@@ -120,8 +121,68 @@ color: #fff;
               </div>
               @endif
               @empty
-
+                <div class="alert dark alert-primary" role="alert">
+                  <h4>No Jobs</h4>
+                  <p>
+                   No Jobs has been added to your favorites
+                  </p>
+                </div>
               @endforelse
+               {!! $joblistings->appends(Request::capture()->except('page'))->render() !!}
+        </div>
+        <div class="col-md-4">
+                 <div class="panel panel-info panel-line">
+              <div class="panel-heading main-color-bg">
+                <h3 class="panel-title">Filters</h3>
+                
+              </div>
+              <form class="" action="{{url('recruits/myjobs')}}" method="get" >
+
+
+              <div class="panel-body">
+                <div class="form-group">
+                  <label for="">Job Title Contains</label>
+
+                  <input type="text" name="name_contains" class="form-control col-lg-6" id="email_t" placeholder="" value="{{ request()->name_contains }}">
+
+                </div>
+                <div class="form-group">
+                  <label for="">Departments</label>
+                  <select class="select2 form-control" name="deptftype">
+                    <option value="or">OR</option>
+                    <option value="and">AND</option>
+                  </select>
+                  <select id="role_f" class=" select2 form-control col-lg-6" name="department[]" multiple>
+                    @forelse ($departments as $department)
+                      <option value="{{$department->id}}" >{{$department->name}}</option>
+                    @empty
+                      <option value="">No Departments Created</option>
+                    @endforelse
+                  </select>
+
+
+                </div>
+                <div class="form-group">
+                  <label for="">Created At</label>
+                  <div class="input-daterange input-group" id="datepicker">
+                    <input type="text" class="input-sm form-control" name="created_from" placeholder="From date" value="{{ request()->created_from }}"/>
+                    <span class="input-group-addon">to</span>
+                    <input type="text" class="input-sm form-control" name="created_to" placeholder="To date" value="{{ request()->created_to }}"/>
+                </div>
+                </div>
+                <div class="form-group">
+                  <label for="">Updated At</label>
+                  <div class="input-daterange input-group" id="datepicker">
+                    <input type="text" class="input-sm form-control" name="created_from" placeholder="From date" value="{{ request()->updated_from }}"/>
+                    <span class="input-group-addon">to</span>
+                    <input type="text" class="input-sm form-control" name="created_to" placeholder="To date" value="{{ request()->updated_to }}"/>
+                </div>
+                </div>
+                <button type="submit" class="btn btn-info" >Filter</button>
+                <button type="reset" class="btn btn-warning pull-right" >Clear Filters</button>
+              </div>
+              </form>
+              </div>
         </div>
       </div>
         
@@ -145,9 +206,14 @@ color: #fff;
   <script src="{{ asset('global/vendor/raphael/raphael-min.js')}}"></script>
   <script src="{{ asset('global/vendor/morris/morris.min.js')}}"></script>
 <script src="{{asset('global/vendor/summernote/summernote.min.js')}}"></script>
+<script src="{{asset('global/vendor/select2/select2.min.js')}}"></script>
   <script type="text/javascript">
   	  $(document).ready(function() {
         $('#requirements').summernote();
+         $('.select2').select2();
+         $('.input-daterange').datepicker({
+    autoclose: true
+});
     $('.datepicker').datepicker({
     autoclose: true
 });

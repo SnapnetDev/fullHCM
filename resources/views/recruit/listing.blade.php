@@ -38,8 +38,8 @@
 		<div class="page-content">
        <div class="row">
         <div class="col-md-8">
-      @foreach($joblistings as $joblisting)
-      	<div class="panel panel-bordered">
+      @forelse($joblistings as $joblisting)
+      	<div class="panel panel-info panel-line panel-bordered">
             <div class="panel-heading">
               <h3 class="panel-title">{{$joblisting->job?$joblisting->job->title:''}}</h3>
               <div class="panel-actions">
@@ -77,7 +77,15 @@
                   </li>
                 </ul>
           </div>
-          @endforeach
+          @empty
+          <div class="alert dark alert-primary" role="alert">
+                  <h4>No Jobs</h4>
+                  <p>
+                   No Jobs has been created
+                  </p>
+                </div>
+          @endforelse
+           {!! $joblistings->appends(Request::capture()->except('page'))->render() !!}
           <div class="site-action" data-plugin="actionBtn">
           <button type="button" class=" btn-raised btn btn-success btn-floating" data-toggle="modal" data-target="#addJoblistingModal">
             <i class="icon md-plus animation-scale-up" aria-hidden="true"></i>
@@ -103,13 +111,13 @@
                 </div>
                 <div class="form-group">
                   <label for="">Departments</label>
-                  <select class="select2 form-control" name="userftype">
+                  <select class="select2 form-control" name="deptftype">
                     <option value="or">OR</option>
                     <option value="and">AND</option>
                   </select>
-                  <select id="role_f" class=" select2 form-control col-lg-6" name="user[]" multiple>
+                  <select id="role_f" class=" select2 form-control col-lg-6" name="department[]" multiple>
                     @forelse ($departments as $department)
-                      <option value="{{$department->id}}">{{$department->name}}</option>
+                      <option value="{{$department->id}}" >{{$department->name}}</option>
                     @empty
                       <option value="">No Departments Created</option>
                     @endforelse
@@ -165,6 +173,9 @@
   	  $(document).ready(function() {
         $('#requirements').summernote();
         $('.select2').select2();
+         $('.input-daterange').datepicker({
+    autoclose: true
+});
     $('.datepicker').datepicker({
     autoclose: true,
     format:'yyyy-mm-dd'

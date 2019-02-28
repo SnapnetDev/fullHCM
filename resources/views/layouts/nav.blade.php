@@ -59,7 +59,7 @@
                           </a>
                         </li>
                         <li class="site-menu-item ">
-                          <a class="animsition-link" href="#">
+                          <a class="animsition-link" href="{{url('recruits/myjobs')}}">
                             <span class="site-menu-title">Job Openings </span>
                           </a>
                         </li>
@@ -158,8 +158,8 @@
                           </a>
                         </li>
                         <li class="site-menu-item ">
-                          <a class="animsition-link" href="{{ url('compensation') }}">
-                            <span class="site-menu-title">TMSA Schedule</span>
+                          <a class="animsition-link" href="{{ url('loan/loan_requests') }}">
+                            <span class="site-menu-title">Loan Requests</span>
                           </a>
                         </li>
                         @endif

@@ -7,6 +7,7 @@ use App\User;
 use App\JobApplication;
 use App\Company;
 use App\Department;
+use App\Filters\JobListingFilter;
 use Auth;
 
 trait RecruitTrait
@@ -46,6 +47,10 @@ trait RecruitTrait
 				# code...
 				return $this->empFavJobListings($request);
 				break;
+				case 'viewjob':
+				# code...
+				return $this->empViewJobListing($request);
+				break;
 				case 'emp_job_fav':
 				# code...
 				return $this->empJobListingFavorite($request);
@@ -53,6 +58,10 @@ trait RecruitTrait
 				case 'emp_job_apply':
 				# code...
 				return $this->empJobListingApplication($request);
+				break;
+				case 'applicant_summary':
+				# code...
+				return $this->applicantSummary($request);
 				break;
 			default:
 				return $this->index($request);
@@ -122,33 +131,58 @@ trait RecruitTrait
 		
 
 	}
-	 public function empJobListings()
+	 public function empJobListings(Request $request)
     {
+    	if (count($request->all())==0) {
         $company_id=companyId();
         $company=Company::find($company_id);
         $departments=$company->departments;
          $jobs=$company->departments()->first()->jobs;
-         $joblistings=JobListing::where(['status'=>1])->get();
+         $joblistings=JobListing::where(['status'=>1])->paginate(5);
+
+        return view('recruit.user_listing',compact('company','departments','jobs','joblistings'));
+    }else{
+
+    	
+        $company_id=companyId();
+        $company=Company::find($company_id);
+        $departments=$company->departments;
+         $jobs=$company->departments()->first()->jobs;
+         $joblistings=JobListingFilter::apply($request);
 
         return view('recruit.user_listing',compact('company','departments','jobs','joblistings'));
     }
-     public function empFavJobListings()
+    }
+     public function empFavJobListings(Request $request)
     {
         $company_id=companyId();
         $company=Company::find($company_id);
         $departments=$company->departments;
          $jobs=$company->departments()->first()->jobs;
-          $joblistings=JobListing::where(['status'=>1])->get();
+          $joblistings=JobListing::where(['status'=>1])->paginate(5);
 
         return view('recruit.user_fav_listing',compact('company','departments','jobs','joblistings'));
     }
-     public function empAppJobListings()
+     public function applicantSummary(Request $request)
+    {
+        $joblisting=JobListing::find($request->listing_id);
+        $user=User::find($request->user_id);
+
+       $qualification=$user->educationHistories()->whereHas('qualification', function ($query) use ($joblisting) {
+        	$query->where('qualifications.id', $joblisting->job->qualification_id);
+
+        })->count();
+         
+
+        return view('recruit.partials.applicantsummary',compact('joblisting','user','qualification'));
+    }
+     public function empAppJobListings(Request $request)
     {
         $company_id=companyId();
         $company=Company::find($company_id);
         $departments=$company->departments;
          $jobs=$company->departments()->first()->jobs;
-         $joblistings=JobListing::where(['status'=>1])->get();
+         $joblistings=JobListing::where(['status'=>1])->paginate(5);
 
         return view('recruit.user_application_listing',compact('company','departments','jobs','joblistings'));
     }
