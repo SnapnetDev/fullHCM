@@ -9,7 +9,7 @@ use App\Scopes\CompanyScope;
 class LeaveRequest extends Model
 {
 	
-    protected $fillable=['leave_id','start_date','end_date','paystatus','priority','reason','absence_doc','user_id','workflow_id','status','company_id'];
+    protected $fillable=['leave_id','start_date','end_date','paystatus','priority','reason','absence_doc','user_id','workflow_id','status','company_id','replacement_id','balance'];
     protected static function boot()
     {
         parent::boot();
@@ -28,5 +28,21 @@ class LeaveRequest extends Model
      public function user()
     {
     	return $this->belongsTo('App\User','user_id');
+    }
+    public function workflow()
+    {
+        return $this->belongsTo('App\Workflow','workflow_id');
+    }
+    public function replacement()
+    {
+        return $this->belongsTo('App\User','replacement_id');
+    }
+    public function getLeaveNameAttribute()
+    {
+        if ($this->leave_id==0) {
+           return "Annual Leave";
+        }else{
+            return $this->leave->name;
+        }
     }
 }

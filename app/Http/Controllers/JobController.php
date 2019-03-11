@@ -52,8 +52,14 @@ class JobController extends Controller
      */
     public function store(Request $request)
     {
+       
           // try {
-          $no_of_skills=count($request->input('skill_id'));
+        if ($request->has('skill')) {
+               $no_of_skills=count($request->input('skill'));
+            }else{
+                $no_of_skills=0;
+            }
+          
           $this->validate($request, ['title'=>'required|min:5']);
           $qualification=\App\Qualification::find($request->qualification);
         if (!$qualification) {
@@ -75,7 +81,7 @@ class JobController extends Controller
             // $this->saveLog('info','App\User',$user->id,'users',$logmsg,Auth::user()->id);
                 }
           }
-           return redirect()->route('jobs')->with(['success'=>'Changes Saved Successfully']); // } catch (\Exception $e) {
+           return redirect()->route('job_list.view',['department_id'=>$request->department_id])->with(['success'=>'Changes Saved Successfully']); // } catch (\Exception $e) {
 
         // }
     }
@@ -113,8 +119,13 @@ class JobController extends Controller
      */
     public function update(Request $request, Job $job)
     {
+  
         
-         $no_of_skills=count($request->input('skill'));
+          if ($request->has('skill')) {
+               $no_of_skills=count($request->input('skill'));
+            }else{
+                $no_of_skills=0;
+            }
           // $this->validate($request, ['title'=>'required|min:5']);
          $qualification=\App\Qualification::find($request->qualification);
         if (!$qualification) {
@@ -137,7 +148,7 @@ class JobController extends Controller
             // $this->saveLog('info','App\User',$user->id,'users',$logmsg,Auth::user()->id);
                 }
           }
-           return redirect()->route('jobs.edit',['id'=>$job->id])->with(['success'=>'Job Created Successfully']); // } catch (\Exception $e) {
+           return redirect()->route('job_list.view',['department_id'=>$request->department_id])->with(['success'=>'Changes saved Successfully']); // } catch (\Exception $e) {
     }
 
     /**
@@ -225,5 +236,16 @@ class JobController extends Controller
         return $name;
     
      
+    }
+
+    public function delete($job_id)
+    {
+        $job=Job::find($job_id);
+        // return $department->users;
+        if ($job->users->count()>0||$job->children->count()>0||$job->listings->count()>0) {
+            return 'Job has users and cannot be deleted';
+        }
+        $job->delete();
+        return  response()->json(['success'],200);
     }
 }

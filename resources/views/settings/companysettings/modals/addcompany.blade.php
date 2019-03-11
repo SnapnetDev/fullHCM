@@ -28,6 +28,22 @@
                     		<option value="{{$user->id}}">{{$user->name}}</option>
                     		@endforeach
                     	</select>
+                    </div>
+                    <div class="form-group">
+                      <h4 class="example-title">Colour</h4>
+                      <input type="text" name="color" class="jscolor form-control" value="#03a9f4">
+                    </div>
+                    <div class="form-group">
+                      <h4 class="example-title">Logo</h4>
+                      <img src="" width="150" height="150" id='img-upload'>
+                      <div class="input-group">
+                      <span class="input-group-btn">
+                          <span class="btn btn-default btn-file">
+                              Browse… <input type="file" id="imgInp" name="logo" accept="image/*">
+                          </span>
+                      </span>
+                      <input type="text" class="form-control" readonly>
+                  </div>
                     </div> 
                   </div>
                   <div class="clearfix hidden-sm-down hidden-lg-up"></div>            

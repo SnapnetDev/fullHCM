@@ -20,6 +20,7 @@ use Illuminate\Http\Request;
 use Auth;
 use Excel;
 use PDF;
+use App\Notifications\ApprovePayroll;
 
 trait PayrollTrait{
 
@@ -53,9 +54,17 @@ trait PayrollTrait{
 
                 return $this->issuePayslip($request);
              break;
+              case'rollback':
+
+                return $this->rollbackPayroll($request);
+             break;
               case'exportford365':
 
                 return $this->exportForD365($request);
+             break;
+             case'exportforexcel':
+
+                return $this->exportForExcel($request);
              break;
 			default:
 				# code...
@@ -126,6 +135,34 @@ trait PayrollTrait{
         })->export('xlsx');
            }
     }
+
+    public function exportForExcel(Request $request)
+    {
+       
+            // $company_id=companyId();
+            // if ($company_id==0) {
+            //    $departments=Department::all();
+            // } else {
+            //     $departments=Department::where('company_id',$company_id)->get();
+            // }
+            
+           
+           
+       $payroll=Payroll::find($request->payroll_id);
+              
+               // return $payroll->payroll_details->count();
+               $view='compensation.partials.payrollexcel';
+                // return view('compensation.d365payroll',compact('payroll','allowances','deductions','income_tax','salary','date','has_been_run'));
+                 return     \Excel::create("export", function($excel) use ($view,$payroll) {
+
+            $excel->sheet("export", function($sheet) use ($view,$payroll) {
+                $sheet->loadView("$view",compact('payroll'))
+                ->setOrientation('landscape');
+            });
+
+        })->export('xlsx');
+     }
+    
     public function payrollList(Request $request)
     {
         if ($request->filled('month')) {
@@ -139,8 +176,10 @@ trait PayrollTrait{
         $pyear=date('Y',strtotime($date));
      
        $payroll=Payroll::where(['month'=>$pmonth,'year'=>$pyear,'company_id'=>$company_id])->first();
+
+        
        if ($payroll) {
-            $date=date('Y-m-d');
+            $date=date('Y-m-d',strtotime($payroll->for));
        $allowances=0;
        $deductions=0;
        $income_tax=0;
@@ -153,7 +192,7 @@ trait PayrollTrait{
           $income_tax+=$detail->paye;
 
        }
-
+        // Auth::user()->notify(new ApprovePayroll($payroll));
        return view('compensation.payroll',compact('payroll','allowances','deductions','income_tax','salary','date','has_been_run'));
        } else {
           $has_been_run=0;
@@ -168,16 +207,16 @@ trait PayrollTrait{
     }
     public function getUserNetPay($user_id)
     {
-       $user=User::has('promotionHistories.grade')->where(['id'=>1])->first(); 
+       $user=User::has('promotionHistories.grade')->where(['id'=>$user_id])->first(); 
         
                 $payroll=[];
                 $payroll['user_id']=$user->id;
                 $payroll['date']=date('Y-m-d');
                 $payroll['month']=$pmonth= date('m');
                 $payroll['year']=$pyear=date('Y');
-                
+                $company_id=companyId();
             
-               
+                $payroll['company_id']=$company_id;
                     $payroll['start_day']=1;
                 
 
@@ -209,18 +248,26 @@ trait PayrollTrait{
          $company_id=companyId();
          $basic_pay_percentage=intval(PayrollPolicy::where(['company_id'=>$company_id])->first()->basic_pay_percentage)/100;
          $users=User::has('promotionHistories.grade')->where('company_id',$company_id)->get();
-        $payroll=Payroll::where(['month'=>$pmonth,'year'=>$pyear,'company_id'=>$company_id])->first();
-        $pp=PayrollPolicy::first();
 
+        $payroll=Payroll::where(['month'=>$pmonth,'year'=>$pyear,'company_id'=>$company_id])->first();
+        $pp=PayrollPolicy::where('company_id',$company_id)->first();
+        if (!$pp->workflow) {
+           return redirect()->back()->with('error', 'Please Select a Workflow in the payroll settings');
+        }
         if ($payroll) {
-           return $payroll;
+           return redirect()->back();
         } else {
-             $PR=Payroll::create(['month'=>$pmonth,'year'=>$pyear,'company_id'=>$company_id,'workflow_id'=>$pp->workflow->id]);
+             $PR=Payroll::create(['month'=>$pmonth,'year'=>$pyear,'company_id'=>$company_id,'workflow_id'=>$pp->workflow->id,'for'=>$date,'user_id'=>Auth::user()->id]);
+             $components=SalaryComponent::where(['status'=>1,'company_id'=>$PR->company_id])->get()->pluck('id');
             
+            $PR->salary_components()->attach($components);
                 $allp=[];
+
             foreach ($users as $user) {
-                 if(date('m',strtotime($user->hiredate))<=$pmonth &&date('Y',strtotime($user->hiredate))<=$pyear){
+                 if($user->hiredate<=$date){
+                  
                 $payroll=[];
+                $payroll['payroll']=$PR;
                 $payroll['user_id']=$user->id;
                 $payroll['date']=$date;
                 $payroll['month']= $pmonth;
@@ -268,6 +315,7 @@ trait PayrollTrait{
 
               }  
             }
+           
             return redirect(url('compensation/payroll_list?month='.date('m-Y',strtotime($date))));
         }
         
@@ -280,7 +328,7 @@ trait PayrollTrait{
 	{
         $user=User::find($payroll['user_id']);
         if($user->promotionHistories){
-            
+          
             $payroll['gross_pay']=$user->promotionHistories()->latest()->first()->grade->basic_pay;
             $payroll['has_grade']=1;
             $payroll['gross_pay']= ($payroll['gross_pay']/$payroll['working_days'])*$payroll['days_worked'];
@@ -291,7 +339,7 @@ trait PayrollTrait{
 		$this->allowancesanddeductions($payroll);
 		$this->calculate_specific_salary_components($payroll);
         
-		$payroll['taxable_income']= $payroll['gross_pay'] - $payroll['consolidated_allowance']-($payroll['not_taxable']*12) + ($payroll['ssc_total_allowances']*12);
+		$payroll['taxable_income']= $payroll['gross_pay'] - $payroll['consolidated_allowance']-($payroll['not_taxable']*12)-14000 + ($payroll['ssc_total_allowances']*12);
 		$this->calculate_tax($payroll);
 		}else{
 
@@ -402,7 +450,7 @@ trait PayrollTrait{
         private function calculate_specific_salary_components(&$payroll) {
         	$user=User::find($payroll['user_id']);
             $components = $user->specificSalaryComponents()->whereDate('starts', '<=', $payroll['date'])
-            ->whereDate('ends', '>=',  $payroll['date'])
+            // ->whereDate('ends', '>=',  $payroll['date'])
             ->get();
             $payroll['ssc_allowances'] = $payroll['ssc_deductions'] =$payroll['ssc_project_code'] = $payroll['ssc_gl_code'] = [];
             $payroll['specifics']['allowances'] = $payroll['specifics']['deductions'] = 0;
@@ -428,13 +476,16 @@ trait PayrollTrait{
                     }else{
                         $component->update(['grants'=>intval($component->grants)+1]);
                     }
-
+                    $payroll['payroll']->specific_salary_components()->attach($component->id);
                     if ($component->type == 1) {
                           
                            $payroll['ssc_total_allowances'] += $component->amount;
                         } else {
                           
                            $payroll['ssc_total_deductions'] += $component->amount;
+                        }
+                        if ($component->taxable==0) {
+                          $payroll['not_taxable']+=number_format($component->amount, 2, '.', '');
                         }
                 }
                    
@@ -466,7 +517,7 @@ trait PayrollTrait{
                     }else{
                         $component->update(['months_deducted'=>intval($component->months_deducted)+1]);
                     }
-
+                     $payroll['payroll']->loan_requests()->attach($component->id);
                     
                     
                 }
@@ -609,12 +660,40 @@ trait PayrollTrait{
     {
 
         $detail=PayrollDetail::find($request->id);
-        $logo=PayslipDetail::first()->logo;
+        // $logo=PayslipDetail::first()->logo;
         // return view('compensation.partials.payslip', compact('detail','logo'));
-        $pdf = PDF::loadView('compensation.partials.payslip', compact('detail','logo'));
+        $pdf = PDF::loadView('compensation.partials.payslip', compact('detail'));
          // $pdf->setWatermarkImage(public_path('storage'.$logo));
         // $pdf->setWatermarkText('example', '150px');
         return $pdf->stream(Auth::user()->name.'.pdf');
+    }
+    public function rollbackPayroll(Request $request)
+    {
+     $payroll=Payroll::find($request->payroll_id);
+     $sscs=$payroll->specific_salary_components;
+     $lrs=$payroll->loan_requests;
+     $pds=$payroll->payroll_details;
+     if ($pds) {
+      foreach ($pds as $pd) {
+       $pd->delete();
+      }
+     }
+     
+     if ($sscs) {
+       foreach ($sscs as $ssc) {
+         $ssc->update(['grants'=>intval($ssc->grants)-1,'completed'=>0]);
+         $payroll->specific_salary_components()->detach($ssc->id);
+       }
+     }
+     if ($lrs) {
+       foreach ($lrs as $lr) {
+         $lr->update(['months_deducted'=>intval($lr->months_deducted)-1,'completed'=>0]);
+         $payroll->loan_requests()->detach($lr->id);
+       }
+     }
+
+     $payroll->delete();
+     return 'success';
     }
 
 

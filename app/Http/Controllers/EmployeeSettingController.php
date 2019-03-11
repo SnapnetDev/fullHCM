@@ -7,6 +7,7 @@ use App\Company;
 use App\Department;
 use App\Qualification;
 use App\Grade;
+use App\GradeCategory;
 use App\User;
 use Validator;
 use Illuminate\Support\Str;
@@ -21,14 +22,15 @@ class EmployeeSettingController extends Controller
 	public function index()
 	{
 		$grades=Grade::all();
+		$grade_categories=GradeCategory::all();
 		$qualifications=Qualification::all();
 		$roles=Role::all();
-		return view('settings.employeesettings.index',compact('grades','qualifications','roles'));
+		return view('settings.employeesettings.index',compact('grades','qualifications','roles','grade_categories'));
 	}
 	public function saveGrade(Request $request)
 	{
 		$company_id=companyId();
-		Grade::updateOrCreate(['id'=>$request->grade_id],['level'=>$request->level,'basic_pay'=>$request->basic_pay,'leave_length'=>$request->leave_length,'company_id'=>$company_id]);
+		Grade::updateOrCreate(['id'=>$request->grade_id],['level'=>$request->level,'basic_pay'=>$request->basic_pay,'leave_length'=>$request->leave_length,'company_id'=>$company_id,'grade_category_id'=>$request->grade_category_id]);
 		return  response()->json('success',200);
 	}
 	public function getGrade($grade_id)
@@ -46,6 +48,28 @@ class EmployeeSettingController extends Controller
 		}
 		return  response()->json(['success'],200);
 	}
+	public function saveGradeCategory(Request $request)
+	{
+		
+		GradeCategory::updateOrCreate(['id'=>$request->grade_category_id],['name'=>$request->name]);
+		return  response()->json('success',200);
+	}
+	public function getGradeCategory($grade_category_id)
+	{
+		$grade_category=GradeCategory::find($grade_category_id);
+		return  response()->json($grade_category,200);
+	}
+	public function deleteGradeCategory($grade_category_id)
+	{
+		$grade_category=GradeCategory::find($grade_category_id);
+		if ($grade_category) {
+			$grade_category->delete();
+		}else{
+			return  response()->json(['failed'],200);
+		}
+		return  response()->json(['success'],200);
+	}
+
 
 	public function saveQualification(Request $request)
 	{

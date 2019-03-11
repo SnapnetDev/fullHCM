@@ -26,17 +26,28 @@ class CompanySettingController extends Controller
 	}
 	public function saveCompany(Request $request)
 	{
-		$validator = Validator::make($request->all(), ['name'=>'required|min:3','user_id'=>'required','email' => [
-            'required',
-            Rule::unique('companies')->ignore($request->company_id)
-        ]]);
-       if ($validator->fails()) {
-            return response()->json([
-                    $validator->errors()
-                    ],401);
-        }
+		// $validator = Validator::make($request->all(), ['name'=>'required|min:3','user_id'=>'required','email' => [
+  //           'required',
+  //           Rule::unique('companies')->ignore($request->company_id)
+  //       ]]);
+  //      if ($validator->fails()) {
+  //           return response()->json([
+  //                   $validator->errors()
+  //                   ],401);
+  //       }
         // return $request->all();
-		Company::updateOrCreate(['id'=>$request->company_id],['name'=>$request->name,'email'=>$request->email,'address'=>$request->address,'user_id'=>$request->user_id]);
+		$company=Company::updateOrCreate(['id'=>$request->company_id],['name'=>$request->name,'email'=>$request->email,'address'=>$request->address,'user_id'=>$request->user_id]);
+		if ($request->file('logo')) {
+                    $path = $request->file('logo')->store('logo');
+                    if (Str::contains($path, 'logo')) {
+                       $filepath= Str::replaceFirst('logo', '', $path);
+                    } else {
+                        $filepath= $path;
+                    }
+                    $company->logo = $filepath;
+                    $company->save();
+                }
+        
 		return  response()->json(['success'],200);
 	}
 	public function changeParentCompany($company_id='')
@@ -57,7 +68,7 @@ class CompanySettingController extends Controller
 	}
 	public function getCompany($company_id)
 	{
-		$company=Company::find($company_id);
+		 $company=Company::with('users')->find($company_id);
 		return  response()->json($company,200);
 
 	}
@@ -86,7 +97,7 @@ class CompanySettingController extends Controller
 	{
 		$department=Department::find($department_id);
 		// return $department->users;
-		if ($department->users->count()>0) {
+		if ($department->jobs->count()>0) {
 			return 'Department has users and cannot be deleted';
 		}
 		$department->delete();

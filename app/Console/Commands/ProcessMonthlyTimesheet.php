@@ -55,8 +55,8 @@ class ProcessMonthlyTimesheet extends Command
         $timesheet=[];
         $tdays=[];
         // $month=date('m',strtotime('first day of previous month'));
-        $month=date('m');
-        $year=date('Y');
+        $month='02';//date('m');
+        $year='2019';date('Y');
         $users=User::all();
         $count=$users->count();
         $days=cal_days_in_month(CAL_GREGORIAN,$month,$year);

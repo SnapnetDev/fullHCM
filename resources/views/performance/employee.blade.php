@@ -62,7 +62,7 @@
               <li class="list-group-item"> 
               	<p class="margin"><b class="text-primary">Hire Date</b></p>
                <p class="margin">                
-                	{{date('Y-m-d',strtotime($employee->hiredate))}}</p>
+                	{{date('F j, Y',strtotime($employee->hiredate))}}</p>
                 	<p class="margin">{{$employee->hiredate->diffForHumans()}}</p>
               </li>
  			<li class="list-group-item"> 
@@ -85,7 +85,7 @@
               <li class="list-group-item"> 
               	<p class="margin"><b class="text-primary">Grade</b></p>
 
-              	<p class="margin"> {{$employee->grade}}</p>
+              	<p class="margin"> {{$employee->grade?$employee->grade->level:''}}</p>
               </li> 
                  <li class="list-group-item"> 
               	<p class="margin"><b class="text-primary">Gender</b></p>
@@ -93,9 +93,9 @@
               	<p class="margin"> {{$employee->sex}}</p>
               </li> 
                <li class="list-group-item"> 
-              	<p class="margin"><b class="text-primary">Subsidiary</b></p>
+              	<p class="margin"><b class="text-primary">Organization</b></p>
 
-              	<p class="margin">Sub</p>
+              	<p class="margin">{{$employee->company->name}}</p>
               </li>
                <li class="list-group-item"> 
               	<p class="margin"><b class="text-primary">Status</b></p>
@@ -154,14 +154,16 @@
             <ul class="nav nav-tabs nav-tabs-line" id="arcordion" role="tablist">
                 <li class="nav-item">
                         <a class="nav-link active" data-toggle="tab" href="#pilotapp" onclick="saveState('pilotapp')" aria-controls="" role="tab" aria-expanded="true">
-                            <i class="icon wb-stats-bars" aria-hidden="true"></i> Pilot Goals
+                            <i class="icon wb-stats-bars" aria-hidden="true"></i> Organizational Goals
                         </a>
                     </li>
+                    @if($employee->managers->count()>1)
                     <li class="nav-item">
                         <a class="nav-link" data-toggle="tab" onclick="saveState('lmapp')" href="#lmapp" aria-controls="" role="tab">
-                            <i class="icon wb-arrow-shrink"></i>Stretch Goals
+                            <i class="icon wb-arrow-shrink"></i>Dual Role Goals
                         </a>
                     </li>
+                    @endif
                      <li class="nav-item">
                         <a class="nav-link" data-toggle="tab" onclick="saveState('kpis')" href="#kpis" aria-controls="" role="tab">
                             <i class="icon wb-arrow-shrink"></i>KPI's

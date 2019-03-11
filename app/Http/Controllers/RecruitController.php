@@ -5,6 +5,10 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\AvaJob;
 use App\Traits\RecruitTrait as Rt;
+use App\Company;
+use App\Department;
+use App\JobListing;
+use App\Filters\JobListingFilter;
 
 class RecruitController extends Controller
 {
@@ -14,11 +18,28 @@ class RecruitController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        
+        if (count($request->all())==0) {
+        $company_id=companyId();
+        $company=Company::find($company_id);
+        $departments=$company->departments;
+         $jobs=$company->departments()->first()->jobs;
+         $joblistings=JobListing::paginate(5);
 
-        return view('recruit.listing');
+
+        return view('recruit.listing',compact('company','departments','jobs','joblistings'));
+        }else{
+                 
+        $company_id=companyId();
+        $company=Company::find($company_id);
+        $departments=$company->departments;
+         $jobs=$company->departments()->first()->jobs;
+        
+                $joblistings=JobListingFilter::apply($request);
+                 return view('recruit.listing',compact('company','departments','jobs','joblistings'));
+             
+         }
     }
 
     /**

@@ -15,7 +15,19 @@ class Workflow extends Model
   }
   public function payrolls()
   {
-    return $this->hasManyThrough('App\Payroll','App\Stage');
+    return $this->hasMany('App\Payroll');
+  }
+  public function payroll_policies()
+  {
+    return $this->hasMany('App\PayrollPolicy');
+  }
+  public function leave_policies()
+  {
+    return $this->hasMany('App\LoanPolicy');
+  }
+  public function loan_policies()
+  {
+    return $this->hasMany('App\LeavePolicy');
   }
   // public function audit_logs()
   // {

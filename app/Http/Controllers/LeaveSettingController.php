@@ -9,6 +9,8 @@ use App\Shift;
 use App\Grade;
 use App\Leave;
 use App\Setting;
+use App\LeavePolicy;
+use App\Workflow;
 use Validator;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -18,25 +20,34 @@ class LeaveSettingController extends Controller
 {
     public function index($value='')
 	{
+		$company_id=companyId();
+	      $lp=LeavePolicy::where('company_id',$company_id)->first();
+	       $workflows=Workflow::all();
+	       
+	      
+	      if (!$lp) {
+	        $lp=LeavePolicy::create(['includes_weekend'=>0,'includes_holiday'=>0,'user_id'=>Auth::user()->id,'company_id'=>$company_id,'workflow_id'=>0]);
+	      }
 		$holidays=Holiday::all();
 		$leaveperiods=LeavePeriod::all();
 		$leaves=Leave::all();
 		$grades=Grade::doesntHave('leaveperiod')->get();
 		$shifts=Shift::all();
-		$leave_includes_holiday=Setting::where('name','leave_includes_holiday')->first();
-		$leave_includes_weekend=Setting::where('name','leave_includes_weekend')->first();
-		return view('settings.leavesettings.index',compact('holidays','leaveperiods','grades','shifts','leaves','leave_includes_holiday','leave_includes_weekend'));
+		return view('settings.leavesettings.index',compact('holidays','leaveperiods','grades','shifts','leaves','workflows','lp'));
 	}
-	public function switchLeaveIncludesHoliday(Request $request)
+	public function savePolicy(Request $request)
 	  {
-	    $setting=Setting::where('name','leave_includes_holiday')->first();
-	    if ($setting->value==1) {
-	     $setting->update(['value'=>0]);
-	      return 2;
-	    }elseif($setting->value==0){
-	      $setting->update(['value'=>1]);
-	       return 1;
-	    }
+
+	    $company_id=companyId();
+      $lp=LeavePolicy::where('company_id',$company_id)->first();
+      $ih = ($request->includes_holiday==1) ? 1 : 0 ;
+       $iw = ($request->includes_weekend==1) ? 1 : 0 ;
+      if ($lp) {
+        $lp->update(['includes_weekend'=>$request->includes_weekend,'includes_holiday'=>$request->includes_holiday,'user_id'=>Auth::user()->id,'workflow_id'=>$request->workflow_id,'default_length'=>$request->default_length]);
+      }else{
+        LeavePolicy::create(['includes_weekend'=>$iw,'includes_holiday'=>$ih,'user_id'=>Auth::user()->id,'workflow_id'=>$request->workflow_id,'default_length'=>$request->default_length,'company_id'=>$company_id]);
+      }
+    return 'success';
 	  }
 	  public function switchLeaveIncludesWeekend(Request $request)
 	  {

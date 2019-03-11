@@ -16,6 +16,10 @@ class SalaryComponent extends Model
     {
         return $this->belongsToMany('App\User','salary_component_exemptions','salary_component_id','user_id');
     }
+    public function payrolls()
+    {
+        return $this->belongsToMany('App\Payroll','payroll_salary_component','salary_component_id','payroll_id');
+    }
     protected static function boot()
     {
         parent::boot();

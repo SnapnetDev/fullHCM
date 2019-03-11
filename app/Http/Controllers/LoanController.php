@@ -15,8 +15,9 @@ class LoanController extends Controller
 	use LoanTrait,PayrollTrait;
    public function index()
    {
-   	$user=User::has('promotionHistories.grade')->where(['id'=>1])->first();
-   	if($user){
+
+   	
+   	if(Auth::user()->promotionHistories){
    	$netpay=$this->getUserNetPay(Auth::user()->id);
    	$maximum_allowed=$netpay*(intval(Setting::where('name','loan_allowed')->first()->value)/100);
    	$annual_interest=intval(Setting::where('name','loan_interest')->first()->value);

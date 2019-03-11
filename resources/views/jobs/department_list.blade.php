@@ -23,7 +23,7 @@
 @section('content')
 <div class="page ">
     <div class="page-header">
-      <h1 class="page-title">Jobs</h1>
+      <h1 class="page-title">Job Roles</h1>
       <div class="page-header-actions">
     <div class="row no-space w-250 hidden-sm-down">
 

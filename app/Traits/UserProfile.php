@@ -6,9 +6,14 @@ use App\EducationHistory;
 use App\EmploymentHistory;
 use App\Skill;
 use App\Dependant;
+use App\Department;
+use App\Company;
+use App\Job;
+use Auth;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
-
+use Validator;
+use Illuminate\Support\Facades\Hash;
 
 trait UserProfile{
 public function processGet($route,Request $request)
@@ -47,6 +52,26 @@ public function processGet($route,Request $request)
 			case 'lgas':
 			return $this->lgas($request);
 			break;
+			case 'changegrade':
+			return $this->changegrade($request);
+			break;
+			case 'primary_manager':
+			return $this->makePrimaryManager($request);
+			break;
+			case 'remove_manager':
+			return $this->removeManager($request);
+			break;
+
+			case 'delete_job_history':
+			return $this->delete_job_history($request);
+			break;
+			case 'notifications':
+			return $this->viewNotifications($request);
+			break;
+			case 'notification':
+			return $this->viewNotificationInfo($request);
+			break;
+			
 		
 		default:
 			# code...
@@ -68,9 +93,13 @@ public function processPost(Request $request)
 			case 'work_experience':
 			return $this->save_work_experience($request);
 			break;
-			case 'promotion_history':
-			# code...
+			case 'job_history':
+			return $this->save_job_history($request);
 			break;
+			case 'change_password':
+			return $this->changePassword($request);
+			break;
+			
 		
 		default:
 			# code...
@@ -194,6 +223,62 @@ public function save_work_experience(Request $request)
 		return $ex->getMessage();
 	}
 }
+public function save_job_history(Request $request)
+{
+	try{
+		$user=User::find($request->user_id);
+		
+		$user->jobs()->detach($request->job_id);
+
+		$user->jobs()->attach($request->job_id, ['started' => date('Y-m-d',strtotime($request->started)),'ended'=>date('Y-m-d',strtotime($request->ended))]);
+		$user->job_id=$request->job_id;
+		$user->save();
+		
+		return 'success';
+
+	}catch(\Exception $ex){
+		return $ex->getMessage();
+	}
+}
+public function update_job_history(Request $request)
+{
+	try{
+		$user=User::find($request->user_id);
+		
+		$user->jobs()->detach($request->job_id);
+
+		$user->jobs()->updateExistingPivot($request->job_id, ['started' => date('Y-m-d',strtotime($request->started)),'ended'=>date('Y-m-d',strtotime($request->ended))]);
+		
+		return 'success';
+
+	}catch(\Exception $ex){
+		return $ex->getMessage();
+	}
+}
+public function delete_job_history(Request $request)
+{
+	try{
+		$user=User::find($request->user_id);
+		;
+		$user->jobs()->detach($request->job_id);
+
+		$job=$user->jobs()->latest()->first();
+		// dd($manager);
+		if ($job) {
+			$user->job_id=$job->id;
+			$user->department_id=$job->department->id;
+		}else{
+			$user->job_id=0;
+			$user->department_id=0;
+		}
+		$user->save();
+		
+		return 'success';
+
+	}catch(\Exception $ex){
+		return $ex->getMessage();
+	}
+}
 
 public function states(Request $request)
 {
@@ -205,6 +290,95 @@ public function lgas(Request $request)
 	
 	$state=\App\State::find($request->state_id);
 	return $state->lgas;
+}
+
+public function changegrade(Request $request)
+{
+		$user=User::find($request->user_id);
+	 	if($user->promotionHistories){
+	 		$oldgrade=$user->promotionHistories()->latest()->first()->grade;
+	 		if ($oldgrade->id!=$request->grade_id) {
+	 			$user->promotionHistories()->create([
+							    'old_grade_id' => $oldgrade->id,'grade_id'=>$request->grade_id,'approved_on'=>date('Y-m-d'),'approved_by'=>Auth::user()->id
+							]);
+	 			$user->grade_id=$request->grade_id;
+	 			$user->save();
+	 		}
+
+	 	}else{
+	 		$user->promotionHistories()->create([
+							    'old_grade_id' => $request->grade_id,'grade_id'=>$request->grade_id,'approved_on'=>date('Y-m-d'),'approved_by'=>Auth::user()->id
+							]);
+	 		$user->grade_id=$request->grade_id;
+	 		$user->save();
+	 	}
+       
+        return 'success';
+}
+
+public function removeManager(Request $request)
+{
+	$user=User::find($request->user_id);
+	
+	
+	$user->managers()->detach($request->manager_id);
+	$manager=$user->managers()->latest()->first();
+	// dd($manager);
+	if ($manager) {
+		$user->line_manager_id=$manager->id;
+		$user->save();
+	}else{
+		$user->line_manager_id=0;
+		$user->save();
+	}
+	
+	return 'success';
+}
+public function makePrimaryManager(Request $request)
+{
+	$user=User::find($request->user_id);
+	
+	$user->managers()->detach($request->manager_id);
+	$user->managers()->attach($request->manager_id);
+	$user->line_manager_id=$request->manager_id;
+	$user->save();
+	return 'success';
+}
+public function viewNotifications(Request $request)
+{
+	$pageType="mailbox";
+	return view('notification.list',compact('pageType'));
+}
+public function viewNotificationInfo(Request $request)
+{
+	$noti=Auth::user()->notifications()->where('id',$request->notification_id)->first();
+	$noti->update(['read_at' => now()]);
+	return view('notification.partials.info',compact('noti'));
+}
+public function changePassword(Request $request)
+{
+	
+	if (Hash::check($request->password,  Auth::user()->password)) {
+    $validator = Validator::make($request->all(),[
+    'new_password' => ['required',
+               'min:8',
+               'regex:/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\d\X])(?=.*[!$#%]).*$/',
+               'confirmed']
+		],['new_password.regex'=>'You need to enter at least <br> -One Uppercase <br>-One Lowercase <br> -One Number <br>-one Special Character']);
+		if ($validator->fails()) {
+            return response()->json([
+                    $validator->errors()
+                    ],401);
+        }
+
+        $request->user()->fill([
+            'password' => Hash::make($request->new_password)
+        ])->save();
+        return 'success';
+		}else{
+
+			return 'failed';
+		}
 }
 
 }

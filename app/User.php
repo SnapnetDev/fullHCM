@@ -17,7 +17,7 @@ class User extends Authenticatable
      *
      * @var array
      */
-    protected $fillable = ['name', 'email', 'password','emp_num','sex','dob','phone','marital_status','password','company_id','branch_id','job_id','hiredate','role_id','image','remember_token','created_at','updated_at','address','lga_id','employment_status_id','superadmin','bank_id','bank_account_no','state_id','country_id'];
+    protected $fillable = ['name', 'email', 'password','emp_num','sex','dob','phone','marital_status','password','company_id','branch_id','job_id','hiredate','role_id','image','remember_token','created_at','updated_at','address','lga_id','employment_status','superadmin','bank_id','bank_account_no','state_id','country_id','grade_id','line_manager_id'];
     protected $dates=['hiredate'];
     /**
      * The attributes that should be hidden for arrays.
@@ -125,6 +125,10 @@ class User extends Authenticatable
     {
         return $this->belongsTo('App\Department');
     }
+    public function job()
+    {
+        return $this->belongsTo('App\Job');
+    }
     public function company()
     {
         return $this->belongsTo('App\Company');
@@ -133,10 +137,10 @@ class User extends Authenticatable
     {
         return $this->belongsTo('App\Bank');
     }
-    public function subsidiary()
-    {
-        return $this->belongsTo('App\Subsidiary');
-    }
+    // public function subsidiary()
+    // {
+    //     return $this->belongsTo('App\Subsidiary');
+    // }
     //Nok is the next of kin
     public function nok()
     {
@@ -187,9 +191,13 @@ class User extends Authenticatable
     {
         return $this->belongsTo('App\EmploymentStatus');
     }
-    public function grades()
+    // public function grades()
+    // {
+    //     return $this->hasManyThrough('App\Grade','App\PromotionHistory');
+    // }
+    public function grade()
     {
-        return $this->hasManyThrough('App\Grade','App\PromotionHistory');
+        return $this->belongsTo('App\Grade');
     }
     public function performanceseason(){
          $checkseason= \App\PerformanceSeason::select('reviewStart')->value('reviewStart');
@@ -345,9 +353,105 @@ public function getquarter(){
     {
         return $this->morphMany('App\Stage', 'stageable');
     }
-    public function lga($value='')
+    public function lga()
     {
        return $this->belongsTo('App\LocalGovernment');
     }
+     public function state()
+    {
+       return $this->belongsTo('App\State');
+    }
+     public function country()
+    {
+       return $this->belongsTo('App\Country');
+    }
+    public function getDRLeaveApprovals()
+    {
+        $lm_id=$this->id;
+
+        return \App\LeaveApproval::whereHas('leave_request',function($query) use ($lm_id){
+                     $query->whereHas('user',function($query) use ($lm_id){
+                                $query->whereHas('managers',function($query) use ($lm_id){
+                                        $query->where('manager_id',$lm_id);
+                                });
+                        });
+                })
+                ->whereHas('stage.role',function($query) use($lm_id){
+                $query->where('manages','dr');
+                
+                 })
+                ->get();
+        # code...
+    }
+    public function user_daily_shifts()
+    {
+         return $this->hasMany('App\UserDailyShift','user_id');
+    }
+    public function user_cust_attendances()
+    {
+         return $this->hasMany('App\CustAttendance','user_id');
+    }
+
+    public function my_departments()
+    {
+         return $this->hasMany('App\Department','manager_id');
+    }
+
+    //RELATIONSHIP FOR TRAINING MODULE STARTS
+    public function TrainingRecommended()
+    {
+        return $this->hasMany('App\TrainingRecommended', 'trainee_id', 'suggester_id', 'approver_id');
+    }
+
+    public function TrainingBudget()
+    {
+        return $this->hasMany('App\TrainingBudget', 'status_id');
+    }
+
+    public function trainings()
+    {
+        return $this->belongsToMany('training_user', 'App\User', 'user_id', 'training_id');
+    }
+
+    // public function trainings()
+    // {
+    //     return $this->belongsToMany('training_user', 'App\User', 'user_id', 'training_id');
+    // }
+
+
+
+
+    public function TrainingUser()
+    {
+        return $this->hasMany('App\TrainingUser', 'user_id');
+    }
+     public function rec_tranings()
+    {
+        return $this->belongsToMany('App\TrainingRecommended','rec_training_trainee' ,'trainee_id','rec_training_id');
+    }
+
+    public function separation()
+    {
+        return $this->hasOne('App\Separation');
+    }
+    public function applications()
+    {
+        return $this->morphMany('App\JobApplication', 'applicable');
+    }
+    public function favorites()
+    {
+        return $this->morphMany('App\JobFavorite', 'favorable');
+    }
+
+    public function plmanager()
+    {
+        return $this->belongsTo('App\User','line_manager_id');
+    }
+    public function pdreports()
+    {
+        return $this->hasMany('App\User','line_manager_id');
+    }
+
+
 
 }

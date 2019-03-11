@@ -54,7 +54,7 @@
 	                  </div>
 	                  </form>
 	      		</div>
-	      		<div class="col-md-5">
+	      		<div class="col-md-7">
 	      			
 	                <ul class="list-group list-group-dividered ">
 	            	<li class="list-group-item"><strong>Payroll For:	{{date('M-Y',strtotime($date))}}</strong></li>
@@ -62,6 +62,7 @@
 	                  <li class="list-group-item">Salary:&#8358;{{number_format( $salary,2)}}</li>
 	                 <li class="list-group-item">Allowances:&#8358;{{number_format( $allowances,2)}}</li>
 	                  <li class="list-group-item">Deductions:&#8358;{{number_format( $deductions+$income_tax,2)}}</li>
+	                  <li class="list-group-item">Total Net Pay :&#8358;{{number_format( ($salary+$allowances-( $deductions+$income_tax)),2)}}</li>
 	                </ul>
 	                <div class="btn-group btn-group-justified">
 	                	@if($payroll->payslip_issued==0)
@@ -82,11 +83,18 @@
 	                      </button>
 	                    </div>
 	                    <div class="btn-group" role="group">
-	                      <button type="button" class="btn btn-success btn-outline">
+	                      <button type="button" class="btn btn-danger btn-outline" onclick="rollbackPayroll({{$payroll->id}})">
+	                        <i class="icon fa fa-refresh" aria-hidden="true"></i>
+	                        <br>
+	                        <span class="text-uppercase hidden-sm-down">Rollback Payroll</span>
+	                      </button>
+	                    </div>
+	                    <div class="btn-group" role="group">
+	                      <a type="button" class="btn btn-success btn-outline" href="{{ url('compensation/exportforexcel?payroll_id='.$payroll->id) }}">
 	                        <i class="icon fa fa-file-excel-o" aria-hidden="true"></i>
 	                        <br>
 	                        <span class="text-uppercase hidden-sm-down">Export Payroll</span>
-	                      </button>
+	                      </a>
 	                    </div>
 	                    <div class="btn-group" role="group">
 	                      <a type="button" class="btn btn-success btn-outline" href="{{ url('compensation/exportford365?payroll_id='.$payroll->id) }}">
@@ -168,6 +176,18 @@
       </div>
     </div>
 		  	@elseif($has_been_run==0)
+		  	 @if (session('success'))
+                <div class="alert alert-success alert-dismissible">
+                  <button type="button" class="close" data-dismiss="alert" aria-label="Close" ><span aria-hidden="true">&times</span> </button>
+                    {{ session('success') }}
+                </div>
+            @endif
+             @if (session('error'))
+                <div class="alert alert-success alert-dismissible">
+                  <button type="button" class="close" data-dismiss="alert" aria-label="Close" ><span aria-hidden="true">&times</span> </button>
+                    {{ session('error') }}
+                </div>
+            @endif
 		  	<div class="row " style="padding-top:20px; padding-bottom: 30px;">
 	      		<div class="col-md-4">
 	      		</div>
@@ -186,7 +206,7 @@
 
 	          	</div>
 	      		<div class="col-md-3 ">
-	      			<form id="monthForm" method="GET" action="{{url('compensation/runpayroll')}}" >
+	      			<form id="monthForm" method="GET" action="{{url('compensation/payroll_list')}}" >
 	                 <div class="input-group">
 	               
 	                   
@@ -216,9 +236,11 @@
 	  					<tr>
 	  						<th>Employee Number</th>
 	  						<th>Employee Name</th>
+	  						<th>Job Role</th>
+	  						<th>Department</th>
 	  						<th>Grade</th>
 	  						<th>Gross pay</th>
-	  						<th>Action</th>
+	  						<th>Payroll Type</th>
 	  					</tr>
 	  				</thead>
 	  				<tbody>
@@ -226,9 +248,11 @@
 	  						<tr>
 	  						<td>{{$employee->emp_num}}</td>
 	  						<td>{{$employee->name}}</td>
+	  						<td>{{$employee->job?$employee->job->title:''}}</td>
+	  						<td>{{$employee->job?$employee->job->department->name:''}}</td>
 	  						<td>{{$employee->promotionHistories()->latest()->first()->grade->level}}</td>
 	  						<td>{{$employee->promotionHistories()->latest()->first()->grade->basic_pay}}</td>
-	  						<td></td>
+	  						<td>{{$employee->payroll_type==''?'Normal':($employee->payroll_type==1?'Normal':$employee->payroll->type==2)}}</td>
 	  					</tr>
 	  					@endforeach
 	  					
@@ -294,13 +318,24 @@ function viewMore(detail_id)
   
 }
 @if($has_been_run==1)
-function issuePayslip(payroll__id){
+function issuePayslip(payroll_id){
     $.get('{{ url('/compensation/issuepayslip') }}/',{ payroll_id: {{$payroll->id}}},function(data){
       if (data=='success') {
     toastr.success("Payslip Issued successfully",'Success');
     location.reload();
       }else{
         toastr.error("Error issuing payslip",'Error');
+      }
+     
+    });
+  }
+  function rollbackPayroll(payroll_id){
+    $.get('{{ url('/compensation/rollback') }}/',{ payroll_id: {{$payroll->id}}},function(data){
+      if (data=='success') {
+    toastr.success("Rollback Successful",'Success');
+    location.reload();
+      }else{
+        toastr.error("Error Rolling Back",'Error');
       }
      
     });

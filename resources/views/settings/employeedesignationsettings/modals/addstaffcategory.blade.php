@@ -14,6 +14,13 @@
                   		<h4 class="example-title">Name</h4>
                   		<input type="text" name="name" class="form-control">
                   	</div>
+                    <div class="form-group " >
+                      <label class="form-control-label" for="select">Payroll Type</label>
+                      <select class="form-control"  name="payroll_type">
+                        <option value="1" >Normal</option>
+                        <option value="2" >TMSA</option>
+                      </select>
+                    </div>
                   </div>
                   <div class="clearfix hidden-sm-down hidden-lg-up"></div>            
                 </div>        

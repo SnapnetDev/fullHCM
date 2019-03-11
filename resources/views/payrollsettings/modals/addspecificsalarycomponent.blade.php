@@ -15,8 +15,9 @@
                     @csrf
                     <div class="form-group">
                       <h4 class="example-title">Upload Excel Sheet</h4>
-                      <a href="#">Want to add multiple at once? Download excel template here</a>
+                      <a href="{{url('/payrollsettings/downloadssctemplate')}}">Want to add multiple at once? Download excel template here</a>
                       <input type="file" name="sscs" class="form-control">
+                      <input type="hidden" name="type" value="import_specific_salary_components">
                     </div>
                     <div class="form-group">
                     <button type="submit" class="btn btn-info pull-left ">Upload</button>
@@ -51,6 +52,13 @@
                     <div class="form-group">
                       <h4 class="example-title">Amount</h4>
                       <input type="text" name="amount"  class="form-control">
+                    </div>
+                    <div class="form-group">
+                      <label class="example-title" for="taxable">Taxable</label>
+                      
+                      <select required="" name="taxable" style="width:100%;" id="taxable" class="form-control " >
+                        <option selected value='0'>No</option>
+                        <option selected value='1'>Yes</option></select>
                     </div>
                     <div class="form-group">
                       <h4 class="example-title">General Ledger Code</h4>

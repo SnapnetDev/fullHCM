@@ -6,7 +6,7 @@
   <link rel="stylesheet" href="{{ asset('global/fonts/7-stroke/7-stroke.css')}}">
   <link rel="stylesheet" href="{{ asset('global/fonts/octicons/octicons.css')}}">
    <link href="{{ asset('global/vendor/select2/select2.min.css') }}" rel="stylesheet" />
-   <link rel="stylesheet" type="text/css" href="http://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
+   <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
 
 
   <style type="text/css">
@@ -46,9 +46,21 @@
                 <a class="list-group-item setting-linker" href="{{ url('payrollsettings/payroll_policy') }}">
                  <i class="icon oi-law setting-linker" aria-hidden="true"></i>{{__('Payroll Policy Settings')}}
                 </a>
-                <a class="list-group-item" href="javascript:void(0)">
-                 <i class="icon pe-wallet setting-linker" aria-hidden="true"></i>{{__('Payroll Wallet Settings')}}
+                {{-- <a class="list-group-item setting-linker" href="{{ url('payrollsettings/tmsa_policy') }}">
+                 <i class="icon oi-law setting-linker" aria-hidden="true"></i>{{__('TMSA Policy Settings')}}
                 </a>
+                <a class="list-group-item setting-linker" href="{{ url('payrollsettings/tmsa_components') }}">
+                 <i class="icon oi-law setting-linker" aria-hidden="true"></i>{{__('TMSA Component Settings')}}
+                </a>
+                <a class="list-group-item setting-linker" href="{{ url('payrollsettings/tmsa_schedules') }}">
+                 <i class="icon oi-law setting-linker" aria-hidden="true"></i>{{__('TMSA Schedule Settings')}}
+                </a> --}}
+                {{-- <a class="list-group-item setting-linker" href="{{ url('payrollsettings/loan_policy') }}">
+                 <i class="icon oi-law setting-linker" aria-hidden="true"></i>{{__('Loan Policy Settings')}}
+                </a> --}}
+                {{-- <a class="list-group-item" href="javascript:void(0)">
+                 <i class="icon pe-wallet setting-linker" aria-hidden="true"></i>{{__('Payroll Wallet Settings')}}
+                </a> --}}
                
               </div>
             </div>
@@ -81,7 +93,7 @@
   <script type="text/javascript" src="{{ asset('global/vendor/bootstrap-toggle/js/bootstrap-toggle.min.js')}}"></script>
   <script src="{{asset('global/vendor/select2/select2.min.js')}}"></script>
     
-   <script type="text/javascript" src="http://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+   <script type="text/javascript" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
 <script type="text/javascript">
  
 	$(function(){

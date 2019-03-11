@@ -6,6 +6,9 @@
   <link rel="stylesheet" href="{{ asset('global/vendor/ladda/ladda.css') }}">
   <link rel="stylesheet" href="{{ asset('assets/examples/css/uikit/buttons.css') }}">
   <link href="{{asset('global/vendor/rwd-table-patterns/dist/css/rwd-table.min.css')}}" rel="stylesheet" type="text/css" media="screen">
+   <link rel="stylesheet" href="{{ asset('global/vendor/bootstrap-datepicker/bootstrap-datepicker.css') }}">
+<link href="{{ asset('global/vendor/select2/select2.min.css') }}" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ asset('global/vendor/bootstrap-table/bootstrap-table.css') }}">
 @endsection
 @section('content')
 <div class="page bg-white">
@@ -61,7 +64,7 @@
     <div class="page-main">
       <!-- Contacts Content Header -->
       <div class="page-header">
-        <h1 class="page-title">Employee List</h1>
+        <h1 class="page-title">Employee Imformation</h1>
         <div class="page-header-actions">
           <form>
             <select class="form-control" id="pagi-change">
@@ -188,6 +191,7 @@
                         <input type="hidden" value="{{ request()->status }}" id="status" name="status">
                         <input type="hidden" value="" id="excel" name="excel">
                         <input type="hidden" value="" id="excelall" name="excelall">
+                        <a href="{{url('/users')}}" class="btn btn-warning pull-xs-right">Clear Filters</a>
                         <button type="submit" class="btn btn-primary pull-xs-right">Filter</button>
                       </div>
                     </form>
@@ -214,11 +218,15 @@
               <th  data-priority="1" class="cell-300" scope="col" data-tablesaw-sortable-col data-tablesaw-priority="3">Name</th>
               <th data-priority="2" class="cell-300" scope="col" data-tablesaw-sortable-col data-tablesaw-priority="3">Staff ID</th>
               <th data-priority="3"  class="cell-300" scope="col" data-tablesaw-sortable-col data-tablesaw-priority="4">Gender</th>
-              <th data-priority="3"  class="cell-300" scope="col" data-tablesaw-sortable-col data-tablesaw-priority="4">Job</th>
+              <th data-priority="3"  class="cell-300" scope="col" data-tablesaw-sortable-col data-tablesaw-priority="4">Grade</th>
+              <th data-priority="3"  class="cell-300" scope="col" data-tablesaw-sortable-col data-tablesaw-priority="4">Grade Nomenclature</th>
+              <th data-priority="3"  class="cell-300" scope="col" data-tablesaw-sortable-col data-tablesaw-priority="4">Department</th>
+              <th data-priority="3"  class="cell-300" scope="col" data-tablesaw-sortable-col data-tablesaw-priority="4">Job Role</th>
               <th data-priority="4"  class="cell-300" scope="col" data-tablesaw-sortable-col data-tablesaw-priority="4">Email</th>
               <th data-priority="4"  class="cell-300" scope="col" data-tablesaw-sortable-col data-tablesaw-priority="4">Manager</th>
-              <th data-priority="4"  class="cell-300" scope="col" data-tablesaw-sortable-col data-tablesaw-priority="4">Address</th>
+             
                <th data-priority="4" class="cell-300" scope="col" data-tablesaw-sortable-col data-tablesaw-priority="4">Role</th>
+                <th data-priority="4"  class="cell-300" scope="col" data-tablesaw-sortable-col data-tablesaw-priority="4">Address</th>
               <th data-priority="5" class="cell-300"  scope="col" data-tablesaw-sortable-col data-tablesaw-priority="4">Options</th>
               <th class="suf-cell"></th>
             </tr>
@@ -240,6 +248,10 @@
               </td>
               <td class="cell-300" >{{$user->emp_num}}</td>
                <td class="cell-300" >{{$user->sex=='M'?'Male':($user->sex=='F'?'Female':'')}}</td>
+               <td class="cell-300" >{{$user->grade?$user->grade->level:''}}</td>
+               <td class="cell-300" >{{$user->grade?($user->grade->grade_category?$user->grade->grade_category->name:''):''}}</td>
+               <td class="cell-300" >{{$user->job?$user->job->department->name:''}}</td>
+              
               <td >
               @if(count($user->jobs)>0)
               {{$user->jobs()->latest()->first()->title}}
@@ -251,12 +263,13 @@
               {{$user->managers()->first()->name}}
               @endif
               </td>
-              <td class="cell-300" >{{$user->address}}</td>
+              
               <td>
               @if($user->role)
               {{$user->role->name}}
               @endif
               </td>
+              <td class="cell-300" >{{$user->address}}</td>
               <td ><div class="btn-group" role="group">
                     <button type="button" class="btn btn-primary btn-sm dropdown-toggle" id="exampleIconDropdown1"
                     data-toggle="dropdown" aria-expanded="false">
@@ -297,7 +310,7 @@
       <button type="button" data-toggle="modal" data-target="#assignManagerModal" class="btn-raised btn btn-success btn-floating animation-slide-bottom" title="Assign to Line Manager" >
         <i class="icon md-arrow-right-top" aria-hidden="true"></i>
       </button>
-      <button type="button" data-action="folder" class="btn-raised btn btn-success btn-floating animation-slide-bottom" title="Change Employee Status" id="changeEmployeeStatus">
+      <button type="button" data-action="folder" class="btn-raised btn btn-success btn-floating animation-slide-bottom" title="Change Employee Status" data-toggle="modal" data-target="#changeStatusModal">
         <i class="icon md-refresh-alt" aria-hidden="true"></i>
       </button>
     </div>
@@ -308,6 +321,7 @@
   @include('empmgt.modals.assignLineManager')
   @include('empmgt.modals.assignGroup')
   @include('empmgt.modals.changeRole')
+  @include('empmgt.modals.changeStatus')
   
   <!-- End Add User Form -->
   <!-- Add Label Form -->
@@ -339,8 +353,52 @@
 @section('scripts')
  {{-- <script src="{{ asset('global/vendor/tablesaw/tablesaw.jquery.js')}}"></script> --}}
  <script src="{{asset('global/vendor/rwd-table-patterns/dist/js/rwd-table.min.js')}}" type="text/javascript"></script>
+ <script src="{{asset('global/vendor/bootstrap-datepicker/bootstrap-datepicker.js')}}"></script>
+  <script src="{{asset('global/js/Plugin/bootstrap-datepicker.js')}}"></script>
+<script src="{{asset('global/vendor/select2/select2.min.js')}}"></script>
 <script type="text/javascript">
-
+  $(document).ready(function() {
+ $('.datepicker').datepicker();
+ $('.select2').select2();
+  $(document).on('submit', '#addNewUserForm', function(event) {
+      event.preventDefault();
+    var form = $(this);
+          var formdata = false;
+          if (window.FormData){
+              formdata = new FormData(form[0]);
+          }
+          // console.log(formdata);
+          // return;
+          //var formAction = form.attr('action');
+          $.ajax({
+              url         : '{{url('users/new')}}',
+              data        : formdata ? formdata : form.serialize(),
+              cache       : false,
+              contentType : false,
+              processData : false,
+              type        : 'POST',
+              success     : function(data, textStatus, jqXHR){
+                  toastr["success"]("User Added successfully",'Success');
+                  $('#addUserForm').modal('toggle');
+              },
+              error:function(data, textStatus, jqXHR){
+                 
+                  jQuery.each( data['responseJSON'], function( i, val ) {
+               
+                jQuery.each( val, function( i, valchild ) {
+               
+                toastr["error"](valchild[0]);
+                
+              });
+                
+              });
+                   console.log(textStatus);
+                    console.log(jqXHR);
+              }
+          });
+          
+    }); 
+  }); 
   function getDepartmentBranchesFilter(company_id){
     event.preventDefault();
     $.get('{{ url('/users/company/departmentsandbranches') }}/'+company_id,function(data){
@@ -446,6 +504,23 @@ if ($('.users-checkbox:checkbox:checked').length==0) {
     });
     });
 
+$(document).on('click','#changeStatus',function(event){
+  event.preventDefault();
+if ($('.users-checkbox:checkbox:checked').length==0) {
+  toastr.error("Please Select a User",'Error');
+}
+    var users = $(".users-checkbox:checkbox:checked").map(function(){
+      if (this.checked === true) {
+        return this.id;
+         }
+    }).toArray();
+    status=$("#status_id").val();
+    $.get('{{ url('/users/alterstatus') }}/',{ status: status,users:users },function(data){
+      toastr.success("Status Changed Successfully",'Success');
+      $('#changeStatusModal').modal('toggle');
+    });
+    });
+
 $(document).on('change','#pagi-change',function(event){
   event.preventDefault();
   $('#pagi').val($(this).val());
@@ -474,7 +549,23 @@ $(document).on('click','#exportalltoexcel',function(event){
   $('#excelall').val(true);
   $('#filterForm').submit();
     });
-
+function departmentChange(department_id){
+    event.preventDefault();
+    $.get('{{ url('/users/department/jobroles') }}/'+department_id,function(data){
+      
+      
+      if (data.jobs=='') {
+         $("#jobroles").empty();
+        $('#jobroles').append($('<option>', {value:0, text:'Please Create a Jobrole in Department'}));
+      }else{
+        $("#jobroles").empty();
+        jQuery.each( data.jobroles, function( i, val ) {       
+               $('#jobroles').append($('<option>', {value:val.id, text:val.title}));  
+              });
+      }
+      
+     });
+  }
 </script>
 
 @endsection

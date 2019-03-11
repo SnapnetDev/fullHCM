@@ -47,9 +47,14 @@ class LeaveRequestRejected extends Notification
      */
     public function toMail($notifiable)
     {
+        if ($this->leave_approval->leave_request->leave_id==0) {
+            $leave_name="Annual_leave";
+        }else{
+            $leave_name=$this->leave_approval->leave_request->leave->name;
+        }
          return (new MailMessage)
         ->subject('Leave Request Rejected')
-        ->line('The leave request, '.$this->leave_approval->leave_request->leave->name.' which you submitted for approval on the '.date('Y-m-d',strtotime($this->leave_approval->leave_request->created_at)).'('.\Carbon\Carbon::parse($this->leave_approval->leave_request->created_at)->diffForHumans().') has been rejected at the final stage')
+        ->line('The leave request, '.$leave_name.' which you submitted for approval on the '.date('Y-m-d',strtotime($this->leave_approval->leave_request->created_at)).'('.\Carbon\Carbon::parse($this->leave_approval->leave_request->created_at)->diffForHumans().') has been rejected at the final stage')
         // ->action('View Leave Request', route("leave_r.view",$this->review->document->id))
         ->line('Thank you for using our application!');
     }
@@ -68,11 +73,17 @@ class LeaveRequestRejected extends Notification
     }
     public function toDatabase($notifiable)
     {
+         if ($this->leave_approval->leave_request->leave_id==0) {
+            $leave_name="Annual_leave";
+        }else{
+            $leave_name=$this->leave_approval->leave_request->leave->name;
+        }
           return new DatabaseMessage([
-            'subject'=>$this->leave_approval->leave_request->leave->name.' -Leave Request Rejected',
-            'message'=>'The leave request, '.$this->leave_approval->leave_request->leave->name.' which you submitted for approval on the '.date('Y-m-d',strtotime($this->stage->workflow->name)).'('.\Carbon\Carbon::parse($this->leave_approval->leave_request->created_at)->diffForHumans().') has been rejected at the final stage',
+            'subject'=>$leave_name.' -Leave Request Rejected',
+            'message'=>'The leave request, '.$leave_name.' which you submitted for approval on the '.date('Y-m-d',strtotime($this->stage->workflow->name)).'('.\Carbon\Carbon::parse($this->leave_approval->leave_request->created_at)->diffForHumans().') has been rejected at the final stage',
             // 'action'=>route('documents.showreview', ['id'=>$this->document->id]),
-            'type'=>'LeaveRequest'
+            'type'=>'LeaveRequest',
+            'icon'=>'md-calendar'
         ]);
 
     }

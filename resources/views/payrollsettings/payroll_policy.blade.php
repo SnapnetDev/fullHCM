@@ -52,7 +52,7 @@
 	          						@forelse($workflows as $workflow)
 	          						<option value="{{$workflow->id}}" {{$pp->workflow_id==$workflow->id?'selected':''}}>{{$workflow->name}}</option>
 	          						@empty
-	          						<option value="0">Please Create a company</option>
+	          						<option value="0">Please Create a Workflow</option>
 	          						@endforelse
 	          						
 	          					</select>
@@ -73,7 +73,7 @@
 		            <div class="panel-heading">
 		              <h3 class="panel-title">Lateness Policy</h3>
 		              <div class="panel-actions">
-                			<input type="checkbox" class="active-toggle" id="lps"{{$setting->value==1?'checked':''}} >
+                			<input type="checkbox" class="active-toggle" id="lps"{{$pp->use_lateness==1?'checked':''}} >
 
               			</div>
 		            	</div>
@@ -93,11 +93,14 @@
 		            	</thead>
 		            	<tbody>
 		            		@forelse ($latenesspolicies as $latenesspolicy)
+		            		<tr>
 		            				<td>{{$latenesspolicy->policy_name}}</td>
 		            			<td>{{$latenesspolicy->late_minute}}</td>
 		            			<td>{{$latenesspolicy->deduction_type==1?'Percentage':'Amount'}}</td>
 		            			<td>{{$latenesspolicy->deduction}}</td>
-		            			<td><button class="btn sc-status btn-sm {{ $latenesspolicy->status == 1 ? 'btn-success' : 'btn-warning' }}" title="{{ $latenesspolicy->status == 1 ? 'Disable' : 'Enable' }}" id="{{$latenesspolicy->id}}"><i class="fa fa-{{ $latenesspolicy->status == 1 ? 'eye' : 'eye-slash' }}" ></i></button></td>
+		            			<td>
+		            				<input type="checkbox" class="active-toggle sc-status" id="{{$latenesspolicy->id}}" {{$latenesspolicy->status == 1?'checked':''}} >
+		            				</td>
 		                    		
 		                    		<td>
 		                    			<div class="btn-group" role="group">
@@ -118,7 +121,7 @@
 		            		</tr>
 		            		
 		            		@endforelse
-		            		<tr>
+		            		
 		            		
 		            	</tbody>
 		            </table>
@@ -142,6 +145,12 @@
   
 
     $('#lps').bootstrapToggle({
+      on: 'Enabled',
+      off: 'Disabled',
+      onstyle:'info',
+      offstyle:'default'
+    });
+     $('.sc-status').bootstrapToggle({
       on: 'Enabled',
       off: 'Disabled',
       onstyle:'info',
@@ -253,7 +262,7 @@
   });
 
   	$(function() {
-  	$(document).on('click','.sc-status',function(event){
+  	 $('.sc-status').on('change', function() {
   		lateness_policy_id= $(this).attr('id');
   		
   		 $.get('{{ url('/payrollsettings/change_lateness_policy_status') }}/',{ lateness_policy_id: lateness_policy_id },function(data){
@@ -282,21 +291,21 @@
   		 });
 		});
   });
-  	$(function() {
-  	$(document).on('click','.sc-status',function(event){
-  		lateness_policy_id= $(this).attr('id');
+  // 	$(function() {
+  // 	$(document).on('click','.sc-status',function(event){
+  // 		lateness_policy_id= $(this).attr('id');
   		
-  		 $.get('{{ url('/payrollsettings/change_lateness_policy_status') }}/',{ lateness_policy_id: lateness_policy_id },function(data){
-  		 	if (data==1) {
-  		 		toastr.success("Lateness Policy Enabled",'Success');
-  		 	}
-  		 	if(data==2){
-  		 		toastr.warning("Lateness Policy Disabled",'Success');
-  		 	}
-  		 	$( "#ldr" ).load('{{url('payrollsettings/payroll_policy')}}');
-  		 });
-  	});
-  });
+  // 		 $.get('{{ url('/payrollsettings/change_lateness_policy_status') }}/',{ lateness_policy_id: lateness_policy_id },function(data){
+  // 		 	if (data==1) {
+  // 		 		toastr.success("Lateness Policy Enabled",'Success');
+  // 		 	}
+  // 		 	if(data==2){
+  // 		 		toastr.warning("Lateness Policy Disabled",'Success');
+  // 		 	}
+  // 		 	$( "#ldr" ).load('{{url('payrollsettings/payroll_policy')}}');
+  // 		 });
+  // 	});
+  // });
   	
   	function prepareEditData(lateness_policy_id){
     $.get('{{ url('/payrollsettings/lateness_policy') }}/',{ lateness_policy_id: lateness_policy_id },function(data){

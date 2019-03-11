@@ -280,13 +280,13 @@ $(function(){
 <div class="col-md-12 col-xs-12">
           <div class="panel panel-info panel-line">
             <div class="panel-heading">
-              <h3 class="panel-title">Key Goals Settings</h3>
+              <h3 class="panel-title">Organization Goals Settings</h3>
                 <div class="panel-actions">
 							@if(is_null($published))
 								<button class="btn btn-success"  id="Publish">Publish</button>
 								@endif
 
-                			<button class="btn btn-info"  id="addpilot">Add Key Goal</button>
+                			<button class="btn btn-info"  id="addpilot">Add Organizational Goal</button>
                 			
               			</div>
             </div>

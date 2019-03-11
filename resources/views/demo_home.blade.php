@@ -8,6 +8,22 @@
   a.list-group-item:hover {
     text-decoration: none;
     background-color: #3f51b5;
+
+}
+.bouton-image:before {
+    content: "";
+    width: 16px;
+    height: 16px;
+    display: inline-block;
+    margin-right: 5px;
+    vertical-align: text-top;
+    background-color: transparent;
+    background-position : center center;
+    background-repeat:no-repeat;
+}
+
+.monBouton:before{
+     background-image : url({{ asset('assets/images/microsoft-sharepoint.png')}});
 }
 </style>
 @endsection
@@ -36,6 +52,7 @@
     </div>
     <div class="page-content container-fluid">
       <div class="row">
+
           <div class="col-xl-3 col-md-6 col-xs-12 info-panel marg">
             <div class="card card-shadow card-shadow1">
               <div class="card-block bg-white p-30">
@@ -65,10 +82,10 @@
            <div class="col-xl-3 col-md-6 col-xs-12 info-panel marg">
             <div class="card card-shadow card-shadow1">
               <div class="card-block bg-white p-30">
-                <button onclick="url('https://snapnet.hcmatrix.com/employee/performance')" type="button" class="btn btn-floating btn-sm btn-primary">
-                  <i class="fa fa-mortar-board"></i>
-                </button>
-                <span class="m-l-15 font-weight-400 text-primary">Training</span>
+                <a href="{{ url('compensation/user_payroll_list') }}" type="button" class="btn btn-floating btn-sm btn-primary">
+                  <i class="icon fa fa-list"></i>
+                </a>
+                <span class="m-l-15 font-weight-400 text-primary">Payslips</span>
                 <div class="content-text text-xs-center m-b-0">
 
                 </div>
@@ -79,7 +96,7 @@
             <div class="card card-shadow card-shadow1">
               <div class="card-block bg-white p-30">
                 <a href="{{ route('attendance.user',['user_id'=>Auth::user()->id]) }}"  class="btn btn-floating btn-sm btn-success">
-                  <i class="icon md-calendar-check"></i>
+                  <i class="icon md-calendar-alt"></i>
                 </a>
                 <span class="m-l-15 font-weight-400 text-success">My Attendance</span>
                 <div class="content-text text-xs-center m-b-0">
@@ -91,10 +108,10 @@
            <div class="col-xl-3 col-md-6 col-xs-12 info-panel marg">
             <div class="card card-shadow card-shadow1">
               <div class="card-block bg-white p-30">
-                <a href="{{ url('leave/myrequests') }}"  class="btn btn-floating btn-sm btn-warning">
+                <a href="{{ url('leave/myrequests') }}"  class="btn btn-floating btn-sm btn-primary">
                   <i class="fa fa-calendar"></i>
                 </a>
-                <span class="m-l-15 font-weight-400 text-warning">Leave Requests</span>
+                <span class="m-l-15 font-weight-400 text-primary">Leave Requests</span>
                 <div class="content-text text-xs-center m-b-0">
 
                 </div>
@@ -104,20 +121,50 @@
            <div class="col-xl-3 col-md-6 col-xs-12 info-panel marg">
             <div class="card card-shadow card-shadow1">
               <div class="card-block bg-white p-30">
-                <a href=" {{url('loan/my_loan_requests')}}" class="btn btn-floating btn-sm btn-success">
-                  <i class="icon md-money-box"></i>
+                <a href="{{ url('leave/approvals') }}"  class="btn btn-floating btn-sm btn-warning">
+                  <i class="icon md-calendar-check"></i>
                 </a>
-                <span class="m-l-15 font-weight-400 text-success">Loan Requests</span>
+                <span class="m-l-15 font-weight-400 text-warning">Leave Approvals</span>
                 <div class="content-text text-xs-center m-b-0">
 
                 </div>
               </div>
               </div>
           </div>
+          @if(Auth::user()->has('my_departments'))
            <div class="col-xl-3 col-md-6 col-xs-12 info-panel marg">
             <div class="card card-shadow card-shadow1">
               <div class="card-block bg-white p-30">
-                <button onclick="url('https://snapnet.hcmatrix.com/employee/performance')" type="button" class="btn btn-floating btn-sm btn-info">
+                <a href="{{ url('leave/department_approvals') }}"  class="btn btn-floating btn-sm btn-success">
+                  <i class="icon md-calendar-check"></i>
+                </a>
+                <span class="m-l-15 font-weight-400 text-success">Department Leave Approvals</span>
+                <div class="content-text text-xs-center m-b-0">
+
+                </div>
+              </div>
+              </div>
+          </div>
+          @endif
+          @if(Auth::user()->role->permissions->contains('constant', 'run_payroll'))
+          <div class="col-xl-3 col-md-6 col-xs-12 info-panel marg">
+            <div class="card card-shadow card-shadow1">
+              <div class="card-block bg-white p-30">
+                <a href="{{ url('compensation') }}"  class="btn btn-floating btn-sm btn-dark">
+                  <i class="fa fa-money"></i>
+                </a>
+                <span class="m-l-15 font-weight-400 text-dark">Compensation and Benefits </span>
+                <div class="content-text text-xs-center m-b-0">
+
+                </div>
+              </div>
+              </div>
+          </div>
+          @endif
+           <div class="col-xl-3 col-md-6 col-xs-12 info-panel marg">
+            <div class="card card-shadow card-shadow1">
+              <div class="card-block bg-white p-30">
+                <button onclick="{{url('recruits/myjobs')}}" type="button" class="btn btn-floating btn-sm btn-info">
                   <i class="icon md-accounts-list"></i>
                 </button>
                 <span class="m-l-15 font-weight-400 text-info">Job Openings</span>
@@ -130,16 +177,45 @@
           <div class="col-xl-3 col-md-6 col-xs-12 info-panel marg">
             <div class="card card-shadow card-shadow1">
               <div class="card-block bg-white p-30">
-                <button onclick="url('https://snapnet.hcmatrix.com/employee/performance')" type="button" class="btn btn-floating btn-sm  btn-danger">
-                  <i class="fa fa-heartbeat"></i>
-                </button>
-                <span class="m-l-15 font-weight-400 text-danger">Health</span>
+                <a href="https://primeatlantic.sharepoint.com" type="button" class="btn btn-floating btn-sm btn-info">
+                  <i class="fa fa-share-alt"></i>
+                </a>
+                <span class="m-l-15 font-weight-400 text-info">Sharepoint</span>
                 <div class="content-text text-xs-center m-b-0">
 
                 </div>
               </div>
               </div>
           </div>
+          <div class="col-xl-3 col-md-6 col-xs-12 info-panel marg">
+            <div class="card card-shadow card-shadow1">
+              <div class="card-block bg-white p-30">
+                <a href="sip:"  class="btn btn-floating btn-sm btn-info">
+                  <i class="fa fa-skype"></i>
+                </a>
+                <span class="m-l-15 font-weight-400 text-info">Skype For Business</span>
+                <div class="content-text text-xs-center m-b-0">
+
+                </div>
+              </div>
+              </div>
+          </div>
+          @if(Auth::user()->role->permissions->contains('constant', 'manage_user') && Auth::user()->role->manages=='all')
+          <div class="col-xl-3 col-md-6 col-xs-12 info-panel marg">
+            <div class="card card-shadow card-shadow1">
+              <div class="card-block bg-white p-30">
+                <a href="{{url('users')}}"  class="btn btn-floating btn-sm btn-success">
+                  <i class="fa fa-users"></i>
+                </a>
+                <span class="m-l-15 font-weight-400 text-success">Manage Employees</span>
+                <div class="content-text text-xs-center m-b-0">
+
+                </div>
+              </div>
+              </div>
+          </div>
+                
+                @endif
       </div>
       <div class="row">
         <div class="col-md-4">
@@ -167,7 +243,7 @@
           <div class="card">
             <div class="card-header white bg-cyan-600 p-30 clearfix">
               <a class="avatar avatar-100 pull-xs-left m-r-20" href="javascript:void(0)">
-                <img src="{{ Auth::user()->image!=''?asset('storage/avatar'.Auth::user()->image):(Auth::user()->sex=='M'?asset('global/portraits/male-user.png'):asset('global/portraits/female-user.png'))}}" alt="">
+                <img src="{{ file_exists(public_path('uploads/avatar'.Auth::user()->image))?asset('uploads/avatar'.Auth::user()->image):(Auth::user()->sex=='M'?asset('global/portraits/male-user.png'):asset('global/portraits/female-user.png'))}}" alt="">
               </a>
               <div class="pull-xs-left">
                 <div class="font-size-20 m-b-15">{{Auth::user()->name}}</div>
@@ -181,7 +257,7 @@
                   <span class="text-break">{{Auth::user()->phone}}</span>
                 </p>
                 <p class="m-b-5 text-nowrap"><i title="Job Title" class="icon fa fa-briefcase m-r-10" aria-hidden="true"></i>
-                  {{-- <span class="text-break">{{Auth::user()->job->title}}</span> --}}
+                  <span class="text-break">{{Auth::user()->job->title}}</span>
                 </p>
                 <p class="m-b-5 text-nowrap"><i title="User Role" class="icon fa fa-sign-in m-r-10" aria-hidden="true"></i>
                   <span class="text-break">{{Auth::user()->role->name}}</span>
@@ -198,24 +274,24 @@
             </div>
             <div class="card-footer bg-white">
               <div class="row no-space p-y-20 p-x-30 text-xs-center">
-                <div class="col-xs-4">
+                <div class="col-xs-6">
                   <div class="counter">
                     <span class="counter-number cyan-600">{{Auth::user()->employees()->count()}}</span>
                     <div class="counter-label">Direct Reports</div>
                   </div>
                 </div>
-                <div class="col-xs-4">
+                <div class="col-xs-6">
                   <div class="counter">
-                    <span class="counter-number cyan-600"></span>
-                    <div class="counter-label">Clients</div>
+                    <span class="counter-number cyan-600">{{Auth::user()->managers()->count()}}</span>
+                    <div class="counter-label">Managers</div>
                   </div>
                 </div>
-                <div class="col-xs-4">
+               {{--  <div class="col-xs-4">
                   <div class="counter">
                     <span class="counter-number cyan-600">3</span>
                     <div class="counter-label">Projects</div>
                   </div>
-                </div>
+                </div> --}}
               </div>
             </div>
           </div>
@@ -424,14 +500,14 @@
             <div class="panel-body">
                 <div class="list-group">
                   <a class="list-group-item" href="javascript:void(0)"><h4 class="list-group-item-heading "><span class="tag tag-default">{{$pending_leave_requests}}</span> Leave Requests</h4></a>
-                  <a class="list-group-item" href="javascript:void(0)"><h4 class="list-group-item-heading "><span class="tag tag-default">6</span> Profile Change Requests</h4></a>
+                 {{--  <a class="list-group-item" href="javascript:void(0)"><h4 class="list-group-item-heading "><span class="tag tag-default">6</span> Profile Change Requests</h4></a> --}}
                 </div>
             </div>
           </div>
         </div>
         @endif
         @if(Auth::user()->role->permissions->contains('constant', 'attendance_kpi'))
-        <div class="col-xl-12 col-md-12">
+        {{-- <div class="col-xl-12 col-md-12">
           <div class="panel panel-bordered panel-info">
             <div class="panel-heading">
               <h3 class="panel-title">Attendance Key Performance Indicators</h3>
@@ -445,10 +521,10 @@
               </div>
             </div>
           </div>
-        </div>
+        </div> --}}
         @endif
         @if(Auth::user()->role->permissions->contains('constant', 'employee_kpi'))
-        <div class="col-xl-12 col-md-12">
+       {{--  <div class="col-xl-12 col-md-12">
           <div class="panel panel-bordered panel-info">
             <div class="panel-heading">
               <h3 class="panel-title">Employee Key Performance Indicators</h3>
@@ -462,10 +538,10 @@
               </div>
             </div>
           </div>
-        </div>
+        </div> --}}
         @endif
         @if(Auth::user()->role->permissions->contains('constant', 'finance_kpi'))
-        <div class="col-xl-12 col-md-12">
+      {{--   <div class="col-xl-12 col-md-12">
           <div class="panel panel-bordered panel-info">
             <div class="panel-heading">
               <h3 class="panel-title"> Finance Key Performance Indicators</h3>
@@ -479,7 +555,7 @@
               </div>
             </div>
           </div>
-        </div>
+        </div> --}}
         @endif
 
       
@@ -492,11 +568,11 @@
           <div class="panel">
             <div class="panel-heading">
               <h3 class="panel-title">
-                Vacant Positions
-                <span class="tag tag-pill tag-info">6</span>
+                Vacant Positions by Job Personnel
+                {{-- <span class="tag tag-pill tag-info">6</span> --}}
               </h3>
               <div class="panel-actions panel-actions-keep">
-                <a href="#" class="btn btn-info"> View All Vacancies</a>
+                <a href="{{url('recruits')}}" class="btn btn-info"> List Jobs</a>
                 
               </div>
             </div>
@@ -508,7 +584,6 @@
                     <td>S/N</td>
                     <td>Position</td>
                     <td>Department</td>
-                    <td>Priority</td>
                     <td>No. of Vacancies</td>
                   </tr>
                 </thead>
@@ -522,9 +597,7 @@
                     <td>{{$sn}}</td>
                     <td>{{$job->title}}</td>
                     <td>{{$job->department->name}}</td>
-                    <td>
-                      <span class="tag tag-danger">Urgent</span>
-                    </td>
+                    
 
                     <td>{{$job->personnel-$job->users()->count()}}</td>
                   </tr>
@@ -564,14 +637,6 @@
                   <a class="list-group-item list-group-item-warning" href="javascript:void(0)">
                     <h4 class="list-group-item-heading grey-50">Leave Requests</h4>
                     <p class="list-group-item-text grey-50">{{$pending_leave_requests}} requests</p>
-                  </a>
-                  <a class="list-group-item list-group-item-success" href="javascript:void(0)">
-                    <h4 class="list-group-item-heading grey-50">Profile Change Requests</h4>
-                    <p class="list-group-item-text grey-50">2 requests</p>
-                  </a>
-                  <a class="list-group-item list-group-item-info" href="javascript:void(0)">
-                    <h4 class="list-group-item-heading grey-50">Expenses Requests</h4>
-                    <p class="list-group-item-text grey-50">5 requests</p>
                   </a>
                 </div>
                </div>        

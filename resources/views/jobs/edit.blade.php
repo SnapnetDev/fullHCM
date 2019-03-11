@@ -73,7 +73,7 @@
                                         </span>
                                     @endif
                   </div>
-                  <div class="form-group">
+                  {{-- <div class="form-group">
                     <label for="">Personnel</label>
                     <input type="number" class="form-control" id="personnel" name="personnel" value="{{$job->personnel}}" placeholder="" required>
                     @if ($errors->has('personnel'))
@@ -81,7 +81,7 @@
                                             <strong>{{ $errors->first('personnel') }}</strong>
                                         </span>
                                     @endif
-                  </div>
+                  </div> --}}
                   <div class="form-group">
                     <label for="">Description</label>
                     <textarea class="form-control" id="description" name="description">{!!$job->description!!}</textarea>
@@ -158,6 +158,7 @@
                     <button type="button" id="addSkill" name="button" class="btn btn-primary">New Skill</button>
                   </div>
                   </div>
+                  <input type="hidden" name="department_id" value="{{$job->department->id}}">
                   <button type="submit" class="btn btn-primary">
                       Save Changes
                   </button>

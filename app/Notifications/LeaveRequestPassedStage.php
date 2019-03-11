@@ -50,10 +50,14 @@ class LeaveRequestPassedStage extends Notification
      */
    public function toMail($notifiable)
     {
-
+         if ($this->leave_approval->leave_request->leave_id==0) {
+            $leave_name="Annual_leave";
+        }else{
+            $leave_name=$this->leave_approval->leave_request->leave->name;
+        }
         return (new MailMessage)
         ->subject('Leave request Passed an Approval Stage')
-        ->line('The leave request, '.$this->leave_approval->leave_request->leave->name.' which you submitted for approval in the '.$this->stage->workflow->name.'has been approved at the '.$this->stage->name.' by '.$this->stage->user->name)
+        ->line('The leave request, '.$leave_name.' which you submitted for approval in the '.$this->stage->workflow->name.'has been approved at the '.$this->stage->name.' by '.$this->stage->user->name)
         ->line('The leave request  which you submitted for approval on the '.date('Y-m-d',strtotime($this->leave_approval->leave_request->created_at)).'('.\Carbon\Carbon::parse($this->leave_approval->leave_request->created_at)->diffForHumans().') in this stage of approval.')
         ->line('The document has been moved to the'.$this->nextstage->name.'and is to be appoved by'.$this->nextstage->user->name)
         // ->action('View Document',  route("documents.view",$this->review->document->id))
@@ -75,11 +79,17 @@ class LeaveRequestPassedStage extends Notification
 
     public function toDatabase($notifiable)
     {
+         if ($this->leave_approval->leave_request->leave_id==0) {
+            $leave_name="Annual_leave";
+        }else{
+            $leave_name=$this->leave_approval->leave_request->leave->name;
+        }
         return new DatabaseMessage([
-            'subject'=>$this->leave_approval->leave_request->leave->name.' -Document Passed an Approval Stage',
-            'message'=>'The document, '.$this->leave_approval->leave_request->leave->name.' which you submitted for approval in the '.$this->stage->workflow->name.'has been approved at the '.$this->stage->name.' by '.$this->stage->user->name,
+            'subject'=>$leave_name.' -Document Passed an Approval Stage',
+            'message'=>'The document, '.$leave_name.' which you submitted for approval in the '.$this->stage->workflow->name.'has been approved at the '.$this->stage->name.' by '.$this->stage->user->name,
             // 'action'=>route('documents.showreview', ['id'=>$this->review->document->id]),
-            'type'=>'LeaveRequest'
+            'type'=>'LeaveRequest',
+            'icon'=>'md-calendar'
         ]);
 
     }

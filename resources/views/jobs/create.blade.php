@@ -21,7 +21,7 @@
 @section('content')
 <div class="page ">
     <div class="page-header">
-      <h1 class="page-title">Jobs</h1>
+      <h1 class="page-title">Job Roles</h1>
       <div class="page-header-actions">
     <div class="row no-space w-250 hidden-sm-down">
 
@@ -57,7 +57,7 @@
               {{ csrf_field() }}
               <div class="panel panel-info panel-line" >
                 <div class="panel-heading main-color-bg">
-                  <h3 class="panel-title">Create new Job</h3>
+                  <h3 class="panel-title">Create new Job Role</h3>
                 </div>
 
                 <div class="panel-body">
@@ -65,14 +65,14 @@
 
                   <div class="form-group">
                     <label for="">Title</label>
-                    <input type="text" class="form-control" id="title" name="tile" placeholder="" required>
+                    <input type="text" class="form-control" id="title" name="title" placeholder="" required>
                     @if ($errors->has('title'))
                                         <span class="help-block">
                                             <strong>{{ $errors->first('title') }}</strong>
                                         </span>
                                     @endif
                   </div>
-                  <div class="form-group">
+                  {{-- <div class="form-group">
                     <label for="">Personnel</label>
                     <input type="number" class="form-control" id="personnel" name="personnel" value="" placeholder="" required>
                     @if ($errors->has('personnel'))
@@ -80,7 +80,7 @@
                                             <strong>{{ $errors->first('personnel') }}</strong>
                                         </span>
                                     @endif
-                  </div>
+                  </div> --}}
                   <div class="form-group">
                     <label for="">Description</label>
                     <textarea class="form-control" id="descripton" name="descripton"></textarea>

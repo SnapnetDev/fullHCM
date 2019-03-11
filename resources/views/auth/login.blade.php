@@ -4,9 +4,9 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
-  <meta name="description" content="bootstrap admin template">
+  <meta name="description" content="{{systemInfo()['name']}}">
   <meta name="author" content="">
-  <title>Login | {{ config('app.name', 'HCMatrix') }}</title>
+  <title>Login | {{ config('app.name', systemInfo()['name']) }}</title>
   <link rel="apple-touch-icon" href="{{ asset('assets/images/apple-touch-icon.png') }}">
   <link rel="shortcut icon" href="{{ asset('assets/images/logo.png') }}">
   <!-- Stylesheets -->
@@ -55,8 +55,8 @@
   <div class="page vertical-align text-xs-center" data-animsition-in="fade-in" data-animsition-out="fade-out">>
     <div class="page-content vertical-align-middle" style="border-radius: 10px;background-color: rgba(20, 26, 26, 0.7);">
       <div class="brand">
-        <img class="brand-img" src="{{ asset('assets/images/logo.png') }}" alt="HCMatrix">
-        <h2 class="brand-text" style="color: #fff;">HCMatrix</h2>
+        <img class="brand-img" src="{{ asset('assets/images/logo.png') }}" alt="{{systemInfo()['name']}}">
+        <h2 class="brand-text" style="color: #fff;">{{systemInfo()['name']}}</h2>
       </div>
       <p class="font-size-20">RECRUIT | RETAIN | REWARD</p>
       <form method="POST" action="{{ route('login') }}" aria-label="{{ __('Login') }}">
@@ -91,7 +91,7 @@
       <p class="text-center" style="text-align:center">- OR -</p>
      <a href="{{ url('/auth/microsoft') }}" class="btn  btn-block" style="background: #fff;color: #eb3c00;" ><img src="{{asset('assets/images/o365.png')}}">&nbsp;Sign in With Office365</a>
       <footer class="page-copyright page-copyright-inverse">
-        <p>HCMatrix</p>
+        <p>{{systemInfo()['name']}}</p>
         <p>© {{date('Y')}}. All RIGHT RESERVED.</p>
         
       </footer>

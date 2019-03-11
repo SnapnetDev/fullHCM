@@ -91,7 +91,7 @@ class HomeController extends Controller
 
         }
         $last_month_early_users=\App\TimesheetDetail::orderBy('average_first_clock_in','asc')->take(5)->get();
-        $last_month_late_users=\App\TimesheetDetail::orderBy('average_first_clock_in','desc')->take(5)->get();
+     $last_month_late_users=\App\TimesheetDetail::orderBy('average_first_clock_in','desc')->take(5)->get();
         $companies=Company::all();
         return view('demo_home',compact('companies','absentees','usersPresent','yesterday_absentees','yesterday_usersPresent','earlys','lates','yesterday_earlys','yesterday_lates','last_month_early_users','last_month_late_users','pending_leave_requests','jobs'));
     }
@@ -105,10 +105,25 @@ class HomeController extends Controller
         
         return view('executiveview.leave');
     }
-    public function executiveViewAttendance()
+    public function executiveViewHR()
     {
         
-        return view('executiveview.attendance');
+        return view('executiveview.hr');
+    }
+    public function executiveViewEmployee()
+    {
+        
+        return view('executiveview.employee');
+    }
+    public function executiveViewPayroll()
+    {
+        
+        return view('executiveview.payroll');
+    }
+    public function executiveViewJobRole()
+    {
+        
+        return view('executiveview.jobrole');
     }
     public function time_diff($time1, $time2)
     {

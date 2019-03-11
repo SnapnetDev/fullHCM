@@ -16,6 +16,7 @@ use App\UserShiftSchedule;
 use MaddHatter\LaravelFullcalendar\Facades\Calendar;
 use App\ShiftSwap;
 use Auth;
+use Excel;
 
 class AttendanceController extends Controller
 { 
@@ -56,6 +57,301 @@ class AttendanceController extends Controller
 		return view('attendance.absenceManagement',compact('attendances','lates','earlys','absentees'));
 	}
 
+	public function custDailyTimesheet(Request $request)
+	{
+		 if($request->has('date')){
+	        $date=date('Y-m-d',strtotime($request->date));
+	    }else{
+	       $date=date('Y-m-d'); 
+	    }
+		$attendances=[];
+		$lates=0;
+		$earlys=0;
+		$absentees= User::whereDoesntHave('user_cust_attendances', function ($query) use ($date) {
+			    $query->whereDate('datetime', $date);
+			})->get();
+		///
+		$users=User::whereHas('user_cust_attendances', function ($query) use ($date) {
+			    $query->whereDate('datetime', $date);
+			})->get();
+	
+		
+		
+
+		
+		foreach ($users as $user) {
+			
+			
+			$previous_day=date('Y-m-d',strtotime($date.'-1 day'));
+			 $pd_usershift=\App\UserDailyShift::where(['sdate'=> $previous_day,'user_id'=>$user->id])->first();
+			 if ($pd_usershift) {
+
+							if (date('Y-m-d',strtotime($pd_usershift->ends))>date('Y-m-d',strtotime($pd_usershift->starts))) {
+
+										$usershift=\App\UserDailyShift::where(['sdate'=> $date,'user_id'=>$user->id])->first();
+									if ($usershift) {
+										if (date('Y-m-d',strtotime($usershift->ends))>date('Y-m-d',strtotime($usershift->starts))) {
+
+										 $first_attendances=$user->user_cust_attendances()->whereDate('datetime', $date)->orderBy('clocktime','asc')->get();
+										 $first_attendances->shift();
+										$first_attendance=$first_attendances->first();
+										 $last_attendance=$user->user_cust_attendances()->whereDate('datetime',date('Y-m-d',strtotime($date. "+ 1 day")))->orderBy('clocktime','asc')->first();
+										 $attendances[$user->id]['spills']=1;
+										
+										
+
+									}else{
+									$first_attendances=$user->user_cust_attendances()->whereDate('datetime', $date)->orderBy('clocktime','asc')->get();
+										 $first_attendances->shift();
+										$first_attendance=$first_attendances->first();
+										 
+										$last_attendances=$user->user_cust_attendances()->whereDate('datetime', $date)->orderBy('clocktime','desc')->get();
+										$last_attendances->pop();
+										 $last_attendance=$last_attendances->first();
+									$attendances[$user->id]['spills']=0;
+									
+								}
+								$attendances[$user->id]['diff']=$this->time_diff($first_attendance,$usershift->shift->start_time);
+									}else{
+										$wp=WorkingPeriod::all()->first();
+										 $first_attendances=$user->user_cust_attendances()->whereDate('datetime', $date)->orderBy('clocktime','asc')->get();
+										 $first_attendances->shift();
+										$first_attendance=$first_attendances->first();
+										 
+										$last_attendances=$user->user_cust_attendances()->whereDate('datetime', $date)->orderBy('clocktime','desc')->get();
+										$last_attendances->pop();
+										 $last_attendance=$last_attendances->first();
+										 $attendances[$user->id]['diff']=$this->time_diff($first_attendance,$wp->sob);
+										$attendances[$user->id]['spills']=0;
+									}
+
+							}
+						}else{
+							$usershift=\App\UserDailyShift::where(['sdate'=> $date,'user_id'=>$user->id])->first();
+				if ($usershift) {
+					if (date('Y-m-d',strtotime($usershift->ends))>date('Y-m-d',strtotime($usershift->starts))) {
+					 $first_attendance=$user->user_cust_attendances()->whereDate('datetime', $date)->orderBy('clocktime','asc')->first();
+					 $last_attendance=$user->user_cust_attendances()->whereDate('datetime',date('Y-m-d',strtotime($date. "+ 1 day")))->orderBy('clocktime','asc')->first();
+					 $attendances[$user->id]['spills']=1;
+					 
+					
+
+				}else{
+					$first_attendance=$user->user_cust_attendances()->whereDate('datetime', $date)->orderBy('clocktime','asc')->first();
+					$last_attendance=$user->user_cust_attendances()->whereDate('datetime', $date)->orderBy('clocktime','desc')->first();
+					$attendances[$user->id]['spills']=0;
+					
+				}
+				$attendances[$user->id]['diff']=$this->time_diff($first_attendance,$usershift->shift->start_time);
+				}else{
+					$wp=WorkingPeriod::all()->first();
+					$first_attendance=$user->user_cust_attendances()->whereDate('datetime', $date)->orderBy('clocktime','asc')->first();
+					$last_attendance=$user->user_cust_attendances()->whereDate('datetime', $date)->orderBy('clocktime','desc')->first();
+					$attendances[$user->id]['diff']=$this->time_diff($first_attendance,$wp->sob);
+					$attendances[$user->id]['spills']=0;
+					
+				}
+						}
+			
+
+			$attendances[$user->id]['emp_num']=$user->emp_num;
+			$attendances[$user->id]['name']=$user->name;
+			$attendances[$user->id]['hours']=$this->getCustDayHours($user->id,$date);
+			$attendances[$user->id]['first_clock_in']= $first_attendance->clocktime;
+			$attendances[$user->id]['first_clock_out']=$last_attendance->clocktime;
+			
+			if ($attendances[$user->id]['diff']>0) {
+				$earlys++;
+			} else {
+				$lates++;
+			}	
+
+		}
+		  $view='attendance.partials.dailyTimesheetDetails';
+                // return view('compensation.d365payroll',compact('payroll','allowances','deductions','income_tax','salary','date','has_been_run'));
+                 return     \Excel::create("export", function($excel) use ($view,$attendances,$users,$lates,$earlys,$date,$absentees) {
+
+            $excel->sheet("export", function($sheet) use ($view,$attendances,$users,$lates,$earlys,$date,$absentees) {
+                $sheet->loadView("$view",compact('attendances','users','lates','earlys','date','absentees'))
+                ->setOrientation('landscape');
+            });
+
+        })->export('xlsx');
+
+		// return view('attendance.partials.dailyTimesheetDetails',compact('attendances','lates','earlys','absentees','date'));
+
+	}
+	public function custRangeTimesheetView(Request $request)
+	{
+		
+		return view('attendance.ExportTimesheets', compact('user'));
+		
+	}
+	public function custRangeTimesheet(Request $request)
+	{
+		
+	        $from=date('Y-m-d',strtotime($request->from));
+	        $to=date('Y-m-d',strtotime($request->to));
+	        
+			
+			
+	    
+	    $attendances=[];
+	    $users = User::all();
+	    foreach ($users as $user) {
+	    	$begin = new \DateTime($from);
+			$end = new \DateTime($to. '+1 days');
+	    	$interval = \DateInterval::createFromDateString('1 day');
+			$period = new \DatePeriod($begin, $interval, $end);
+			$index=1;
+			foreach ($period as $dt) {
+	    	$attendances[$user->id]['day_'.$index]['emp_num']=$user->emp_num;
+			$attendances[$user->id]['day_'.$index]['name']=$user->name;
+	    	$attendances[$user->id]['day_'.$index]['hours']=$this->getCustDayHours($user->id,$dt->format(" Y-m-d"));
+	    	$index++;
+	    }
+	    }
+
+	    // return $attendances;
+	    $view='attendance.partials.rangeTimesheetDetails';
+                // return view('compensation.d365payroll',compact('payroll','allowances','deductions','income_tax','salary','date','has_been_run'));
+                 return     \Excel::create("export", function($excel) use ($view,$attendances,$users,$from,$to) {
+
+            $excel->sheet("export", function($sheet) use ($view,$attendances,$users,$from,$to) {
+                $sheet->loadView("$view",compact('attendances','users','from','to'))
+                ->setOrientation('landscape');
+            });
+
+        })->export('xlsx');
+
+	}
+
+	public function custAbsenceManagement(Request $request)
+	{
+		 if($request->has('date')){
+	        $date=date('Y-m-d',strtotime($request->date));
+	    }else{
+	       $date=date('Y-m-d'); 
+	    }
+		$attendances=[];
+		$lates=0;
+		$earlys=0;
+		$absentees= User::whereDoesntHave('user_cust_attendances', function ($query) use ($date) {
+			    $query->whereDate('datetime', $date);
+			})->get();
+		///
+		$users=User::whereHas('user_cust_attendances', function ($query) use ($date) {
+			    $query->whereDate('datetime', $date);
+			})->get();
+	
+		
+		
+
+		
+		foreach ($users as $user) {
+			$previous_day=date('Y-m-d',strtotime($date.'-1 day'));
+		 $pd_usershift=\App\UserDailyShift::where(['sdate'=> $previous_day,'user_id'=>$user->id])->first();
+		 if ($pd_usershift) {
+
+							if (date('Y-m-d',strtotime($pd_usershift->ends))>date('Y-m-d',strtotime($pd_usershift->starts))) {
+
+										$usershift=\App\UserDailyShift::where(['sdate'=> $date,'user_id'=>$user->id])->first();
+									if ($usershift) {
+										if (date('Y-m-d',strtotime($usershift->ends))>date('Y-m-d',strtotime($usershift->starts))) {
+
+										 $first_attendances=$user->user_cust_attendances()->whereDate('datetime', $date)->orderBy('clocktime','asc')->get();
+										 $first_attendances->shift();
+										$first_attendance=$first_attendances->first();
+										 $last_attendance=$user->user_cust_attendances()->whereDate('datetime',date('Y-m-d',strtotime($date. "+ 1 day")))->orderBy('clocktime','asc')->first();
+										 $attendances[$user->id]['spills']=1;
+										
+										
+
+									}else{
+									$first_attendances=$user->user_cust_attendances()->whereDate('datetime', $date)->orderBy('clocktime','asc')->get();
+										 $first_attendances->shift();
+										$first_attendance=$first_attendances->first();
+										 
+										$last_attendances=$user->user_cust_attendances()->whereDate('datetime', $date)->orderBy('clocktime','desc')->get();
+										$last_attendances->pop();
+										 $last_attendance=$last_attendances->first();
+									$attendances[$user->id]['spills']=0;
+									
+								}
+								$attendances[$user->id]['diff']=$this->time_diff($first_attendance,$usershift->shift->start_time);
+									}else{
+										$wp=WorkingPeriod::all()->first();
+										 $first_attendances=$user->user_cust_attendances()->whereDate('datetime', $date)->orderBy('clocktime','asc')->get();
+										 $first_attendances->shift();
+										$first_attendance=$first_attendances->first();
+										 
+										$last_attendances=$user->user_cust_attendances()->whereDate('datetime', $date)->orderBy('clocktime','desc')->get();
+										$last_attendances->pop();
+										 $last_attendance=$last_attendances->first();
+										 $attendances[$user->id]['diff']=$this->time_diff($first_attendance,$wp->sob);
+										$attendances[$user->id]['spills']=0;
+									}
+
+							}
+						}else{
+							$usershift=\App\UserDailyShift::where(['sdate'=> $date,'user_id'=>$user->id])->first();
+				if ($usershift) {
+					if (date('Y-m-d',strtotime($usershift->ends))>date('Y-m-d',strtotime($usershift->starts))) {
+					 $first_attendance=$user->user_cust_attendances()->whereDate('datetime', $date)->orderBy('clocktime','asc')->first();
+					 $last_attendance=$user->user_cust_attendances()->whereDate('datetime',date('Y-m-d',strtotime($date. "+ 1 day")))->orderBy('clocktime','asc')->first();
+					 $attendances[$user->id]['spills']=1;
+					 
+					
+
+				}else{
+					$first_attendance=$user->user_cust_attendances()->whereDate('datetime', $date)->orderBy('clocktime','asc')->first();
+					$last_attendance=$user->user_cust_attendances()->whereDate('datetime', $date)->orderBy('clocktime','desc')->first();
+					$attendances[$user->id]['spills']=0;
+					
+				}
+				$attendances[$user->id]['diff']=$this->time_diff($first_attendance,$usershift->shift->start_time);
+				}else{
+					$wp=WorkingPeriod::all()->first();
+					$first_attendance=$user->user_cust_attendances()->whereDate('datetime', $date)->orderBy('clocktime','asc')->first();
+					$last_attendance=$user->user_cust_attendances()->whereDate('datetime', $date)->orderBy('clocktime','desc')->first();
+					$attendances[$user->id]['diff']=$this->time_diff($first_attendance,$wp->sob);
+					$attendances[$user->id]['spills']=0;
+					
+				}
+						}
+			
+
+			$attendances[$user->id]['emp_num']=$user->emp_num;
+			$attendances[$user->id]['name']=$user->name;
+			$attendances[$user->id]['hours']=$this->getCustDayHours($user->id,$date);
+			$attendances[$user->id]['first_clock_in']= $first_attendance->clocktime;
+			$attendances[$user->id]['first_clock_out']=$last_attendance->clocktime;
+			
+			if ($attendances[$user->id]['diff']>0) {
+				$earlys++;
+			} else {
+				$lates++;
+			}	
+
+		}
+		 // return $attendances;
+		return view('attendance.cust_absenceManagement',compact('attendances','lates','earlys','absentees','date'));
+	}
+	public function employeesSchedule(Request $request)
+	{
+		$date=date('Y-m-d',strtotime($request->date));
+		$user_daily_shifts=\App\UserDailyShift::where('sdate',$date)->get();
+		return view('attendance.partials.dayScheduleDetails', compact('user_daily_shifts','date'));
+	}
+	public function exportShiftSchedule(Request $request)
+	{
+
+	        $from=date('Y-m-d',strtotime($request->from));
+	        $to=date('Y-m-d',strtotime($request->to));
+		$date=date('Y-m-d',strtotime($request->date));
+		$user_daily_shifts=\App\UserDailyShift::whereBetween('sdate', [$from, $to])->get();
+		return view('attendance.partials.dayScheduleDetails', compact('user_daily_shifts','date'));
+	}
 	
 
 	public function userShiftSchedule($user_id)
@@ -123,23 +419,27 @@ class AttendanceController extends Controller
 			    	'color' =>'#3aac76',
 			    	'id'=>($clock_in) ? $attendance->id:''];
 			   }else{
-			   	$dispemp[]=[
-			    	
+			  
+			   		if ($dt->format(" Y-m-d")<date('Y-m-d')) {
+			   			 	$dispemp[]=[
+
 			    	'title'=>'Absent',
 			    	'start'=>$attendance->date,
 			    	'end'=>$attendance->date,
 			    	'color' =>'#be3030',
 			    	'id'=>''];
+			   		}
+			    	
 			   }
 			   
 				}else{
-					$dispemp[]=[
+					// $dispemp[]=[
 			    	
-			    	'title'=>'Absent',
-			    	'start'=>$dt->format(" Y-m-d"),
-			    	'end'=>$dt->format(" Y-m-d"),
-			    	'color' =>'#be3030',
-			    	'id'=>''];
+			  //   	'title'=>'Absent',
+			  //   	'start'=>$dt->format(" Y-m-d"),
+			  //   	'end'=>$dt->format(" Y-m-d"),
+			  //   	'color' =>'#be3030',
+			  //   	'id'=>''];
 
 				}	
 			   
@@ -459,6 +759,104 @@ class AttendanceController extends Controller
 		
 			return $hours;
 	}
+
+	public function getCustDayHours($user_id,$date)
+	{
+		
+		$hours=0;
+		$diff=0;
+		$time='';
+		// dd($date);
+		$user=User::find($user_id);
+		$is_present=User::whereHas('user_cust_attendances', function ($query) use ($date) {
+			    $query->whereDate('datetime', $date);
+			})->where('id',$user_id)->first();
+		$previous_day=date('Y-m-d',strtotime($date.'-1 day'));
+		 $pd_usershift=\App\UserDailyShift::where(['sdate'=> $previous_day,'user_id'=>$user_id])->first();
+		if ($is_present) {
+						if ($pd_usershift) {
+
+							if (date('Y-m-d',strtotime($pd_usershift->ends))>date('Y-m-d',strtotime($pd_usershift->starts))) {
+
+										$usershift=\App\UserDailyShift::where(['sdate'=> $date,'user_id'=>$user_id])->first();
+									if ($usershift) {
+										if (date('Y-m-d',strtotime($usershift->ends))>date('Y-m-d',strtotime($usershift->starts))) {
+
+										 $first_attendances=$user->user_cust_attendances()->whereDate('datetime', $date)->orderBy('clocktime','asc')->get();
+										 $first_attendances->shift();
+										$first_attendance=$first_attendances->first();
+										 $last_attendance=$user->user_cust_attendances()->whereDate('datetime',date('Y-m-d',strtotime($date. "+ 1 day")))->orderBy('clocktime','asc')->first();
+										 if ($first_attendance||$last_attendance) {
+										 	 if ($first_attendance->clocktime<$usershift->shift->start_time) {
+										 	return $hours=round($this->get_time_difference($usershift->shift->start_time, $last_attendance->clocktime));
+										 }else{
+										 	return $hours=round($this->get_time_difference($first_attendance->clocktime, $last_attendance->clocktime));
+										 }
+										 }else{
+										 	return 0;
+										 }
+										
+										
+
+									}
+									}else{
+										$wp=WorkingPeriod::all()->first();
+										 $first_attendances=$user->user_cust_attendances()->whereDate('datetime', $date)->orderBy('clocktime','asc')->get();
+										 $first_attendances->shift();
+										$first_attendance=$first_attendances->first();
+										 
+										$last_attendances=$user->user_cust_attendances()->whereDate('datetime', $date)->orderBy('clocktime','desc')->get();
+										$last_attendances->pop();
+										 $last_attendance=$last_attendances->first();
+										if ($first_attendance->clocktime<$wp->sob && $first_attendance->clocktime!=$last_attendance->clocktime) {
+											
+										 	return $hours=round($this->get_time_difference($wp->sob, $last_attendance->clocktime));
+										 }else{
+										 	return $hours=round($this->get_time_difference($first_attendance->clocktime, $last_attendance->clocktime));
+										 }
+									}
+
+							}
+						}
+					$usershift=\App\UserDailyShift::where(['sdate'=> $date,'user_id'=>$user_id])->first();
+				if ($usershift) {
+					if (date('Y-m-d',strtotime($usershift->ends))>date('Y-m-d',strtotime($usershift->starts))) {
+					 $first_attendance=$user->user_cust_attendances()->whereDate('datetime', $date)->orderBy('clocktime','asc')->first();
+					 $last_attendance=$user->user_cust_attendances()->whereDate('datetime',date('Y-m-d',strtotime($date. "+ 1 day")))->orderBy('clocktime','asc')->first();
+					 if ($first_attendance->clocktime<$usershift->shift->start_time) {
+					 	return $hours=round($this->get_time_difference($usershift->shift->start_time, $last_attendance->clocktime));
+					 }else{
+					 	return $hours=round($this->get_time_difference($first_attendance->clocktime, $last_attendance->clocktime));
+					 }
+					
+
+				}else{
+					$first_attendance=$user->user_cust_attendances()->whereDate('datetime', $date)->orderBy('clocktime','asc')->first();
+					$last_attendance=$user->user_cust_attendances()->whereDate('datetime', $date)->orderBy('clocktime','desc')->first();
+					if ($first_attendance->clocktime<$usershift->shift->start_time) {
+					 	return $hours=round($this->get_time_difference($usershift->shift->start_time, $last_attendance->clocktime));
+					 }else{
+					 	return $hours=round($this->get_time_difference($first_attendance->clocktime, $last_attendance->clocktime));
+					 }
+				}
+				}else{
+					$wp=WorkingPeriod::all()->first();
+					$first_attendance=$user->user_cust_attendances()->whereDate('datetime', $date)->orderBy('clocktime','asc')->first();
+					$last_attendance=$user->user_cust_attendances()->whereDate('datetime', $date)->orderBy('clocktime','desc')->first();
+					if ($first_attendance->clocktime<$wp->sob && $first_attendance->clocktime!=$last_attendance->clocktime) {
+						
+					 	return $hours=round($this->get_time_difference($wp->sob, $last_attendance->clocktime));
+					 }else{
+					 	return $hours=round($this->get_time_difference($first_attendance->clocktime, $last_attendance->clocktime));
+					 }
+				}
+		}
+		return $hours;
+		
+		
+		
+			
+	}
 		
 	public function getMonthHours($emp_num,$month,$year)
 	{
@@ -466,6 +864,16 @@ class AttendanceController extends Controller
 		$days=cal_days_in_month(CAL_GREGORIAN,$month,$year);
 		for ($i=1; $i <=$days ; $i++) { 
 				$total_hours+=$this->getDayHours($emp_num,$year.'-'.$month.'-'.$i);
+				
+			}
+			return $total_hours;
+	}
+	public function getCustMonthHours($user_id,$month,$year)
+	{
+		$total_hours=0;
+		$days=cal_days_in_month(CAL_GREGORIAN,$month,$year);
+		for ($i=1; $i <=$days ; $i++) { 
+				$total_hours+=$this->getCustDayHours($user_id,$year.'-'.$month.'-'.$i);
 				
 			}
 			return $total_hours;
@@ -478,6 +886,20 @@ class AttendanceController extends Controller
 		for ($i=1; $i <=$days ; $i++) { 
 			if (date('N',strtotime("$year-$month-$i"))<6 && $this->checkHoliday("$year-$month-$i")==false) {
 				$total_hours+=$this->getDayHours($emp_num,$year.'-'.$month.'-'.$i);
+			}
+				
+				
+		}
+			return $total_hours;
+
+	}
+	public function getCustWeekdayHours($user_id,$month,$year)
+	{
+		$total_hours=0;
+		$days=cal_days_in_month(CAL_GREGORIAN,$month,$year);
+		for ($i=1; $i <=$days ; $i++) { 
+			if (date('N',strtotime("$year-$month-$i"))<6 && $this->checkHoliday("$year-$month-$i")==false) {
+				$total_hours+=$this->getCustDayHours($user_id,$year.'-'.$month.'-'.$i);
 			}
 				
 				
@@ -690,4 +1112,234 @@ class AttendanceController extends Controller
 			return response()->json("Error:$ex");
 		}
 	}
+	public function saveAttendance(Request $request)
+    {
+        $user=User::where(['emp_num'=>$request->empnum])->first();
+       
+        if ($user) {
+        	$attendance=\App\CustAttendance::firstOrCreate(['user_id'=>$user->id,'clocktime'=>date('H:i:s',strtotime($request->time)),'datetime'=>date('Y-m-d H:i:s',strtotime($request->time))]);
+        }
+        
+        
+       
+
+        return "success";
+         
+            
+    }
+
+    public function employeeShiftSchedules(Request $request)
+	{
+		
+		return view('attendance.empShiftSchedules');
+	}
+
+    public function downloadShiftUploadTemplate(Request $request)
+    {
+    	$template=['Staff ID'];
+                           $users=\App\User::select('name as Employee Name','emp_num as Staff Id')->get()->toArray();
+                           $shifts=\App\Shift::select('type as Shift Name','start_time as Starts','end_time as Ends', 'id as Shift ID')->get()->toArray();
+
+                           return $this->exportshiftexcel('template',['template'=>$template,'users'=>$users,'shifts'=>$shifts]);
+    }
+    private function exportshiftexcel($worksheetname,$data)
+	{
+		return \Excel::create($worksheetname, function($excel) use ($data)
+		{
+			foreach($data as $sheetname=>$realdata)
+			{
+				$excel->sheet($sheetname, function($sheet) use ($realdata,$sheetname)
+				{
+					  
+			            $sheet->fromArray($realdata);
+			    //        $sheet->_parent->getSheet(0)->setColumnFormat(array(
+							//     'B1:H1' => 'yyyy-mm-dd'
+							// ));
+
+			      if($sheetname=='users'){
+			      
+		            	$sheet->_parent->addNamedRange(
+		            		new \PHPExcel_NamedRange(
+		            			'sd', $sheet->_parent->getSheet( 1 ), "B2:B" . $sheet->_parent->getSheet( 1 )->getHighestRow()
+		            		)
+		            	);
+		            
+			     for($j=2; $j<=100; $j++){ 
+			           $objValidation = $sheet->_parent->getSheet(0)->getCell("A$j")->getDataValidation();
+			           $objValidation->setType(\PHPExcel_Cell_DataValidation::TYPE_LIST);
+			           $objValidation->setErrorStyle(\PHPExcel_Cell_DataValidation::STYLE_INFORMATION);
+			           $objValidation->setAllowBlank(false);
+			           $objValidation->setShowInputMessage(true);
+			           $objValidation->setShowErrorMessage(true);
+			           $objValidation->setShowDropDown(true);
+			           $objValidation->setErrorTitle('Input error');
+			           $objValidation->setError('Value is not in list.');
+			           $objValidation->setPromptTitle('Pick from list');
+			           $objValidation->setPrompt('Please pick a value from the drop-down list.');
+      				   $objValidation->setFormula1('sd');
+
+
+
+			            }
+			            }
+
+			            if($sheetname=='shifts'){
+			      
+		            	$sheet->_parent->addNamedRange(
+		            		new \PHPExcel_NamedRange(
+		            			'sdf', $sheet->_parent->getSheet( 2 ), "D2:D" . $sheet->_parent->getSheet( 2 )->getHighestRow()
+		            		)
+		            	);
+		            
+			     		for($j=2; $j<=100; $j++){ 
+			           $objValidation = $sheet->_parent->getSheet(0)->getCell("B$j")->getDataValidation();
+			           $objValidation->setType(\PHPExcel_Cell_DataValidation::TYPE_LIST);
+			           $objValidation->setErrorStyle(\PHPExcel_Cell_DataValidation::STYLE_INFORMATION);
+			           $objValidation->setAllowBlank(false);
+			           $objValidation->setShowInputMessage(true);
+			           $objValidation->setShowErrorMessage(true);
+			           $objValidation->setShowDropDown(true);
+			           $objValidation->setErrorTitle('Input error');
+			           $objValidation->setError('Value is not in list.');
+			           $objValidation->setPromptTitle('Pick Shift ID from list');
+			           $objValidation->setPrompt('Please pick a value from the drop-down list.');
+      				   $objValidation->setFormula1('sdf');
+
+      				   $objValidation = $sheet->_parent->getSheet(0)->getCell("C$j")->getDataValidation();
+			           $objValidation->setType(\PHPExcel_Cell_DataValidation::TYPE_LIST);
+			           $objValidation->setErrorStyle(\PHPExcel_Cell_DataValidation::STYLE_INFORMATION);
+			           $objValidation->setAllowBlank(false);
+			           $objValidation->setShowInputMessage(true);
+			           $objValidation->setShowErrorMessage(true);
+			           $objValidation->setShowDropDown(true);
+			           $objValidation->setErrorTitle('Input error');
+			           $objValidation->setError('Value is not in list.');
+			           $objValidation->setPromptTitle('Pick Shift ID from list');
+			           $objValidation->setPrompt('Please pick a value from the drop-down list.');
+      				   $objValidation->setFormula1('sdf');
+
+      				   $objValidation = $sheet->_parent->getSheet(0)->getCell("D$j")->getDataValidation();
+			           $objValidation->setType(\PHPExcel_Cell_DataValidation::TYPE_LIST);
+			           $objValidation->setErrorStyle(\PHPExcel_Cell_DataValidation::STYLE_INFORMATION);
+			           $objValidation->setAllowBlank(false);
+			           $objValidation->setShowInputMessage(true);
+			           $objValidation->setShowErrorMessage(true);
+			           $objValidation->setShowDropDown(true);
+			           $objValidation->setErrorTitle('Input error');
+			           $objValidation->setError('Value is not in list.');
+			           $objValidation->setPromptTitle('Pick Shift ID from list');
+			           $objValidation->setPrompt('Please pick a value from the drop-down list.');
+      				   $objValidation->setFormula1('sdf');
+
+      				   $objValidation = $sheet->_parent->getSheet(0)->getCell("E$j")->getDataValidation();
+			           $objValidation->setType(\PHPExcel_Cell_DataValidation::TYPE_LIST);
+			           $objValidation->setErrorStyle(\PHPExcel_Cell_DataValidation::STYLE_INFORMATION);
+			           $objValidation->setAllowBlank(false);
+			           $objValidation->setShowInputMessage(true);
+			           $objValidation->setShowErrorMessage(true);
+			           $objValidation->setShowDropDown(true);
+			           $objValidation->setErrorTitle('Input error');
+			           $objValidation->setError('Value is not in list.');
+			           $objValidation->setPromptTitle('Pick Shift ID from list');
+			           $objValidation->setPrompt('Please pick a value from the drop-down list.');
+      				   $objValidation->setFormula1('sdf');
+
+      				   $objValidation = $sheet->_parent->getSheet(0)->getCell("F$j")->getDataValidation();
+			           $objValidation->setType(\PHPExcel_Cell_DataValidation::TYPE_LIST);
+			           $objValidation->setErrorStyle(\PHPExcel_Cell_DataValidation::STYLE_INFORMATION);
+			           $objValidation->setAllowBlank(false);
+			           $objValidation->setShowInputMessage(true);
+			           $objValidation->setShowErrorMessage(true);
+			           $objValidation->setShowDropDown(true);
+			           $objValidation->setErrorTitle('Input error');
+			           $objValidation->setError('Value is not in list.');
+			           $objValidation->setPromptTitle('Pick Shift ID from list');
+			           $objValidation->setPrompt('Please pick a value from the drop-down list.');
+      				   $objValidation->setFormula1('sdf');
+
+      				   $objValidation = $sheet->_parent->getSheet(0)->getCell("G$j")->getDataValidation();
+			           $objValidation->setType(\PHPExcel_Cell_DataValidation::TYPE_LIST);
+			           $objValidation->setErrorStyle(\PHPExcel_Cell_DataValidation::STYLE_INFORMATION);
+			           $objValidation->setAllowBlank(false);
+			           $objValidation->setShowInputMessage(true);
+			           $objValidation->setShowErrorMessage(true);
+			           $objValidation->setShowDropDown(true);
+			           $objValidation->setErrorTitle('Input error');
+			           $objValidation->setError('Value is not in list.');
+			           $objValidation->setPromptTitle('Pick Shift ID from list');
+			           $objValidation->setPrompt('Please pick a value from the drop-down list.');
+      				   $objValidation->setFormula1('sdf');
+
+      				   $objValidation = $sheet->_parent->getSheet(0)->getCell("H$j")->getDataValidation();
+			           $objValidation->setType(\PHPExcel_Cell_DataValidation::TYPE_LIST);
+			           $objValidation->setErrorStyle(\PHPExcel_Cell_DataValidation::STYLE_INFORMATION);
+			           $objValidation->setAllowBlank(false);
+			           $objValidation->setShowInputMessage(true);
+			           $objValidation->setShowErrorMessage(true);
+			           $objValidation->setShowDropDown(true);
+			           $objValidation->setErrorTitle('Input error');
+			           $objValidation->setError('Value is not in list.');
+			           $objValidation->setPromptTitle('Pick Shift ID from list');
+			           $objValidation->setPrompt('Please pick a value from the drop-down list.');
+      				   $objValidation->setFormula1('sdf');
+
+
+
+			            }
+			            }
+  		
+				});
+			}
+		})->download('xlsx');
+	}
+
+
+
+
+    public function importUserShifts(Request $request)
+    {
+    	 if($request->hasFile('template')){
+
+		 	$datas=\Excel::load($request->file('template')->getrealPath(), function($reader) { 
+                                         $reader->noHeading();
+		 		// $reader->formatDates(true, 'Y-m-d');
+                           })->get();
+		 			$dates=[];
+		 			$user;
+                           foreach ($datas[0] as $dkey => $data) {
+                           	
+                           	if ($dkey==0) {
+                           		foreach ($data as $key => $value) {
+		                           if ($key!=0) {
+		                           $dates[$key]=$value;
+		                           }
+		                           }
+		                          
+                           	}else{
+                           		foreach ($data as $key => $value) {
+                       			 if ($key==0) {
+                           			$user=\App\User::where('emp_num',$value)->first();
+                       			}else{
+                       				
+                           				$shift=\App\Shift::find(intval($value));
+                           				$sd=date('Y-m-d',strtotime($dates[$key]));
+                           				$sdt=date('Y-m-d H:i:s',strtotime($sd.$shift->start_time));
+                           				if ($shift->start_time>$shift->end_time) {
+                           					$edt=date('Y-m-d H:i:s',strtotime($sd.$shift->end_time. '+1 day'));
+                           				}else{
+                           					$edt=date('Y-m-d H:i:s',strtotime($sd.$shift->end_time));
+                           				}
+
+                           				$user_shift=\App\UserDailyShift::updateOrCreate(['user_id'=>$user->id,'sdate'=>$sd],['user_id'=>$user->id,'shift_id'=>$shift->id,'starts'=>$sdt,'ends'=>$edt,'sdate'=>$sd]);
+                           				
+                           			}	
+                           		}
+                           	}
+         
+
+       
+        }
+    }
+     return 'success';
+}
 }

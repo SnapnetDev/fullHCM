@@ -30,7 +30,8 @@
 	</div>
     
       <div class="page-content container-fluid">
-      	<iframe width="100%" height="800" src="https://app.powerbi.com/view?r=eyJrIjoiNGJkMDFjYWItNGZmYS00N2IyLTk2OWYtNDAyZDBhN2QwOWQ0IiwidCI6ImJhMTMwZWNhLTMwMzAtNDhlMS05MDg5LWM5NzkyOTNhZWI3MCIsImMiOjh9" frameborder="0" allowFullScreen="true"></iframe>
+      	{{-- <iframe width="100%" height="800" src="https://app.powerbi.com/view?r=eyJrIjoiNGJkMDFjYWItNGZmYS00N2IyLTk2OWYtNDAyZDBhN2QwOWQ0IiwidCI6ImJhMTMwZWNhLTMwMzAtNDhlMS05MDg5LWM5NzkyOTNhZWI3MCIsImMiOjh9" frameborder="0" allowFullScreen="true"></iframe> --}}
+      	<iframe width="1200" height="600" src="https://app.powerbi.com/view?r=eyJrIjoiZjk3ZmJkYjgtNDRmNC00MWE5LTgyYjYtOTIyNmFhYjRkMTA3IiwidCI6ImJhMTMwZWNhLTMwMzAtNDhlMS05MDg5LWM5NzkyOTNhZWI3MCIsImMiOjh9" frameborder="0" allowFullScreen="true"></iframe>
 
     </div>
   	

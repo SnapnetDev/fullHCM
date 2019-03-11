@@ -58,35 +58,53 @@
 	                  </table>
 	          		</div>
 	          		</div>
+
+	          		<div class="panel panel-info panel-line">
+		            <div class="panel-heading">
+		              <h3 class="panel-title">Leave Policy Settings</h3>
+		              <div class="panel-actions">
+                			
+
+              			</div>
+		            	</div>
+		            	<form id="leavePolicyForm" enctype="multipart/form-data">
+		            <div class="panel-body">
+		            <div class="col-md-6">
+		            	@csrf
+		            		<div class="form-group" >
+	          					<h4>Does your leave include weekends?</h4>
+	          					<input type="checkbox" name="includes_weekend" class="active-toggle bstoggle"  {{$lp->includes_weekend==1?'checked':''}} value="1">
+	          					<h4>Does your leave include holidays?</h4>
+	          					<input type="checkbox" name="includes_holiday" class="active-toggle bstoggle"  {{$lp->includes_holiday==1?'checked':''}} value="1">
+	          				</div>
+	          				<div class="form-group" >
+	          					<h4>Default Leave Length</h4>
+	          					<input type="text" name="default_length" class="form-control" value="{{$lp->default_length}}">
+	          				</div>
+	          				<div class="form-group" >
+	          					<h4>Approval Workflow</h4>
+	          					<select class="form-control" name="workflow_id">
+	          						@forelse($workflows as $workflow)
+	          						<option value="{{$workflow->id}}" {{$lp->workflow_id==$workflow->id?'selected':''}}>{{$workflow->name}}</option>
+	          						@empty
+	          						<option value="0">Please Create a Workflow</option>
+	          						@endforelse
+	          						
+	          					</select>
+	          				</div>
+	          				<input type="hidden" name=" type" value="leave_policy">
+	          					            	
+		            </div>
+	                 
+	          		</div>
+	          		<div class="panel-footer">
+	          			<div class="form-group">
+	          					<button class="btn btn-info" >Save Changes</button>
+	          				</div>
+	          		</div>
+	          		</form>
+		          </div>
 	          
-	          	<div class="panel panel-info panel-line">
-		            <div class="panel-heading">
-		              <h3 class="panel-title">Leave Includes Weekends</h3>
-		              <div class="panel-actions">
-                			<input type="checkbox" class="active-toggle" id="leaveIncludesWeekends" {{$leave_includes_weekend->value==1?'checked':''}} >
-
-              			</div>
-		            	</div>
-		            <div class="panel-body">
-		            <p>Enable if your leave days includes weekends</p>
-	                  
-	          		</div>
-	          		
-		          </div>
-	          	<div class="panel panel-info panel-line">
-		            <div class="panel-heading">
-		              <h3 class="panel-title">Leave Includes Holidays</h3>
-		              <div class="panel-actions">
-                			<input type="checkbox" class="active-toggle" id="leaveIncludesHolidays" {{$leave_includes_holiday->value==1?'checked':''}}>
-
-              			</div>
-		            	</div>
-		            <div class="panel-body">
-		            <p>Enable if your leave days includes Holidays</p>
-	                  
-	          		</div>
-	          		
-		          </div>
 	          	<div class="panel panel-info panel-line">
 		            <div class="panel-heading">
 		              <h3 class="panel-title">Holidays</h3>
@@ -113,7 +131,7 @@
 		                    	<tr>
 		                    		<td>{{$holiday->title}}</td>
 		                    		<td>{{date("F j, Y",strtotime($holiday->date))}}</td>
-		                    		<td>{{$holiday->user->name}}</td>
+		                    		<td>{{$holiday->user?$holiday->user->name:''}}</td>
 		                    		<td><a class="dropdown-item" title="edit" class="btn btn-info" id="{{$holiday->id}}" onclick="prepareHEditData(this.id);"><i class="fa fa-pencil" aria-hidden="true"></i></a></td>
 		                    	</tr>
 		                    	@empty
@@ -183,42 +201,42 @@
 	 $('.datepicker').datepicker({
     autoclose: true
 });
-	  $('#leaveIncludesHolidays').bootstrapToggle({
-      on: 'Enabled',
-      off: 'Disabled',
+	  $('.bstoggle').bootstrapToggle({
+      on: 'Yes',
+      off: 'No',
       onstyle:'info',
       offstyle:'default'
     });
-	   $('#leaveIncludesWeekends').bootstrapToggle({
-      on: 'Enabled',
-      off: 'Disabled',
-      onstyle:'info',
-      offstyle:'default'
-    });
-	    $('#leaveIncludesHolidays').on('change', function() {
+	  $(document).on('submit','#leavePolicyForm',function(event){
+		 event.preventDefault();
+		 var form = $(this);
+		    var formdata = false;
+		    if (window.FormData){
+		        formdata = new FormData(form[0]);
+		    }
+		    $.ajax({
+		        url         : '{{route('leave_policy.store')}}',
+		        data        : formdata ? formdata : form.serialize(),
+		        cache       : false,
+		        contentType : false,
+		        processData : false,
+		        type        : 'POST',
+		        success     : function(data, textStatus, jqXHR){
 
-		 $.get('{{ url('settings/leaves/switch_includes_holiday') }}/',function(data){
-  		 	if (data==1) {
-  		 		toastr.success("Leave Includes Holiday Enabled",'Success');
-  		 	}
-  		 	if(data==2){
-  		 		toastr.warning("Leave Includes Holiday Disabled",'Success');
-  		 	}
-  		 	$( "#ldr" ).load('{{route('leavesettings')}}');
-  		 });
+		            toastr.success("Changes saved successfully",'Success');
+		            
+		        },
+		        error:function(data, textStatus, jqXHR){
+		        	 jQuery.each( data['responseJSON'], function( i, val ) {
+							  jQuery.each( val, function( i, valchild ) {
+							  toastr.error(valchild[0]);
+							});  
+							});
+		        }
+		    });
+      
 		});
-		 $('#leaveIncludesWeekends').on('change', function() {
-
-		 $.get('{{ url('settings/leaves/switch_includes_weekend') }}/',function(data){
-  		 	if (data==1) {
-  		 		toastr.success("Leave Includes Weekends Enabled",'Success');
-  		 	}
-  		 	if(data==2){
-  		 		toastr.warning("Leave Includes Weekends Disabled",'Success');
-  		 	}
-  		 	$( "#ldr" ).load('{{route('leavesettings')}}');
-  		 });
-		});
+	   
 
 	  $(document).on('submit','#addLeaveForm',function(event){
 		 event.preventDefault();

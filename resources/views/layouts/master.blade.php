@@ -7,7 +7,7 @@
   <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'HCMatrix Time & Attendance') }}</title>
+    <title>{{ config('app.name', 'HCMatrix') }}</title>
   <link rel="apple-touch-icon" href="{{ asset('assets/images/apple-touch-icon.png') }}">
   <link rel="shortcut icon" href="{{ asset('assets/images/logo.png') }}">
   <!-- Stylesheets -->
@@ -31,7 +31,7 @@
   <link rel="stylesheet" href="{{ asset('global/fonts/material-design/material-design.min.css') }}">
   <link rel="stylesheet" href="{{ asset('global/fonts/brand-icons/brand-icons.min.css') }}">
   
-  <link rel='stylesheet' href='http://fonts.googleapis.com/css?family=Roboto:300,400,500,300italic'>
+  <link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Roboto:300,400,500,300italic'>
   <!--[if lt IE 9]>
     <script src="{{ asset('global/vendor/html5shiv/html5shiv.min.js') }}"></script>
     <![endif]-->
@@ -42,8 +42,36 @@
   <!-- Scripts -->
   <style type="text/css">
      .select2-container--open{
-        z-index:9999999;        
+        z-index:9999999 !important;       
     }
+     .datepicker-dropdown {
+      z-index: 2147483647 !important;
+    }
+/*    .btn-info {
+    color: #fff;
+    border-color: #{{companyInfo()->color}};
+    background-color: #{{companyInfo()->color}};
+}*/
+.modal-info .modal-header {
+    border-radius: .286rem .286rem 0 0;
+    background-color: #{{companyInfo()->color}};
+}
+.bg-light-blue-500, .bg-cyan-600  {
+    background-color: #{{companyInfo()->color}} !important;
+}
+.panel-info > .panel-heading {
+    color: #fff;
+    background-color: #{{companyInfo()->color}};
+    border-color: #{{companyInfo()->color}};
+}
+.panel-line.panel-info .panel-heading {
+    color: #{{companyInfo()->color}}!important;
+    background: transparent;
+    border-top-color: #{{companyInfo()->color}} !important;
+}
+.panel-line.panel-info .panel-title {
+    color: #{{companyInfo()->color}} !important;
+}
   </style>
   <script src="{{ asset('global/vendor/breakpoints/breakpoints.js') }}"></script>
   <script>
@@ -100,7 +128,7 @@
       <div class="navbar-brand navbar-brand-center site-gridmenu-toggle" data-toggle="gridmenu">
         <a href="{{ route('home') }}" style="color: #fff;text-decoration: none">
         <img class="navbar-brand-logo" src="{{ asset('assets/images/logo.png') }}" title="HCMatrix Time & Attendance">
-        <span class="navbar-brand-text hidden-xs-down"> HCMatrix</span>
+        <span class="navbar-brand-text hidden-xs-down">{{systemInfo()['name']}}</span>
         </a>
       </div>
       <button type="button" class="navbar-toggler collapsed" data-target="#site-navbar-search"
@@ -138,6 +166,12 @@
         <!-- End Navbar Toolbar -->
         <!-- Navbar Toolbar Right -->
         <ul class="nav navbar-toolbar navbar-right navbar-toolbar-right">
+          <li class="nav-item hidden-float" style="margin-top:15px;margin-right:10px;" >
+             
+               <img src="{{ file_exists(public_path('uploads/logo'.companyInfo()->logo))?asset('uploads/logo'.companyInfo()->logo):''}}" style="height: 2.286rem;background-color:#fff; " title="{{userCompanyName()}}">
+
+              
+            </li>
            @if (Auth::user()->role->permissions->contains('constant', 'group_access'))
            <li class="nav-item hidden-float" style="margin-top:15px;">
             <select class="form-control " id="cpny" onchange="setcpny()"> 
@@ -161,7 +195,7 @@
            @endif
           
 
-          <li class="nav-item hidden-float" style="margin-top:15px;">
+          {{-- <li class="nav-item hidden-float" style="margin-top:15px;">
             <select class="form-control " id="fiscalyear" onchange="setfy()"> 
              <option  >- {{__('Fiscal Year')}} -</option>
 
@@ -172,8 +206,8 @@
              @endfor
            </select>
 
-         </li>
-          <li class="nav-item dropdown">
+         </li> --}}
+         {{--  <li class="nav-item dropdown">
             <a class="nav-link" data-toggle="dropdown" href="javascript:void(0)" data-animation="scale-up"
             aria-expanded="false" role="button">
               <span class="flag-icon flag-icon-us"></span>
@@ -190,18 +224,20 @@
               <a class="dropdown-item" href="javascript:void(0)" role="menuitem">
                 <span class="flag-icon flag-icon-nl"></span> Dutch</a>
             </div>
-          </li>
+          </li> --}}
           <li class="nav-item dropdown">
             <a class="nav-link navbar-avatar" data-toggle="dropdown" href="#" aria-expanded="false"
             data-animation="scale-up" role="button">
               <span class="avatar avatar-online">
-                <img src="../../../../global/portraits/5.jpg" alt="...">
+                <img src="{{ file_exists(public_path('uploads/avatar'.Auth::user()->image))?asset('uploads/avatar'.Auth::user()->image):(Auth::user()->sex=='M'?asset('global/portraits/male-user.png'):asset('global/portraits/female-user.png'))}}" alt="...">
                 <i></i>
               </span>
             </a>
             <div class="dropdown-menu" role="menu">
-              <a class="dropdown-item" href="{{ route('users.edit',['id'=>Auth::user()->id]) }}" role="menuitem"><i class="icon md-account" aria-hidden="true"></i> Profile</a>
-              <a class="dropdown-item" href="javascript:void(0)" role="menuitem"><i class="icon md-settings" aria-hidden="true"></i> Settings</a>
+              <a class="dropdown-item" href="{{ url('userprofile') }}" role="menuitem"><i class="icon md-account" aria-hidden="true"></i> Profile</a>
+               @if(Auth::user()->role->permissions->contains('constant', 'edit_settings'))
+              <a class="dropdown-item" href="{{ url('settings') }}" role="menuitem"><i class="icon md-settings" aria-hidden="true"></i> Settings</a>
+              @endif
               <div class="dropdown-divider"></div>
               <a class="dropdown-item" href="{{ route('logout') }}"  role="menuitem" onclick="event.preventDefault();
                                                      document.getElementById('logout-form').submit();"><i class="icon md-power" aria-hidden="true"></i> {{ __('Logout') }}</a>
@@ -210,75 +246,58 @@
                                     </form>
             </div>
           </li>
+           @if(Auth::user()->role->permissions->contains('constant', 'edit_settings') ||Auth::user()->role->permissions->contains('constant', 'payroll_setting')||Auth::user()->role->permissions->contains('constant', 'workflows'))
+          <li class="nav-item dropdown">
+            <a class="nav-link" data-toggle="dropdown" href="javascript:void(0)" title="Settings"
+            aria-expanded="false" data-animation="scale-up" role="button">
+              <i class="icon md-settings" aria-hidden="true" style="font-size: 24px;"></i>
+              
+            </a>
+            <div class="dropdown-menu" role="menu">
+              
+              @if(Auth::user()->role->permissions->contains('constant', 'edit_settings'))
+              <a class="dropdown-item" href="{{ url('settings') }}" role="menuitem">General Settings</a>
+              
+              <div class="dropdown-divider"></div>
+              @endif
+              @if(Auth::user()->role->permissions->contains('constant', 'payroll_setting'))
+              <a class="dropdown-item" href="{{ url('payrollsettings') }}" role="menuitem"> Payroll Settings</a>
+              <div class="dropdown-divider"></div>
+              @endif
+              @if(Auth::user()->role->permissions->contains('constant', 'workflows'))
+              <a class="dropdown-item" href="{{ url('workflows') }}" role="menuitem"> Workflow Settings</a>
+            </div>
+            @endif
+          </li>
+          @endif
+
           <li class="nav-item dropdown">
             <a class="nav-link" data-toggle="dropdown" href="javascript:void(0)" title="Notifications"
             aria-expanded="false" data-animation="scale-up" role="button">
               <i class="icon md-notifications" aria-hidden="true"></i>
-              <span class="tag tag-pill tag-danger up">5</span>
+              <span class="tag tag-pill tag-danger up">{{count(Auth::user()->unreadNotifications)}}</span>
             </a>
             <div class="dropdown-menu dropdown-menu-right dropdown-menu-media" role="menu">
               <div class="dropdown-menu-header">
                 <h5>NOTIFICATIONS</h5>
-                <span class="tag tag-round tag-danger">New 5</span>
+                <span class="tag tag-round tag-danger">New {{count(Auth::user()->unreadNotifications)}}</span>
               </div>
               <div class="list-group">
                 <div data-role="container">
                   <div data-role="content">
-                    <a class="list-group-item dropdown-item" href="javascript:void(0)" role="menuitem">
+                    @foreach(Auth::user()->unreadNotifications as $notification)
+                    <a class="list-group-item dropdown-item" href="{{isset($notification->data['action'])?$notification->data['action']:'#'}}" role="menuitem">
                       <div class="media">
                         <div class="media-left p-r-10">
-                          <i class="icon md-receipt bg-red-600 white icon-circle" aria-hidden="true"></i>
+                          <i class="icon {{isset($notification->data['icon'])?$notification->data['icon']:''}} bg-red-600 white icon-circle" aria-hidden="true"></i>
                         </div>
                         <div class="media-body">
-                          <h6 class="media-heading">A new order has been placed</h6>
-                          <time class="media-meta" datetime="2016-06-12T20:50:48+08:00">5 hours ago</time>
+                          <h6 class="media-heading">{{isset($notification->data['type'])?$notification->data['type']:''}}</h6>
+                          <time class="media-meta" datetime="{{$notification->created_at}}">{{$notification->created_at->diffForHumans()}}</time>
                         </div>
                       </div>
                     </a>
-                    <a class="list-group-item dropdown-item" href="javascript:void(0)" role="menuitem">
-                      <div class="media">
-                        <div class="media-left p-r-10">
-                          <i class="icon md-account bg-green-600 white icon-circle" aria-hidden="true"></i>
-                        </div>
-                        <div class="media-body">
-                          <h6 class="media-heading">Completed the task</h6>
-                          <time class="media-meta" datetime="2016-06-11T18:29:20+08:00">2 days ago</time>
-                        </div>
-                      </div>
-                    </a>
-                    <a class="list-group-item dropdown-item" href="javascript:void(0)" role="menuitem">
-                      <div class="media">
-                        <div class="media-left p-r-10">
-                          <i class="icon md-settings bg-red-600 white icon-circle" aria-hidden="true"></i>
-                        </div>
-                        <div class="media-body">
-                          <h6 class="media-heading">Settings updated</h6>
-                          <time class="media-meta" datetime="2016-06-11T14:05:00+08:00">2 days ago</time>
-                        </div>
-                      </div>
-                    </a>
-                    <a class="list-group-item dropdown-item" href="javascript:void(0)" role="menuitem">
-                      <div class="media">
-                        <div class="media-left p-r-10">
-                          <i class="icon md-calendar bg-blue-600 white icon-circle" aria-hidden="true"></i>
-                        </div>
-                        <div class="media-body">
-                          <h6 class="media-heading">Event started</h6>
-                          <time class="media-meta" datetime="2016-06-10T13:50:18+08:00">3 days ago</time>
-                        </div>
-                      </div>
-                    </a>
-                    <a class="list-group-item dropdown-item" href="javascript:void(0)" role="menuitem">
-                      <div class="media">
-                        <div class="media-left p-r-10">
-                          <i class="icon md-comment bg-orange-600 white icon-circle" aria-hidden="true"></i>
-                        </div>
-                        <div class="media-body">
-                          <h6 class="media-heading">Message received</h6>
-                          <time class="media-meta" datetime="2016-06-10T12:34:48+08:00">3 days ago</time>
-                        </div>
-                      </div>
-                    </a>
+                   @endforeach
                   </div>
                 </div>
               </div>
@@ -286,7 +305,7 @@
                 <a class="dropdown-menu-footer-btn" href="javascript:void(0)" role="button">
                   <i class="icon md-settings" aria-hidden="true"></i>
                 </a>
-                <a class="dropdown-item" href="javascript:void(0)" role="menuitem">
+                <a class="dropdown-item" href="{{url('userprofile/notifications')}}" role="menuitem">
                     All notifications
                   </a>
               </div>
@@ -312,7 +331,11 @@
       <!-- End Site Navbar Seach -->
     </div>
   </nav>
+  @if(Auth::user()->role->manages=='dr')
+  @include('layouts.lmnav')
+  @else
   @include('layouts.nav')
+  @endif
   @yield('content')
   
   <!-- Footer -->

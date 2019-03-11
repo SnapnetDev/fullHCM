@@ -21,7 +21,16 @@ class SystemSettingController extends Controller
 	{
 		$has_sub=Setting::where('name','has_sub')->first();
 		$use_parent_setting=Setting::where('name','use_parent_setting')->first();
-		return view('settings.systemsettings.index',compact('has_sub','use_parent_setting'));
+		$name=Setting::where('name','sys_name')->first();
+		$logo=Setting::where('name','sys_logo')->first();
+		if (!$name) {
+			$name=Setting::create(['name'=>'sys_name','value'=>'HCMatrix']);
+		}
+		if (!$logo) {
+			$logo=Setting::create(['name'=>'sys_logo','value'=>'']);
+		}
+	  	
+		return view('settings.systemsettings.index',compact('has_sub','use_parent_setting','name','logo'));
 	}
 	public function switchHasSubsidiary(Request $request)
 	  {
@@ -44,6 +53,43 @@ class SystemSettingController extends Controller
 	      $setting->update(['value'=>1]);
 	       return 1;
 	    }
+	  }
+	  public function whiteLabel(Request $request)
+	  {
+	  	$name=Setting::where('name','sys_name')->first();
+	  	$logo=Setting::where('name','sys_logo')->first();
+	  	if ($name) {
+	  		$name->update(['value'=>$request->name]);
+	  	}else{
+	  		Setting::create(['name'=>'sys_name','value'=>$request->name]);
+	  	}
+	  	if ($logo) {
+	  		 if ($request->file('logo')) {
+                    $path = $request->file('logo')->store('logo');
+                    if (Str::contains($path, 'logo')) {
+                       $filepath= Str::replaceFirst('logo', '', $path);
+                    } else {
+                        $filepath= $path;
+                    }
+                    $logo->update(['value'=>$filepath]);
+                   
+                }
+	  		
+	  	}else{
+	  		 if ($request->file('logo')) {
+                    $path = $request->file('logo')->store('logo');
+                    if (Str::contains($path, 'logo')) {
+                       $filepath= Str::replaceFirst('logo', '', $path);
+                    } else {
+                        $filepath= $path;
+                    }
+                    Setting::create(['name'=>'sys_logo','value'=>$request->filepath]);
+                   
+                }
+	  		
+	  	}
+	  	return 'success';
+
 	  }
 	
 

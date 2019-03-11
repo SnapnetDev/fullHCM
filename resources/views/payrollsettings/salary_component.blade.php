@@ -46,6 +46,7 @@
 		                         <th>GL Code</th>
 		                          <th>Project Code</th>
 		                        <th>Comment</th>
+		                        <th>Taxable</th>
 		                        <th>Status</th>
 		                         <th>Exemption List</th>
 		                          <th>Action</th>
@@ -61,8 +62,9 @@
 		                    		<td>{{$salary_component->gl_code}}</td>
 		                    		<td>{{$salary_component->project_code}}</td>
 		                    		<td>{{$salary_component->comment}}</td>
-		                    		<td><span class="tag {{ $salary_component->taxable == 1 ? 'tag-success' : 'tag-dark' }}">{{ $salary_component->taxable == 1 ? 'Yes' : 'No' }}</span></td>
-		                    		<td><button class="btn sc-status btn-sm {{ $salary_component->status == 1 ? 'btn-success' : 'btn-warning' }}" title="{{ $salary_component->status == 1 ? 'Disable' : 'Enable' }}" id="{{$salary_component->id}}"><i class="fa fa-{{ $salary_component->status == 1 ? 'eye' : 'eye-slash' }}" ></i></button></td>
+		                    		<td><input type="checkbox" class="active-toggle sc-taxable" id="{{$salary_component->id}}" {{$salary_component->taxable == 1?'checked':''}} data-size="mini">
+		                    		<td><input type="checkbox" class="active-toggle sc-status" id="{{$salary_component->id}}" {{$salary_component->status == 1?'checked':''}} data-size="mini">
+		            				
 		                    		<td>
 		                    			
 		                    			@foreach($salary_component->exemptions as $user)
@@ -117,6 +119,18 @@
 	    <script type="text/javascript">
 	    	 $(document).ready( function () {
     $('#dataTable').DataTable();
+    $('.sc-status').bootstrapToggle({
+      on: 'on',
+      off: 'off',
+      onstyle:'info',
+      offstyle:'default'
+    });
+    $('.sc-taxable').bootstrapToggle({
+      on: 'on',
+      off: 'off',
+      onstyle:'info',
+      offstyle:'default'
+    });
 } );
   	$(function() {
   
@@ -186,28 +200,28 @@
 		});
   });
 
-  	$(function() {
-  	$(document).on('click','.sc-status',function(event){
+  // 	$(function() {
+  // 	$(document).on('click','.sc-status',function(event){
   		
-  		salary_component_id= $(this).attr('id');
+  // 		salary_component_id= $(this).attr('id');
   		
-  		 $.get('{{ url('/payrollsettings/change_salary_component_status') }}/',{ salary_component_id: salary_component_id },function(data){
-  		 	if (data==1) {
+  // 		 $.get('{{ url('/payrollsettings/change_salary_component_status') }}/',{ salary_component_id: salary_component_id },function(data){
+  // 		 	if (data==1) {
 
-  		 		toastr.success("Salary Component Enabled",'Success');
-  		 		$(this).removeClass('btn-warning');
-  		 		$(this).addClass('btn-success');
-  		 	}
-  		 	if(data==2){
-  		 		toastr.warning("Salary Component Disabled",'Success');
-  		 		$(this).addClass('btn-warning');
-  		 		$(this).removeClass('btn-success');
-  		 	}
+  // 		 		toastr.success("Salary Component Enabled",'Success');
+  // 		 		$(this).removeClass('btn-warning');
+  // 		 		$(this).addClass('btn-success');
+  // 		 	}
+  // 		 	if(data==2){
+  // 		 		toastr.warning("Salary Component Disabled",'Success');
+  // 		 		$(this).addClass('btn-warning');
+  // 		 		$(this).removeClass('btn-success');
+  // 		 	}
   		 	
-  		 });
+  // 		 });
   		 
-  	});
-  });
+  // 	});
+  // });
   	
   	function prepareEditData(salary_component_id){
     $.get('{{ url('/payrollsettings/salary_component') }}/',{ salary_component_id: salary_component_id },function(data){
@@ -282,5 +296,36 @@
 		}
 	});
   });
+	$(function() {
+  	 $('.sc-status').on('change', function() {
+  		salary_component_id= $(this).attr('id');
+  		
+  		 $.get('{{ url('/payrollsettings/change_salary_component_status') }}/',{ salary_component_id: salary_component_id },function(data){
+  		 	if (data==1) {
+  		 		toastr.success("Salary Component Enabled",'Success');
+  		 	}
+  		 	if(data==2){
+  		 		toastr.warning("Salary Component Disabled",'Success');
+  		 	}
+  		 	$( "#ldr" ).load('{{url('payrollsettings/salary_components')}}');
+  		 });
+  	});
+  	 	});
+
+	$(function() {
+  	 $('.sc-taxable').on('change', function() {
+  		salary_component_id= $(this).attr('id');
+  		
+  		 $.get('{{ url('/payrollsettings/change_salary_component_taxable') }}/',{ salary_component_id: salary_component_id },function(data){
+  		 	if (data==1) {
+  		 		toastr.success("Salary Component is now Taxable",'Success');
+  		 	}
+  		 	if(data==2){
+  		 		toastr.warning("Salary Component is no more Taxable",'Success');
+  		 	}
+  		 	$( "#ldr" ).load('{{url('payrollsettings/salary_components')}}');
+  		 });
+  	});
+  	 	});
   </script>
 

@@ -15,7 +15,7 @@ class UserSkillCompetency extends Pivot
 
     public function skill()
     {
-    	return $this->belongsTo('App\Skill','skill');
+    	return $this->belongsTo('App\Skill','skill_id');
     }
     public function user()
     {

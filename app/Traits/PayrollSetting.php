@@ -6,7 +6,11 @@ use App\Bank;
 use App\CompanyAccountDetail;
 use App\PayslipDetail;
 use App\PayrollPolicy;
+use App\TmsaPolicy;
+use App\LoanPolicy;
 use App\SalaryComponent;
+use App\TmsaComponent;
+use App\TmsaSchedule;
 use App\SpecificSalaryComponent;
 use App\Workflow;
 use App\LatenessPolicy;
@@ -15,6 +19,8 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Auth;
 use Excel;
+use Illuminate\Validation\Rule;
+use Validator;
 /**
  *
  */
@@ -35,6 +41,14 @@ trait PayrollSetting
       # code...
       return $this->payrollPolicySettings($request);
       break;
+       case 'tmsa_policy':
+      # code...
+      return $this->tmsaPolicySettings($request);
+      break;
+      case 'loan_policy':
+      # code...
+      return $this->loanPolicySettings($request);
+      break;
       case 'salary_components':
       # code...
       return $this->salaryComponents($request);
@@ -47,6 +61,9 @@ trait PayrollSetting
       # code...
       return $this->specificSalaryComponents($request);
       break;
+      case 'downloadssctemplate':
+        return $this->downloadSSTemplate($request);
+        break;
       case 'specific_salary_component':
       # code...
       return $this->specificSalaryComponent($request);
@@ -62,6 +79,14 @@ trait PayrollSetting
        case 'change_specific_salary_component_status':
       # code...
       return $this->changeSpecificSalaryComponentStatus($request);
+      break;
+      case 'change_salary_component_taxable':
+      # code...
+      return $this->changeSalaryComponentTaxable($request);
+      break;
+       case 'change_specific_salary_component_taxable':
+      # code...
+      return $this->changeSpecificSalaryComponentTaxable($request);
       break;
        case 'delete_specific_salary_component':
       # code...
@@ -82,6 +107,26 @@ trait PayrollSetting
        case 'switch_lateness_policy':
       # code...
       return $this->switchLatenessPolicy($request);
+      break;
+       case 'tmsa_components':
+      # code...
+      return $this->tmsaComponents($request);
+      break;
+      case 'tmsa_component':
+      # code...
+      return $this->tmsaComponent($request);
+      break;
+      case 'change_tmsa_component_status':
+      # code...
+      return $this->changeTmsaComponentStatus($request);
+      break;
+       case 'delete_tmsa_component':
+      # code...
+      return $this->deleteTmsaComponent($request);
+      break;
+      case 'change_tmsa_component_taxable':
+      # code...
+      return $this->changeTmsaComponentTaxable($request);
       break;
 			
 			default:
@@ -106,13 +151,29 @@ trait PayrollSetting
       # code...
       return $this->savePayrollPolicySettings($request);
       break;
+       case 'tmsa_policy':
+      # code...
+      return $this->saveTmsaPolicySettings($request);
+      break;
+      case 'loan_policy':
+      # code...
+      return $this->saveLoanPolicySettings($request);
+      break;
        case 'salary_component':
       # code...
       return $this->saveSalaryComponent($request);
       break;
+       case 'tmsa_component':
+      # code...
+      return $this->saveTmsaComponent($request);
+      break;
        case 'specific_salary_component':
       # code...
       return $this->saveSpecificSalaryComponent($request);
+      break;
+      case 'import_specific_salary_components':
+      # code...
+      return $this->importSpecificSalaryComponent($request);
       break;
       case 'lateness_policy':
       # code...
@@ -197,7 +258,7 @@ trait PayrollSetting
   public function saveSpecificSalaryComponent(Request $request)
   {
      $company_id=companyId();
-   $sc=SpecificSalaryComponent::updateOrCreate(['id'=>$request->specific_salary_component_id],['name'=>$request->name,'gl_code'=>$request->gl_code,'project_code'=>$request->project_code,'type'=>$request->ssctype,'comment'=>$request->comment,'emp_id'=>$request->user_id,'duration'=>$request->duration,'grants'=>$request->grant,'status'=>0,'starts'=>$request->starts,'ends'=>$request->ends,'company_id'=>$company_id]);
+   $sc=SpecificSalaryComponent::updateOrCreate(['id'=>$request->specific_salary_component_id],['name'=>$request->name,'amount'=>$request->amount,'gl_code'=>$request->gl_code,'project_code'=>$request->project_code,'type'=>$request->ssctype,'comment'=>$request->comment,'emp_id'=>$request->user_id,'duration'=>$request->duration,'grants'=>$request->grant,'status'=>0,'starts'=>$request->starts,'ends'=>$request->ends,'company_id'=>$company_id]);
    
     return 'success';
   }
@@ -224,6 +285,22 @@ trait PayrollSetting
   public function saveSalaryComponent(Request $request)
   {
     $company_id=companyId();
+
+    $validator=Validator::make($request->all(), [
+    'constant' => [
+        'required',
+        Rule::unique('salary_components')->where(function ($query) use($company_id,$request) {
+    return $query->where('company_id', $company_id)
+    ->where('id','!=',$request->salary_component_id);
+})
+          ],
+      ]);
+    if ($validator->fails()) {
+            return response()->json([
+                    $validator->errors()
+                    ],401);
+        }
+   
     $sc=SalaryComponent::updateOrCreate(['id'=>$request->salary_component_id],['name'=>$request->name,'gl_code'=>$request->gl_code,'project_code'=>$request->project_code,'type'=>$request->sctype,'comment'=>$request->comment,'constant'=>$request->constant,'formula'=>$request->formula,'company_id'=>$company_id,'taxable'=>$request->taxable]);
     $no_of_exemptions=count($request->input('exemptions'));
     if($no_of_exemptions>0){
@@ -269,27 +346,80 @@ trait PayrollSetting
     $sc->update(['status'=>1]);
     return 1;
    }
+ }
+
+   public function changeSalaryComponentTaxable(Request $request)
+  {
+   $sc=SalaryComponent::find($request->salary_component_id);
+   if ($sc->taxable==1) {
+     $sc->update(['taxable'=>0]);
+      return 2;
+   }elseif($sc->taxable==0){
+    $sc->update(['taxable'=>1]);
+    return 1;
+   }
    
   
   }
-  public function exemptEmployeeFromSalaryComponent(Request $request)
+  public function changeSpecificSalaryComponentTaxable(Request $request)
   {
+   $ssc=SpecificSalaryComponent::find($request->specific_salary_component_id);
+   if ($ssc->taxable==1) {
+     $ssc->update(['taxable'=>0]);
+      return 2;
+   }elseif($ssc->taxable==0){
+    $ssc->update(['taxable'=>1]);
+    return 1;
+   }
    
+  
+  }
+  public function importSpecificSalaryComponent(Request $request)
+  {
+    $document = $request->file('template');
+    $company_id=companyId();
+    $company=Company::find($company_id);
+     //$document->getRealPath();
+    // return $document->getClientOriginalName();
+    // $document->getClientOriginalExtension();
+    // $document->getSize();
+    // $document->getMimeType();
+    
+
+     if($request->hasFile('template')){
+            Excel::load($request->file('template')->getRealPath(), function ($reader) use($company) {
+           
+              foreach ($reader->toArray() as $key => $row) {
+                 // $hiredate=\Carbon\Carbon::createFromFormat('d/m/Y', $row['hiredate'])->toDateTimeString();  
+                if ($row['staff_id']) {
+                  $user=\App\User::where(['emp_num'=>$row['staff_id']])->first();
+                 $user->specific_salary_components()->create(['name'=>$row['component_name'],'gl_code'=>$row['gl_code'],'project_code'=>$row['project_code'],'type'=>$row['type'],'comment'=>$row['comment'],'duration'=>$row['duration'],'grants'=>0,'status'=>0,'company_id'=>$company->id,'amount'=>$row['amount'],'taxable'=>$row['taxable']]);
+                }
+                
+                
+             }
+            });
+            
+          $request->session()->flash('success', 'Import was successful!');
+
+        return back();
+        }
+
   }
   public function payrollPolicySettings(Request $request)
   {
       $company_id=companyId();
       $pp=PayrollPolicy::where('company_id',$company_id)->first();
        $workflows=Workflow::all();
-       $setting=Setting::where(['name'=>'use_lateness','company_id'=>$company_id])->first();
-       if (!$setting) {
-        $setting=Setting::create(['name'=>'use_lateness','company_id'=>$company_id]);
-       }
+       // $setting=Setting::where(['name'=>'use_lateness','company_id'=>$company_id])->first();
+       // if (!$setting) {
+       //  $setting=Setting::create(['name'=>'use_lateness','company_id'=>$company_id]);
+       // }
        $latenesspolicies=LatenessPolicy::where('company_id',$company_id)->get();
       if (!$pp) {
         $pp=PayrollPolicy::create(['basic_pay_percentage'=>$request->basic_pay_percentage,'payroll_runs'=>$request->when,'user_id'=>Auth::user()->id,'company_id'=>$company_id]);
       }
-    return view('payrollsettings.payroll_policy',compact('pp','workflows','setting','latenesspolicies'));
+    return view('payrollsettings.payroll_policy',compact('pp','workflows','latenesspolicies'));
   }
   public function savePayrollPolicySettings(Request $request)
   {
@@ -301,6 +431,56 @@ trait PayrollSetting
         $pp->update(['basic_pay_percentage'=>$request->basic_pay_percentage,'payroll_runs'=>$request->when,'user_id'=>Auth::user()->id,'workflow_id'=>$request->workflow_id]);
       }else{
         PayrollPolicy::create(['basic_pay_percentage'=>$request->basic_pay_percentage,'payroll_runs'=>$request->payroll_runs,'user_id'=>Auth::user()->id,'workflow_id'=>$request->workflow_id,'company_id'=>$company_id]);
+      }
+    return 'success';
+  }
+  public function tmsaPolicySettings(Request $request)
+  {
+      $company_id=companyId();
+      $tp=TmsaPolicy::where('company_id',$company_id)->first();
+       $workflows=Workflow::all();
+      
+       
+      if (!$tp) {
+        $tp=TmsaPolicy::create(['onshore_day_rate'=>$request->onshore_day_rate,'offshore_day_rate'=>$request->offshore_day_rate,'out_of_station'=>$request->out_of_station,'company_id'=>$company_id]);
+      }
+    return view('payrollsettings.tmsa_policy',compact('tp','workflows'));
+  }
+  public function saveTmsaPolicySettings(Request $request)
+  {
+      // return $request->all();
+    $company_id=companyId();
+      $tp=TmsaPolicy::where('company_id',$company_id)->first();
+
+      if ($tp) {
+        $tp->update(['onshore_day_rate'=>$request->onshore_day_rate,'offshore_day_rate'=>$request->offshore_day_rate,'out_of_station'=>$request->out_of_station,'workflow_id'=>$request->workflow_id]);
+      }else{
+        TmsaPolicy::create(['onshore_day_rate'=>$request->onshore_day_rate,'offshore_day_rate'=>$request->offshore_day_rate,'out_of_station'=>$request->out_of_station,'workflow_id'=>$request->workflow_id]);
+      }
+    return 'success';
+  }
+   public function loanPolicySettings(Request $request)
+  {
+      $company_id=companyId();
+      $lp=LoanPolicy::where('company_id',$company_id)->first();
+       $workflows=Workflow::all();
+       
+       
+      if (!$lp) {
+        $lp=LoanPolicy::create(['annual_interest'=>0,'maximum_allowed'=>0,'user_id'=>Auth::user()->id,'company_id'=>$company_id,'workflow_id'=>0]);
+      }
+    return view('payrollsettings.loan_policy',compact('lp','workflows'));
+  }
+  public function saveLoanPolicySettings(Request $request)
+  {
+      // return $request->all();
+    $company_id=companyId();
+       $lp=LoanPolicy::where('company_id',$company_id)->first();
+
+      if ($lp) {
+        $lp->update(['annual_interest'=>$request->annual_interest,'maximum_allowed'=>$request->maximum_allowed,'user_id'=>Auth::user()->id,'workflow_id'=>$request->workflow_id]);
+      }else{
+        LoanPolicy::create(['annual_interest'=>$request->annual_interest,'maximum_allowed'=>$request->maximum_allowed,'user_id'=>Auth::user()->id,'workflow_id'=>$request->workflow_id,'company_id'=>$company_id]);
       }
     return 'success';
   }
@@ -346,13 +526,150 @@ public function saveLatenessPolicy(Request $request)
   }
   public function switchLatenessPolicy(Request $request)
   {
-    $setting=Setting::where('name','use_lateness')->first();
-    if ($setting->value==1) {
-     $setting->update(['value'=>0]);
+    $company_id=companyId();
+    $pp=PayrollPolicy::where('company_id',$company_id)->first();
+    if ($pp->use_lateness==1) {
+     $pp->update(['use_lateness'=>0]);
       return 2;
-    }elseif($setting->value==0){
-      $setting->update(['value'=>1]);
+    }elseif($pp->use_lateness==0){
+      $pp->update(['use_lateness'=>1]);
        return 1;
     }
   }
+
+  public function tmsaComponent(Request $request)
+  {
+
+   $tc=TmsaComponent::where('id',$request->tmsa_component_id)->with('exemptions')->first();
+   return $tc;
+  }
+  public function tmsaComponents(Request $request)
+  {
+   $tcs=TmsaComponent::with('exemptions')->get();
+   return view('payrollsettings.tmsa_component',compact('tcs'));
+  }
+  public function saveTmsaComponent(Request $request)
+  {
+    $company_id=companyId();
+
+    $validator=Validator::make($request->all(), [
+    'constant' => [
+        'required',
+        Rule::unique('tmsa_components')->where(function ($query) use($company_id,$request) {
+    return $query->where('company_id', $company_id)
+    ->where('id','!=',$request->tmsa_component_id);
+})
+          ],
+      ]);
+    if ($validator->fails()) {
+            return response()->json([
+                    $validator->errors()
+                    ],401);
+        }
+   
+    $tc=TmsaComponent::updateOrCreate(['id'=>$request->tmsa_component_id],['name'=>$request->name,'type'=>$request->tctype,'constant'=>$request->constant,'company_id'=>$company_id,'taxable'=>$request->taxable,'amount'=>$request->amount,'status'=>0,'comment'=>$request->comment,'gl_code'=>$request->gl_code,'project_code'=>$request->project_code]);
+    $no_of_exemptions=count($request->input('exemptions'));
+    if($no_of_exemptions>0){
+      $tc->exemptions()->detach();
+              for ($i=0; $i <$no_of_exemptions ; $i++) {
+                if ($request->exemptions[$i]!=0) {
+                  $tc->exemptions()->attach($request->exemptions[$i],['created_at' => date('Y-m-d H:i:s'),'updated_at'=>date('Y-m-d H:i:s')]);
+                }
+            
+            }
+        }
+        return 'success';
+  }
+  public function deleteTmsaComponent(Request $request)
+  {
+   $tc=TmsaComponent::find($request->tmsa_component_id);
+   if ($tc) {
+    $tc->exemptions()->detach();
+     $tc->delete();
+      return 'success';
+   }
+  }
+  public function changeTmsaComponentStatus(Request $request)
+  {
+   $tc=TmsaComponent::find($request->tmsa_component_id);
+   if ($tc->status==1) {
+     $tc->update(['status'=>0]);
+      return 2;
+   }elseif($tc->status==0){
+    $tc->update(['status'=>1]);
+    return 1;
+   }
+   
+  
+  }
+ public function changeTmsaComponentTaxable(Request $request)
+  {
+   $tc=TmsaComponent::find($request->tmsa_component_id);
+   if ($tc->taxable==1) {
+     $tc->update(['taxable'=>0]);
+      return 2;
+   }elseif($tc->taxable==0){
+    $tc->update(['taxable'=>1]);
+    return 1;
+   }
+   
+  
+  }
+
+  private function downloadSSTemplate(Request $request){
+
+                           $template=['staff id','component name','type','amount','comment','duration','taxable','gl_code','project_code'];
+                          
+
+                           return $this->exportexcel('template',['template'=>$template]);
+
+              }
+
+  private function exportexcel($worksheetname,$data)
+  {
+    return \Excel::create($worksheetname, function($excel) use ($data)
+    {
+      foreach($data as $sheetname=>$realdata)
+      {
+        $excel->sheet($sheetname, function($sheet) use ($realdata,$sheetname)
+        {
+            
+                  $sheet->fromArray($realdata);
+                 
+
+           
+        });
+      }
+    })->download('xlsx');
+  }
+
+  // public function importTemplate(Request $request)
+  // {
+  //   $document = $request->file('template');
+  //   $company_id=companyId();
+  //   $det=BscDet::find($request->det_id);
+    
+
+  //    if($request->hasFile('template')){
+
+  //     $datas=\Excel::load($request->file('template')->getrealPath(), function($reader) { 
+  //                                        $reader->noHeading()->skipRows(1);
+  //                          })->get();
+      
+  //                          foreach ($datas[0] as $data) {
+  //                           // dd($data[0]);
+  //                           if ($data[0]) {
+  //                       $user=User::where('emp_num',$data[0])->first();
+  //                        $det_detail=BscDetDetail::create(['bsc_det_id'=>$det->id,'bsc_metric_id'=>$metric->id,'business_goal'=>$data[1],'measure'=>$data[2],'lower'=>$data[3],'mid'=>$data[4],'upper'=>$data[5],'weighting'=>$data[6]*100]);
+                        
+                        
+  //                     }
+                                                             
+  //                          }
+
+
+  //       return 'success';
+  //       }
+
+  // }
 }

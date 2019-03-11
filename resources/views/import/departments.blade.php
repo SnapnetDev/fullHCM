@@ -84,7 +84,7 @@
 
                   
                 
-                <input type="hidden" name="type" value="departmets" >
+                <input type="hidden" name="type" value="departments" >
                    
                   
 

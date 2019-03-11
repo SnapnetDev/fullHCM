@@ -66,9 +66,9 @@
             </ul>
           </div>
           <div class="panel-footer">
-            <a href="{{ route('jobs.edit',$job->id) }}" class="btn btn-primary">
+            {{-- <a href="{{ route('jobs.edit',$job->id) }}" class="btn btn-primary">
                 Edit Job Details
-            </a>
+            </a> --}}
 
           </div>
         </div>

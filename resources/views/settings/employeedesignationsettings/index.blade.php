@@ -85,7 +85,8 @@
 		                  data-height="400" data-pagination="true" data-search="true" class="table table-striped">
 		                    <thead>
 		                      <tr>
-		                        <th style="width: 80%">Name:</th>
+		                        <th style="width: 40%">Name:</th>
+		                        <th style="width: 40%">Payroll Type:</th>
 		                        <th style="width: 20%">Action:</th>
 		                      </tr>
 		                    </thead>
@@ -93,6 +94,7 @@
 		                    	@forelse($staffcategories as $staffcategory)
 		                    	<tr>
 		                    		<td>{{$staffcategory->name}}</td>
+		                    		<td>{{$staffcategory->payroll_type==1?'Normal Payroll':'TMSA Payroll'}}</td>
 		                    		<td><div class="btn-group" role="group">
 		                    			<button type="button" class="btn btn-primary dropdown-toggle" id="exampleIconDropdown2"
 					                    data-toggle="dropdown" aria-expanded="false">
@@ -373,6 +375,7 @@
     	console.log(data);
      $('#editscid').val(data.id);
      $('#editscname').val(data.name);
+     $('#editscpayrolltype').val(data.payroll_type);
     });
     $('#editStaffCategoryModal').modal();
   }

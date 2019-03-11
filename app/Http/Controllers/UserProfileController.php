@@ -12,6 +12,7 @@ use App\Qualification;
 use App\UserGroup;
 use App\Competency;
 use App\Bank;
+use App\Grade;
 use Illuminate\Http\Request;
 use App\Traits\UserProfile;
 
@@ -31,12 +32,16 @@ class UserProfileController extends Controller
        $competencies=Competency::all();
        $companies=Company::all();
        $banks=Bank::all();
+       $grades=Grade::all();
         $company=Company::find(session('company_id'));
         if(!$company){
           $company=Company::first();
         }
+        $departments=$company->departments;
+        $jobroles=$company->departments()->first()->jobs;
+        $staff_categories=StaffCategory::all();
        // return $user->skills()->where('skills.id',1)->first()->pivot->competency;
-       return view('empmgt.profile',['user'=>$user,'qualifications'=>$qualifications,'countries'=>$countries,'competencies'=>$competencies,'companies'=>$companies,'banks'=>$banks,'company'=>$company]);
+       return view('empmgt.profile',['user'=>$user,'qualifications'=>$qualifications,'countries'=>$countries,'competencies'=>$competencies,'companies'=>$companies,'banks'=>$banks,'company'=>$company,'grades'=>$grades,'departments'=>$departments,'jobs'=>$jobroles,'staff_categories'=>$staff_categories]);
     }
    
    public function store(Request $request)

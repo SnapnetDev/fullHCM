@@ -73,10 +73,19 @@ class WorkflowController extends Controller
     {
         // try {
           $this->validate($request, ['name'=>'required']);
-           $no_of_stages=count($request->input('stagename'));
-           $no_of_users=count($request->input('user_id'));
+          if ($request->input('stagename')!==null) {
+              $no_of_stages=count($request->input('stagename'));
+           }
+           
+           if ($request->input('user_id')!==null) {
+              $no_of_users=count($request->input('user_id'));
+           }
+          if ($request->input('role')!==null) {
            $no_of_roles=count($request->input('role'));
+         }
+         if ($request->input('group')!==null) {
            $no_of_groups=count($request->input('group'));
+         }
            $no_of_users_used=0;
            $no_of_roles_used=0;
            $no_of_groups_used=0;
@@ -170,8 +179,8 @@ class WorkflowController extends Controller
     {
       try {
         $wf= Workflow::find($id);
-        if ($this->hasactivereviews($id)) {
-        return redirect()->route('workflows.edit',$id)->with('error', 'Workflow is in use by a document in review! Therefore changes cannot be made to the workflow');
+        if ($wf->payrolls ||$wf->payroll_policies||$wf->loan_policies||$wf->leave_policies||$wf->leave_requests||$wf->loan_requests) {
+        return redirect()->route('workflows.edit',$id)->with('error', 'Workflow is in use, Therefore changes cannot be made to the workflow');
       }else{
         $this->validate($request, ['name'=>'required']);
         $wf= Workflow::find($id);
@@ -181,18 +190,18 @@ class WorkflowController extends Controller
         for ($i=0; $i < $no_of_stages; $i++) {
           $stg=Stage::find($request->stage_id[$i]);
           if($stg){
-            if ($request->user_id[$i]!=$stg->user_id) {
-              $logmsg='Approver in '.$stage->name.'was changed from '.$stg->user->name.' to '.User::find($request->user_id[$i])->name;
+          //   if ($request->user_id[$i]!=$stg->user_id) {
+          //     $logmsg='Approver in '.$stage->name.'was changed from '.$stg->user->name.' to '.User::find($request->user_id[$i])->name;
               
-            }
-            if ($request->stagename[$i]!=$stg->name) {
-              $logmsg='The Stage name in '.$stage->name.'was changed from '.$stg->name.' to '.$request->stagename[$i];
+          //   }
+          //   if ($request->stagename[$i]!=$stg->name) {
+          //     $logmsg='The Stage name in '.$stage->name.'was changed from '.$stg->name.' to '.$request->stagename[$i];
               
-            }
-            if ($stg->position!=$i) {
-              $logmsg=''.$stage->name.'was moved from position'.$stg->position.' to position '.$i;
+          //   }
+          //   if ($stg->position!=$i) {
+          //     $logmsg=''.$stage->name.'was moved from position'.$stg->position.' to position '.$i;
               
-            }
+          //   }
             $stg->name=$request->stagename[$i];
             $stg->position=$i;
             $stg->user_id=$request->user_id[$i];

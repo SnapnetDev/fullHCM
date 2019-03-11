@@ -83,14 +83,26 @@
     </thead>
     <tbody>
       <tr>
-        <td>
-          GRADE:Level @if($detail->user->promotionHistories) {{$detail->user->promotionHistories()->latest()->first()->grade->level }}@endif
+        @php
+        $level='';
+          if ($detail->user->promotionHistories) {
+           $level=$detail->user->promotionHistories()->latest()->first()->grade->level;
+           // $gc = explode("-", $level);
+          }
+            @endphp
+        {{-- <td>
+
+          
+          Grade: @if($level!='') {{$gc[0] }}@endif
         </td>
         <td>
-          DEPT:
+          Level @if($level!='') {{$gc[1] }}@endif
+        </td> --}}
+        <td>
+          Grade:@if($level!='') {{$level }}@endif
         </td>
         <td>
-          REF ID:
+          DEPT:{{$detail->user->job?$detail->user->job->department->name:''}}
         </td>
       </tr>
     </tbody>

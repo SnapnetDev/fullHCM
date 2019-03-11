@@ -26,21 +26,30 @@ Auth::routes();
 Route::get('/home', 'HomeController@index')->name('home');
 Route::resource('import','ImportController')->middleware(['auth']);
 
-Route::get('users/modal/{user_id}','UserController@modal')->name('users.modal');
-Route::get('users/assignrole','UserController@assignRole')->name('users.assignrole');
-Route::get('users/assignmanager','UserController@assignManager')->name('users.assignmanager');
-Route::get('users/assigngroup','UserController@assignGroup')->name('users.assigngroup');
-Route::get('users/search','UserController@search')->name('users.search');
+Route::get('users/modal/{user_id}','UserController@modal')->name('users.modal')->middleware(['auth']);
+Route::get('users/assignrole','UserController@assignRole')->name('users.assignrole')->middleware(['auth']);
+Route::get('users/alterstatus','UserController@alterStatus')->name('users.alterstatus')->middleware(['auth']);
+Route::get('users/assignmanager','UserController@assignManager')->name('users.assignmanager')->middleware(['auth']);
+Route::get('users/assigngroup','UserController@assignGroup')->name('users.assigngroup')->middleware(['auth']);
+Route::get('users/search','UserController@search')->name('users.search')->middleware(['auth']);
+Route::get('organogram','UserController@viewOrganogram')->name('users.organogram')->middleware(['auth']);
+Route::get('dept-organogram/{id}','UserController@deptOrganogram')->name('users.dept_organogram')->middleware(['auth']);
+Route::get('team-organogram','UserController@teamOrganogram')->name('users.team_organogram')->middleware(['auth']);
+Route::get('myteam-organogram','UserController@myteamOrganogram')->name('users.myteam_organogram')->middleware(['auth']);
+Route::get('user/dr','UserController@directReports')->name('users.dr')->middleware(['auth']);
+Route::get('directory','UserController@viewDirectory')->name('users.directory')->middleware(['auth']);
+Route::post('users/new','UserController@saveNew')->name('users.savenew');
 Route::resource('userprofile','UserProfileController')->middleware(['auth']); 
 Route::resource('users', 'UserController')->middleware(['permission:edit_settings','auth']);
 Route::get('users/company/departmentsandbranches/{company_id}','UserController@getCompanyDepartmentsBranches')->name('users.companydepartmentsandbranches')->middleware(['permission:edit_settings','auth']);
+Route::get('users/department/jobroles/{department_id}','UserController@getDepartmentJobroles')->middleware(['permission:edit_settings','auth']);
 Route::resource('groups', 'UserGroupController',['names'=>['create'=>'groups.create','index'=>'groups','store'=>'groups.save','edit'=>'groups.edit','update'=>'groups.update','show'=>'groups.view','destroy'=>'groups.delete']])->middleware(['auth']);
 Route::get('setfy/{year}','HomeController@setfy');
 Route::get('setcpny/{company_id}','HomeController@setcpny');
 //end user routes
 //settings routes
 Route::get('/settings', 'GlobalSettingController@index')->name('settings')->middleware(['permission:edit_settings','auth'])->middleware(['permission:edit_settings','auth']);
-
+Route::get('/deviceclockin', 'AttendanceController@saveAttendance')->name('attendance.sync');
 Route::get('/settings/companies', 'CompanySettingController@companies')->name('companies')->middleware(['permission:edit_settings','auth']);
 Route::post('/settings/companies', 'CompanySettingController@saveCompany')->name('companies.store')->middleware(['permission:edit_settings','auth']);
 Route::get('/settings/companies/{company_id}', 'CompanySettingController@getCompany')->name('companies.show')->middleware(['permission:edit_settings','auth']);
@@ -63,6 +72,7 @@ Route::get('/settings/jobs/{job_id}', 'CompanySettingController@getJob')->name('
 Route::get('/settings/system', 'SystemSettingController@index')->name('systemsettings')->middleware(['permission:edit_settings','auth']);
 Route::get('/settings/system/switchhassub', 'SystemSettingController@switchHasSubsidiary')->name('systemsettings.switchhassub')->middleware(['permission:edit_settings','auth']);
 Route::get('/settings/system/switchuseparent', 'SystemSettingController@switchUseParentSetting')->name('systemsettings.switchuseparent')->middleware(['permission:edit_settings','auth']);
+Route::post('/settings/system/whitelabel', 'SystemSettingController@whiteLabel')->name('systemsettings.store')->middleware(['permission:edit_settings','auth']);
 
 // system settings end
 
@@ -72,6 +82,9 @@ Route::get('/settings/employee', 'EmployeeSettingController@index')->name('emplo
 Route::post('/settings/grades', 'EmployeeSettingController@saveGrade')->name('grades.store')->middleware(['permission:edit_settings','auth']);
 Route::get('/settings/grades/{grade_id}', 'EmployeeSettingController@getGrade')->name('grades.show')->middleware(['permission:edit_settings','auth']);
 Route::get('/settings/grades/delete/{grade_id}', 'EmployeeSettingController@deleteGrade')->name('grades.delete')->middleware(['permission:edit_settings','auth']);
+Route::post('/settings/grade_categories', 'EmployeeSettingController@saveGradeCategory')->name('grade_categories.store')->middleware(['permission:edit_settings','auth']);
+Route::get('/settings/grade_categories/{grade_category_id}', 'EmployeeSettingController@getGradeCategory')->name('grade_categories.show')->middleware(['permission:edit_settings','auth']);
+Route::get('/settings/grade_categories/delete/{grade_category_id}', 'EmployeeSettingController@deleteGradeCategory')->name('grade_categories.delete')->middleware(['permission:edit_settings','auth']);
 Route::post('/settings/qualifications', 'EmployeeSettingController@saveQualification')->name('qualifications.store')->middleware(['permission:edit_settings','auth']);
 Route::get('/settings/qualifications/{qualification_id}', 'EmployeeSettingController@getQualification')->name('qualifications.show')->middleware(['permission:edit_settings','auth']);
 Route::get('/settings/qualifications/delete/{qualification_id}', 'EmployeeSettingController@deleteQualification')->name('qualifications.delete')->middleware(['permission:edit_settings','auth']);
@@ -79,8 +92,8 @@ Route::get('/settings/qualifications/delete/{qualification_id}', 'EmployeeSettin
 //employee settings end
 //leave settings
 Route::get('/settings/leave', 'LeaveSettingController@index')->name('leavesettings')->middleware(['permission:edit_settings','auth']);
-Route::get('/settings/leaves/switch_includes_holiday', 'LeaveSettingController@switchLeaveIncludesHoliday')->middleware(['permission:edit_settings','auth']);
-Route::get('/settings/leaves/switch_includes_weekend', 'LeaveSettingController@switchLeaveIncludesWeekend')->middleware(['permission:edit_settings','auth']);
+Route::post('/settings/leaves/save_policy', 'LeaveSettingController@savePolicy')->middleware(['permission:edit_settings','auth'])->name('leave_policy.store');
+
 Route::post('/settings/holidays', 'LeaveSettingController@saveHoliday')->name('holidays.store')->middleware(['permission:edit_settings','auth']);
 Route::get('/settings/holiday/{holiday_id}', 'LeaveSettingController@getHoliday')->name('holidays.show')->middleware(['permission:edit_settings','auth']);
 Route::get('/settings/holidays/delete/{holiday_id}', 'LeaveSettingController@deleteHoliday')->name('holidays.delete')->middleware(['permission:edit_settings','auth']);
@@ -150,7 +163,18 @@ Route::get('/timesheets/{timesheet_id}', 'AttendanceController@timesheetDetail')
 Route::get('/usertimesheets/{user_id}/', 'AttendanceController@userTimesheetDetail')->name('timesheets.user')->middleware(['permission:view_timesheet','auth']);
 Route::get('/generate_timesheet', 'AttendanceController@queueTimesheet')->name('timesheets.queue')->middleware(['permission:view_timesheet','auth']);
 Route::get('/timesheet-excel/{timesheet_id}', 'AttendanceController@timesheetExcel')->name('timesheets.excel')->middleware(['permission:view_timesheet','auth']);
+// new shift functions
+Route::get('/attendance/reports', 'AttendanceController@custAbsenceManagement')->name('attendance.absenceManagement')->middleware(['permission:view_timesheet','auth']);
+Route::get('/employee_shift_schedules', 'AttendanceController@employeeShiftSchedules')->name('employeeShiftSchedules')->middleware(['auth']);
+Route::get('/cust_shift_schedules', 'AttendanceController@employeesSchedule')->name('employeesSchedule')->middleware(['auth']);
 
+Route::get('/shift_template_download', 'AttendanceController@downloadShiftUploadTemplate')->name('downloadShiftUploadTemplate')->middleware(['auth']);
+Route::get('/cust_day_hours/{user_id}/{date}', 'AttendanceController@getCustDayHours')->name('getCustDayHours')->middleware(['auth']);
+Route::get('/export_timesheets', 'AttendanceController@custRangeTimesheetView')->name('custRangeTimesheetView')->middleware(['auth']);
+Route::get('/cust_dts', 'AttendanceController@custDailyTimesheet')->name('custDailyTimesheet')->middleware(['auth']);
+Route::get('/cust_rts', 'AttendanceController@custRangeTimesheet')->name('custRangeTimesheet')->middleware(['auth']);
+Route::post('/import_employee_shift', 'AttendanceController@importUserShifts')->name('importUserShifts')->middleware(['auth']);
+// end of new shift funtions
 Route::get('/shift_schedules', 'AttendanceController@shift_schedules')->name('shift_schedules')->middleware(['auth']);
 Route::get('/shift_schedules/{shift_schedule_id}', 'AttendanceController@shift_schedule_details')->name('shift_schedule.show')->middleware(['auth']);
 Route::get('/user_shift_schedules/{user_id}', 'AttendanceController@userShiftSchedule')->name('shift_schedule.user')->middleware(['auth']);
@@ -177,7 +201,11 @@ Route::resource('payrollsettings', 'PayrollSettingController')->middleware(['per
 // executive view
 Route::get('/people_analytics', 'HomeController@executiveView')->name('executive_view')->middleware(['permission:view_hr_reports','auth']);
 Route::get('/people_analytics_leave', 'HomeController@executiveViewLeave')->name('executive_view_leave')->middleware(['permission:view_leave_report','auth']);
-Route::get('/people_analytics_attendance', 'HomeController@executiveViewAttendance')->name('executive_view_attendance')->middleware(['permission:view_attendance_report','auth']);
+Route::get('/people_analytics_hr', 'HomeController@executiveViewHR')->name('executive_view_hr')->middleware(['permission:view_attendance_report','auth']);
+Route::get('/people_analytics_employee', 'HomeController@executiveViewEmployee')->name('executive_view_attendance')->middleware(['permission:view_attendance_report','auth']);
+Route::get('/people_analytics_jobrole', 'HomeController@executiveViewJobRole')->name('executive_view_attendance')->middleware(['permission:view_attendance_report','auth']);
+Route::get('/people_analytics_payroll', 'HomeController@executiveViewPayroll')->name('executive_view_attendance')->middleware(['permission:view_attendance_report','auth']);
+Route::get('/bi-report', 'ReportController@getReport')->name('bi_report')->middleware(['auth']);
 // end of executive view
 Route::resource('roles', 'RoleController')->middleware(['permission:edit_settings','auth']);
 Route::resource('performances', 'PerformanceController')->middleware(['permission:edit_settings','auth']);
@@ -195,6 +223,7 @@ Route::get('job_qualification_search','JobController@qualification_search')->mid
 Route::get('joblist/{department_id}', 'JobController@list')->name('job_list.view')->middleware(['auth']);
 Route::get('jobs/department/{department_id}','JobController@index')->middleware(['auth']);
 Route::get('jobs/create/{department_id}','JobController@create')->middleware(['auth'])->name('jobs.create');
+Route::get('jobs/delete/{job_id}','JobController@delete')->middleware(['auth'])->name('jobs.delete');
 Route::get('job_search','JobController@job_search')->middleware(['auth']);
 Route::resource('jobs', 'JobController',['names'=>['store'=>'jobs.save','edit'=>'jobs.edit','update'=>'jobs.update','show'=>'jobs.view','destroy'=>'jobs.delete']])->except([
     'index', 'create'])->middleware('auth');
@@ -202,8 +231,13 @@ Route::get('location/country','HomeController@countries')->middleware(['auth']);
 Route::get('location/state/{country_id}','HomeController@states')->middleware(['auth']);
 Route::get('location/lga/{state_id}','HomeController@lgas')->middleware(['auth']);
 
+//OAuth 
+Route::get('/auth/microsoft', 'MicrosoftController@redirectToProvider');
+Route::get('/auth/microsoft/callback', 'MicrosoftController@callbackurl');
 
-
+Route::resource('bscsettings', 'BSCController')->middleware(['auth']);
+Route::get('bsc/usersearch', 'BSCEvaluationController@usersearch')->middleware(['auth']);
+Route::resource('bsc', 'BSCEvaluationController')->middleware(['auth']);
 
 
 /*************Payroll Module Start******************/
@@ -478,4 +512,35 @@ Route::get('/mypayslip/{empnum}/{month}/{payrollid}', 'PayrollController@create_
 
 
 Route::get('testrev', 'PayrollController@leaves');
+
+ //NEW TRAINING MODULE ROUTES
+Route::get('/training', 'TrainingController@index')->name('index')->middleware(['auth']);
+Route::get('/newtraining', 'TrainingController@newtraining')->name('training')->middleware(['auth']);
+Route::get('/training/create', 'TrainingController@create_training')->name('create_training')->middleware('auth');
+Route::get('/training/edit/{id}', 'TrainingController@edit_training')->name('edit_training')->middleware('auth');
+Route::get('/training/edit-training/{id}', 'TrainingController@edit_ongoing_training')->name('edit_ongoing_training')->middleware('auth');
+Route::post('/training/save_training', 'TrainingController@save_training')->name('save_training')->middleware('auth');
+Route::get('/training/view/{id}', 'TrainingController@view_training')->name('view_training')->middleware('auth');
+Route::get('/training/info', 'TrainingController@training_info')->name('training_info')->middleware('auth');
+Route::post('/training/save_start_training', 'TrainingController@save_start_training')->name('save_start_training')->middleware('auth');
+
+Route::post('/training/save_training_user', 'TrainingController@save_training_user')->name('save_training_user')->middleware('auth');
+Route::post('/training/save_training_group', 'TrainingController@save_training_group')->name('save_training_group')->middleware('auth');
+Route::get('/training/delete_training_user', 'TrainingController@delete_training_user')->name('delete_training_user')->middleware('auth');
+Route::get('/training/approve_training_user', 'TrainingController@approve_training_user')->name('approve_training_user')->middleware('auth');
+Route::get('/training/decline_training_user', 'TrainingController@decline_training_user')->name('decline_training_user')->middleware('auth');
+Route::post('/training/add_budget_to_training', 'TrainingController@add_budget_to_training')->name('add_budget_to_training')->middleware('auth');
+
+Route::get('/training/budget', 'TrainingController@budget')->name('training.budget')->middleware('auth');
+Route::get('/training/budget/create', 'TrainingController@create_budget')->name('create_budget')->middleware('auth');
+Route::get('/training/budget/edit/{id}', 'TrainingController@edit_budget')->name('edit_budget')->middleware('auth');
+Route::post('/training/budget/save_budget', 'TrainingController@save_budget')->name('save_budget')->middleware('auth');
+Route::get('/training/budget/view/{id}', 'TrainingController@view_budget')->name('view_budget')->middleware('auth');
+
+Route::get('/mytraining', 'TrainingController@my_training')->name('my.training')->middleware('auth');
+
+
+
+//AJAX
+Route::get('/getTraineeDetails', 'TrainingController@getTraineeDetails');
  

@@ -105,17 +105,68 @@ class AssignCompanySeeder extends Seeder
       //     'created_at'=>$faker->dateTimeThisYear($max = 'now', $timezone = null)
       //   ]);
       // }
+      // $separations=['Constructive Discharge','Layoff','Termination for Cause','Termination By Mutual Agreement','Termination With Prejudice','Termination Without Prejudice','Termination Without Prejudice','Involuntary Termination','Voluntary Termination','Wrongful Termination','Temporary Job or Employment Contract Ends','Forced Resignation','Mandatory Retirement','Phased Retirement'];
+      // for ($i=0; $i <count($separations) ; $i++) { 
+      //   \App\SeparationType::create(['name'=>$separations[$i]]);
+      // }
+      // foreach ($seperations as $seperation) {
+      //   \App\SeperationType::create(['name'=>$separation]);
+      // }
 
-      $users=App\User::all();
-       // $cnt=1000;
-      foreach($users as $user){
-        // $faker = Faker\Factory::create();
-       // $num=$cnt+1;
-        $companies=App\Company::all();
-        // echo $user->company->has('departments')->jobs()->inRandomOrder()->first()->id.'-';
-        $user->jobs()->attach($user->company->jobs()->inRandomOrder()->first()->id,['started'=>$user->hiredate]);
+      // $users=App\User::all();
+      // $randoms = $users->random(50);
+      //  // $cnt=1000;
+      // foreach($randoms as $random){
+      //    $faker = Faker\Factory::create();
+      //  // $num=$cnt+1;
+      // \App\Separation::create(['user_id'=>$random->id,'date_of_separation'=>$faker->dateTimeBetween($startDate = '-5 years', $endDate = 'now'),'separation_type_id'=>mt_rand(1,14),'days_of_employment'=>mt_rand(30,5000)]);
+
+      //   // echo $user->company->has('departments')->jobs()->inRandomOrder()->first()->id.'-';
+      //   // $user->jobs()->attach($user->company->jobs()->inRandomOrder()->first()->id,['started'=>$user->hiredate]);
         
+      // }
+
+      $companies=App\Company::all();
+      foreach ($companies as $company) {
+         $faker = Faker\Factory::create();
+       $company->update(['name'=>$faker->company,'address'=>$faker->streetAddress.$faker->cityPrefix.','.$faker->state,'email'=>$faker->email]);
+
       }
+
+      // $users=App\User::all();
+      // foreach ($users as $user) {
+        
+      //   $user->department_id=$user->job->department_id;
+      //   $user->save();
+
+      // }
+
+      // foreach ($users as $user) {
+        // if ($user->separation) {
+        //   $user->employment_status=0;
+        //   $user->save();
+        // }
+      //   if (count($user->promotionHistories)>0) {
+      //      $user->grade_id=$user->promotionHistories()->latest()->first()->grade->id;
+      //      $user->save();
+      //   }else{
+      //     $grade=\App\Grade::all()->random();
+      //     $user->promotionHistories()->create([
+      //             'old_grade_id' => $grade->id,'grade_id'=>$grade->id,'approved_on'=>date('Y-m-d'),'approved_by'=>1
+      //         ]);
+      // $user->grade_id=$grade->id;
+      // $user->save();
+
+      //   }
+       
+      //   $country=\App\Country::find(160);
+      // $state=$country->states->random(); 
+      //  $lga=$state->lgas->random();
+      //  $user->update(['country_id'=>$country->id,'state_id'=>$state->id,'lga_id'=>$lga->id]);
+      
+      // }
+
+      
 
       //  $users=App\User::all();
       //  // $cnt=1000;

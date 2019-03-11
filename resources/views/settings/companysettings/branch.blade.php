@@ -53,7 +53,7 @@
 	                      </tr>
 	                    </thead>
 	                    <tbody>
-	                    	@forelse($branches as $branch)
+	                    	@forelse($company->branches as $branch)
 	                    	<tr>
 	                    		<td>{{$branch->name}}</td>
 	                    		<td>{{$branch->manager?$branch->manager->name:''}}</td>

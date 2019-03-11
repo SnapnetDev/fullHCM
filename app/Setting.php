@@ -8,10 +8,10 @@ use App\Scopes\CompanyScope;
 class Setting extends Model
 {
     protected $fillable=['name','value','company_id'];
-     protected static function boot()
-    {
-        parent::boot();
+    //  protected static function boot()
+    // {
+    //     parent::boot();
       
-        static::addGlobalScope(new CompanyScope);
-    }
+    //     static::addGlobalScope(new CompanyScope);
+    // }
 }

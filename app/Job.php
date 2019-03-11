@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Job extends Model
 {
 	protected $table="jobroles";
-    protected $fillable=['name','department_id','parent_id','description','personnel','qualification_id'];
+    protected $fillable=['title','department_id','parent_id','description','personnel','qualification_id'];
     //
     public function users()
     {
@@ -24,7 +24,7 @@ class Job extends Model
 
     public function skills()
     {
-        return $this->belongsToMany('App\Skill')->using('App\UserSkillCompetency')->withTimestamps()->withPivot('competency_id');
+        return $this->belongsToMany('App\Skill')->using('App\JobSkillCompetency')->withTimestamps()->withPivot('competency_id');
     }
 
     public function parent()
