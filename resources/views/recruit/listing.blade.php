@@ -36,6 +36,7 @@
 	</div>
     
 		<div class="page-content">
+<<<<<<< HEAD
       <div class="btn-group btn-group-justified">
                     <div class="btn-group" role="group">
                       <a href="{{url('recruits')}}" class="btn btn-primary waves-effect waves-light waves-round">
@@ -53,6 +54,8 @@
                   </div>
                   <br>
                   <br>
+=======
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
        <div class="row">
         <div class="col-md-8">
       @forelse($joblistings as $joblisting)
@@ -82,6 +85,7 @@
                   </li>
                 </ul>
               <ul class="list-group list-group-bordered list-group-full">
+<<<<<<< HEAD
                
               <li class="list-group-item ">
                 <strong>Minimum Educational Qualification:</strong> {{$joblisting->job->qualification?$joblisting->job->qualification->name:''}}
@@ -91,6 +95,19 @@
                   </li>
             </ul>
               
+=======
+                <li class="list-group-item bg-grey-300">Minimum Educational Qualification</li>
+              <li class="list-group-item ">
+                {{$joblisting->job->qualification?$joblisting->job->qualification->name:''}}
+              </li>
+            </ul>
+              <ul class="list-group list-group-bordered list-group-full">
+                    <li class="list-group-item bg-grey-300">Expires</li>
+                  <li class="list-group-item ">
+                     {{date("F j, Y",strtotime($joblisting->expires))}}({{\Carbon\Carbon::parse($joblisting->expires)->diffForHumans()}})
+                  </li>
+                </ul>
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
           </div>
           @empty
           <div class="alert dark alert-primary" role="alert">
@@ -116,6 +133,7 @@
               </div>
               <form class="" action="{{url('recruits')}}" method="get" >
 
+<<<<<<< HEAD
 
               <div class="panel-body">
                 <div class="form-group">
@@ -123,6 +141,15 @@
 
                   <input type="text" name="name_contains" class="form-control col-lg-6" id="email_t" placeholder="" value="{{ request()->name_contains }}">
 
+=======
+
+              <div class="panel-body">
+                <div class="form-group">
+                  <label for="">Job Title Contains</label>
+
+                  <input type="text" name="name_contains" class="form-control col-lg-6" id="email_t" placeholder="" value="{{ request()->name_contains }}">
+
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
                 </div>
                 <div class="form-group">
                   <label for="">Departments</label>
@@ -186,10 +213,15 @@
 <script src="{{asset('global/vendor/select2/select2.min.js')}}"></script>
   <script type="text/javascript">
   	  $(document).ready(function() {
+<<<<<<< HEAD
         $('.summernote').summernote();
         $('.select2').select2();
         $('.ej_cont').hide();
           $('.ej_elt').attr('required',false);
+=======
+        $('#requirements').summernote();
+        $('.select2').select2();
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
          $('.input-daterange').datepicker({
     autoclose: true
 });
@@ -218,6 +250,7 @@
        });
     });
 
+<<<<<<< HEAD
  $('#target').on('change', function() {
       type= $(this).val();
 
@@ -237,6 +270,8 @@
      
     });
 
+=======
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
 
 
 
@@ -305,6 +340,7 @@
         });
       
     });
+<<<<<<< HEAD
 
     var country=$('#country').val();
 var state=$('#state').val();
@@ -385,5 +421,57 @@ var state=$('#state').val();
     });
   }
 
+=======
+  
+
+    });
+
+       function prepareEditData(listing_id){
+    $.get('{{ url('/recruits/get_job_listing_info') }}/',{ listing_id: listing_id },function(data){
+     
+     $('#editjtype').val(data.type);
+     $('#editjlevel').val(data.level);
+     $('#editjsalary_from').val(data.salary_from);
+     $('#editjsalary_to').val(data.salary_to);
+      $('#editjexperience_from').val(data.experience_from);
+       $('#editjexperience_to').val(data.experience_to);
+       $('#editjexpires').val(data.expires);
+        $('#editjrequirements').val(data.requirements);
+        $('#editjlid').val(data.id);
+        $('#editjobid').val(data.job_id);
+       
+    $('#editJobListingModal').modal();
+  });
+  }
+
+      function departmentChange(department_id){
+    event.preventDefault();
+    $.get('{{ url('/users/department/jobroles') }}/'+department_id,function(data){
+      
+      
+      if (data.jobs=='') {
+         $("#jobroles").empty();
+        $('#jobroles').append($('<option>', {value:0, text:'Please Create a Jobrole in Department'}));
+      }else{
+        $("#jobroles").empty();
+        jQuery.each( data.jobroles, function( i, val ) {       
+               $('#jobroles').append($('<option>', {value:val.id, text:val.title}));  
+              });
+      }
+      
+     });
+  }
+
+  function deleteJobListing(listing_id){
+    $.get('{{ url('/recruits/delete_job_listing') }}/',{ listing_id: listing_id },function(data){
+      if (data=='success') {
+    toastr.success("Job Listing deleted successfully",'Success');
+      }else{
+        toastr.error("Error deleting Salary Component",'Success');
+      }
+     
+    });
+  }
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
   </script>
 @endsection

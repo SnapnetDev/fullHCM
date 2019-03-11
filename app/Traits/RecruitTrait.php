@@ -2,14 +2,20 @@
 namespace App\Traits;
 use Illuminate\Http\Request;
 use App\JobListing;
+<<<<<<< HEAD
 use App\JobListingExternal;
+=======
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
 use App\Applicant;
 use App\User;
 use App\JobApplication;
 use App\Company;
 use App\Department;
 use App\Filters\JobListingFilter;
+<<<<<<< HEAD
 use App\Filters\EJobListingFilter;
+=======
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
 use Auth;
 
 trait RecruitTrait
@@ -42,6 +48,7 @@ trait RecruitTrait
 				return $this->empJobListings($request);
 				break;
 				case 'jobsapplied':
+<<<<<<< HEAD
 				# code...
 				return $this->empAppJobListings($request);
 				break;
@@ -55,6 +62,21 @@ trait RecruitTrait
 				break;
 				case 'emp_job_fav':
 				# code...
+=======
+				# code...
+				return $this->empAppJobListings($request);
+				break;
+				case 'favjobs':
+				# code...
+				return $this->empFavJobListings($request);
+				break;
+				case 'viewjob':
+				# code...
+				return $this->empViewJobListing($request);
+				break;
+				case 'emp_job_fav':
+				# code...
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
 				return $this->empJobListingFavorite($request);
 				break;
 				case 'emp_job_apply':
@@ -64,6 +86,7 @@ trait RecruitTrait
 				case 'applicant_summary':
 				# code...
 				return $this->applicantSummary($request);
+<<<<<<< HEAD
 				break;
 				case 'external':
 				# code...
@@ -80,6 +103,8 @@ trait RecruitTrait
 				case 'get_ejob_listing_info':
 				# code...
 				return $this->getEJobListingInfo($request);
+=======
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
 				break;
 			default:
 				return $this->index($request);
@@ -111,6 +136,7 @@ trait RecruitTrait
 
 	public function saveJobListing(Request $request)
 	{
+<<<<<<< HEAD
 		if ($request->target==1) {
 			$listing=JobListing::updateOrCreate(['id'=>$request->job_listing_id],['job_id'=>$request->job_id,'salary_from'=>$request->salary_from,'salary_to'=>$request->salary_to,'expires'=>date('Y-m-d',strtotime($request->expires)),'level'=>$request->level,'experience_from'=>$request->experience_from,'experience_to'=>$request->experience_to,'requirements'=>$request->requirements,'type'=>$request->jtype]);
 		return 'success';
@@ -119,6 +145,10 @@ trait RecruitTrait
 			return 'success';
 		}
 		 
+=======
+		return $listing=JobListing::updateOrCreate(['id'=>$request->job_listing_id],['job_id'=>$request->job_id,'salary_from'=>$request->salary_from,'salary_to'=>$request->salary_to,'expires'=>date('Y-m-d',strtotime($request->expires)),'level'=>$request->level,'experience_from'=>$request->experience_from,'experience_to'=>$request->experience_to,'requirements'=>$request->requirements,'type'=>$request->jtype]);
+		return 'success';
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
 
 	}
 
@@ -135,6 +165,7 @@ trait RecruitTrait
         $company=Company::find($company_id);
         $departments=$company->departments;
          $jobs=$company->departments()->first()->jobs;
+<<<<<<< HEAD
 		
 				return view('recruit.view',compact('joblisting','company','departments','jobs'));
 
@@ -223,6 +254,90 @@ trait RecruitTrait
 
 
 	}
+=======
+		
+				return view('recruit.view',compact('joblisting','company','departments','jobs'));
+
+	}
+	public function empViewJobListing(Request $request)
+	{
+		$joblisting=JobListing::find($request->listing_id);
+		if ($joblisting->status==1) {
+			$company_id=companyId();
+        $company=Company::find($company_id);
+        $departments=$company->departments;
+         $jobs=$company->departments()->first()->jobs;
+		
+				return view('recruit.user_view',compact('joblisting','company','departments','jobs'));
+		}else{
+			return redirect()->back()->with('This job cannot be viewed as it has been unlisted');
+		}
+		
+
+	}
+	 public function empJobListings(Request $request)
+    {
+    	if (count($request->all())==0) {
+        $company_id=companyId();
+        $company=Company::find($company_id);
+        $departments=$company->departments;
+         $jobs=$company->departments()->first()->jobs;
+         $joblistings=JobListing::where(['status'=>1])->paginate(5);
+
+        return view('recruit.user_listing',compact('company','departments','jobs','joblistings'));
+    }else{
+
+    	
+        $company_id=companyId();
+        $company=Company::find($company_id);
+        $departments=$company->departments;
+         $jobs=$company->departments()->first()->jobs;
+         $joblistings=JobListingFilter::apply($request);
+
+        return view('recruit.user_listing',compact('company','departments','jobs','joblistings'));
+    }
+    }
+     public function empFavJobListings(Request $request)
+    {
+        $company_id=companyId();
+        $company=Company::find($company_id);
+        $departments=$company->departments;
+         $jobs=$company->departments()->first()->jobs;
+          $joblistings=JobListing::where(['status'=>1])->paginate(5);
+
+        return view('recruit.user_fav_listing',compact('company','departments','jobs','joblistings'));
+    }
+     public function applicantSummary(Request $request)
+    {
+        $joblisting=JobListing::find($request->listing_id);
+        $user=User::find($request->user_id);
+
+       $qualification=$user->educationHistories()->whereHas('qualification', function ($query) use ($joblisting) {
+        	$query->where('qualifications.id', $joblisting->job->qualification_id);
+
+        })->count();
+         
+
+        return view('recruit.partials.applicantsummary',compact('joblisting','user','qualification'));
+    }
+     public function empAppJobListings(Request $request)
+    {
+        $company_id=companyId();
+        $company=Company::find($company_id);
+        $departments=$company->departments;
+         $jobs=$company->departments()->first()->jobs;
+         $joblistings=JobListing::where(['status'=>1])->paginate(5);
+
+        return view('recruit.user_application_listing',compact('company','departments','jobs','joblistings'));
+    }
+	
+	public function getJobListingInfo(Request $request)
+	{
+		return $joblisting=JobListing::find($request->listing_id);
+
+
+	}
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
 	public function deleteJobListing(Request $request)
 	{
 		$listing=JobListing::find($request->listing_id);
@@ -231,6 +346,7 @@ trait RecruitTrait
 	      return 'success';
 	   }
 	}
+<<<<<<< HEAD
 	public function deleteEJobListing(Request $request)
 	{
 		$listing=JobListingExternal::find($request->listing_id);
@@ -250,6 +366,8 @@ trait RecruitTrait
 	    return 1;
 	   }
 	 }
+=======
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
 	public function changeJobListingStatus(Request $request)
 	  {
 	   $listing=JobListing::find($request->listing_id);
@@ -261,6 +379,7 @@ trait RecruitTrait
 	    return 1;
 	   }
 	 }
+<<<<<<< HEAD
 	 public function externalJobListings(Request $request)
 	 {
 	 	if (count($request->all())==0) {
@@ -284,6 +403,8 @@ trait RecruitTrait
              
          }
 	 }
+=======
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
 
 	 public function empJobListingApplication(Request $request)
 	  {

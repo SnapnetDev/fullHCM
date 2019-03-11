@@ -67,7 +67,10 @@
 		                    		<td>{{$salary_component->duration}}</td>
 		                    		<td>{{$salary_component->grants}}</td>
 		                    		<td>{{$salary_component->completed==1?'Completed':'Not Completed'}}</td>
+<<<<<<< HEAD
 		                    		<td><input type="checkbox" class="active-toggle sc-taxable" id="{{$salary_component->id}}" {{$salary_component->taxable == 1?'checked':''}} data-size="mini">
+=======
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
 		                    		<td><input type="checkbox" class="active-toggle sc-status" id="{{$salary_component->id}}" {{$salary_component->status == 1?'checked':''}} {{$salary_component->completed==1?'disabled':''}} data-size="mini">
 		            				
 		                    		</td>
@@ -117,12 +120,15 @@
       onstyle:'info',
       offstyle:'default'
     });
+<<<<<<< HEAD
      $('.sc-taxable').bootstrapToggle({
       on: 'on',
       off: 'off',
       onstyle:'info',
       offstyle:'default'
     });
+=======
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
 } );
   	$(function() {
   
@@ -262,6 +268,7 @@
   		 });
   	});
   	 	});
+<<<<<<< HEAD
  	$(function() {
   	 $('.sc-taxable').on('change', function() {
   		salary_component_id= $(this).attr('id');
@@ -277,5 +284,7 @@
   		 });
   	});
   	 	});
+=======
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
   </script>
 

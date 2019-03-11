@@ -70,6 +70,12 @@
                 <a class="list-group-item setting-linker" href="{{ url('bscsettings')}}">
                  <i class="icon fa fa-wrench" aria-hidden="true"></i>{{__('Balance Score Card Settings')}}
                 </a>
+<<<<<<< HEAD
+=======
+                <a class="list-group-item setting-linker" href="{{ url('e360settings')}}">
+                 <i class="icon fa fa-circle-o-notch" aria-hidden="true"></i>{{__('360 Review Settings')}}
+                </a>
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
                 
                
               </div>
@@ -108,8 +114,11 @@
   <script type="text/javascript" src="{{ asset('global/vendor/bootstrap-datepicker/bootstrap-datepicker.min.js')}}"></script>
     <script src="{{ asset('global/vendor/editable-table/mindmup-editabletable.js')}}"></script>
   <script src="{{ asset('global/vendor/editable-table/numeric-input-example.js')}}"></script>
+<<<<<<< HEAD
   <script src="{{ asset('global/vendor/jscolor/jscolor.js')}}"></script>
 
+=======
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
 <script type="text/javascript">
 	
 	$(function(){
@@ -117,7 +126,11 @@
 
 		$('#rolestable').DataTable();
     
+<<<<<<< HEAD
 		// $( "#ldr" ).load( "{{route('companies')}}" );
+=======
+		$( "#ldr" ).load( "{{route('companies')}}" );
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
 
 	});
 	$(function(){

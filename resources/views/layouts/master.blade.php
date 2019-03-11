@@ -206,7 +206,11 @@
              @endfor
            </select>
 
+<<<<<<< HEAD
          </li> --}}
+=======
+         </li>
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
          {{--  <li class="nav-item dropdown">
             <a class="nav-link" data-toggle="dropdown" href="javascript:void(0)" data-animation="scale-up"
             aria-expanded="false" role="button">
@@ -229,7 +233,11 @@
             <a class="nav-link navbar-avatar" data-toggle="dropdown" href="#" aria-expanded="false"
             data-animation="scale-up" role="button">
               <span class="avatar avatar-online">
+<<<<<<< HEAD
                 <img src="{{ file_exists(public_path('uploads/avatar'.Auth::user()->image))?asset('uploads/avatar'.Auth::user()->image):(Auth::user()->sex=='M'?asset('global/portraits/male-user.png'):asset('global/portraits/female-user.png'))}}" alt="...">
+=======
+                <img src="{{ File::exists('storage/avatar'.Auth::user()->image)?asset('storage/avatar'.Auth::user()->image):(Auth::user()->sex=='M'?asset('global/portraits/male-user.png'):asset('global/portraits/female-user.png'))}}" alt="...">
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
                 <i></i>
               </span>
             </a>
@@ -246,7 +254,11 @@
                                     </form>
             </div>
           </li>
+<<<<<<< HEAD
            @if(Auth::user()->role->permissions->contains('constant', 'edit_settings') ||Auth::user()->role->permissions->contains('constant', 'payroll_setting')||Auth::user()->role->permissions->contains('constant', 'workflows'))
+=======
+           @if(Auth::user()->role->permissions->contains('constant', 'edit_settings'))
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
           <li class="nav-item dropdown">
             <a class="nav-link" data-toggle="dropdown" href="javascript:void(0)" title="Settings"
             aria-expanded="false" data-animation="scale-up" role="button">
@@ -255,6 +267,7 @@
             </a>
             <div class="dropdown-menu" role="menu">
               
+<<<<<<< HEAD
               @if(Auth::user()->role->permissions->contains('constant', 'edit_settings'))
               <a class="dropdown-item" href="{{ url('settings') }}" role="menuitem">General Settings</a>
               
@@ -268,6 +281,16 @@
               <a class="dropdown-item" href="{{ url('workflows') }}" role="menuitem"> Workflow Settings</a>
             </div>
             @endif
+=======
+              
+              <a class="dropdown-item" href="{{ url('settings') }}" role="menuitem">General Settings</a>
+              
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item" href="{{ url('payrollsettings') }}" role="menuitem"> Payroll Settings</a>
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item" href="{{ url('payrollsettings') }}" role="menuitem"> Workflow Settings</a>
+            </div>
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
           </li>
           @endif
 
@@ -286,6 +309,7 @@
                 <div data-role="container">
                   <div data-role="content">
                     @foreach(Auth::user()->unreadNotifications as $notification)
+<<<<<<< HEAD
                     <a class="list-group-item dropdown-item" href="{{isset($notification->data['action'])?$notification->data['action']:'#'}}" role="menuitem">
                       <div class="media">
                         <div class="media-left p-r-10">
@@ -293,6 +317,15 @@
                         </div>
                         <div class="media-body">
                           <h6 class="media-heading">{{isset($notification->data['type'])?$notification->data['type']:''}}</h6>
+=======
+                    <a class="list-group-item dropdown-item" href="{{$notification->data['action']}}" role="menuitem">
+                      <div class="media">
+                        <div class="media-left p-r-10">
+                          <i class="icon {{$notification->data['icon']}} bg-red-600 white icon-circle" aria-hidden="true"></i>
+                        </div>
+                        <div class="media-body">
+                          <h6 class="media-heading">{{$notification->data['type']}}</h6>
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
                           <time class="media-meta" datetime="{{$notification->created_at}}">{{$notification->created_at->diffForHumans()}}</time>
                         </div>
                       </div>

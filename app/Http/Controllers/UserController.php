@@ -376,6 +376,7 @@ class UserController extends Controller
 
          return 'success';
     }
+<<<<<<< HEAD
     public function viewOrganogram(Request $request)
     {
         $company=Company::find(companyId());
@@ -432,4 +433,6 @@ class UserController extends Controller
         $users=User::paginate(20);
         return view('empmgt.emp-dir',compact('users'));
     }
+=======
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
 }

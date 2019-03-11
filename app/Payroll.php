@@ -39,8 +39,11 @@ class Payroll extends Model
     {
         return $this->belongsToMany('App\SalaryComponent','payroll_salary_component','payroll_id','salary_component_id');
     }
+<<<<<<< HEAD
     public function tmsa_components()
     {
         return $this->belongsToMany('App\TmsaComponent','payroll_tmsa_component','payroll_id','tmsa_component_id');
     }
+=======
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
 }

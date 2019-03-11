@@ -252,7 +252,11 @@
           loading: true,
           loadingClass: 'loader-overlay',
           loadingParentElement: 'html',
+<<<<<<< HEAD
           
+=======
+          loadingInner: '\n      <div class="loader-content">\n        <img src="' + Config.get('assets') + '/images/logo@2x.png">\n        <h2>HCMatrix</h2>\n        <div class="loader-index">\n          <div></div>\n          <div></div>\n          <div></div>\n          <div></div>\n          <div></div>\n          <div></div>\n        </div>\n      </div>',
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
           onLoadEvent: true
         });
       }

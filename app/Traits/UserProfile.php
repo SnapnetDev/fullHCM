@@ -352,6 +352,7 @@ public function viewNotifications(Request $request)
 public function viewNotificationInfo(Request $request)
 {
 	$noti=Auth::user()->notifications()->where('id',$request->notification_id)->first();
+<<<<<<< HEAD
 	$noti->update(['read_at' => now()]);
 	return view('notification.partials.info',compact('noti'));
 }
@@ -380,5 +381,10 @@ public function changePassword(Request $request)
 			return 'failed';
 		}
 }
+=======
+	$noti->update(['read_at']);
+	return view('notification.partials.info',compact('noti'));
+}
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
 
 }

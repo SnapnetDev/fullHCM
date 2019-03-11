@@ -6,7 +6,10 @@ use App\Bank;
 use App\CompanyAccountDetail;
 use App\PayslipDetail;
 use App\PayrollPolicy;
+<<<<<<< HEAD
 use App\TmsaPolicy;
+=======
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
 use App\LoanPolicy;
 use App\SalaryComponent;
 use App\TmsaComponent;
@@ -41,10 +44,13 @@ trait PayrollSetting
       # code...
       return $this->payrollPolicySettings($request);
       break;
+<<<<<<< HEAD
        case 'tmsa_policy':
       # code...
       return $this->tmsaPolicySettings($request);
       break;
+=======
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
       case 'loan_policy':
       # code...
       return $this->loanPolicySettings($request);
@@ -84,10 +90,13 @@ trait PayrollSetting
       # code...
       return $this->changeSalaryComponentTaxable($request);
       break;
+<<<<<<< HEAD
        case 'change_specific_salary_component_taxable':
       # code...
       return $this->changeSpecificSalaryComponentTaxable($request);
       break;
+=======
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
        case 'delete_specific_salary_component':
       # code...
       return $this->deleteSpecificSalaryComponent($request);
@@ -151,10 +160,13 @@ trait PayrollSetting
       # code...
       return $this->savePayrollPolicySettings($request);
       break;
+<<<<<<< HEAD
        case 'tmsa_policy':
       # code...
       return $this->saveTmsaPolicySettings($request);
       break;
+=======
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
       case 'loan_policy':
       # code...
       return $this->saveLoanPolicySettings($request);
@@ -434,6 +446,7 @@ trait PayrollSetting
       }
     return 'success';
   }
+<<<<<<< HEAD
   public function tmsaPolicySettings(Request $request)
   {
       $company_id=companyId();
@@ -459,6 +472,8 @@ trait PayrollSetting
       }
     return 'success';
   }
+=======
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
    public function loanPolicySettings(Request $request)
   {
       $company_id=companyId();

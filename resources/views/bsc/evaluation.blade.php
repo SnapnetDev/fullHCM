@@ -126,7 +126,11 @@
                 <hr>
                 @foreach($metrics as $metric)
                 <div class="table-responsive">  
+<<<<<<< HEAD
                 <h3 align="center">{{$metric->name}} ({{bscweight($evaluation->department_id,$user->grade->grade_category_id,$metric->id)->percentage}}%)</h3><br />
+=======
+                <h3 align="center">{{$metric->name}} ({{bscweight($user->department_id,$user->grade->grade_category_id,$metric->id)->percentage}}%)</h3><br />
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
                 <div id="grid_table_{{$metric->id}}"></div>
                </div> 
                @endforeach
@@ -206,7 +210,29 @@
                });
               },
              }, onItemInserting: function(args) {
+<<<<<<< HEAD
        
+=======
+        // cancel insertion of the item with empty 'name' field
+
+               //  $.ajax({
+               //  type: "GET",
+               //  url: "{{url("bsc/get_evaluation_details_sum")}}",
+               //  data: { 
+               //          "bsc_evaluation_id": "{{$evaluation->id}}", 
+               //          "metric_id": "{{$metric->id}}"
+               //      },function(response){
+               //         args.cancel = true;
+               //        alert(args.item.weighting);
+               //        var perspecive_weighting=parseInt({{bscweight($user->department_id,$user->grade->grade_category_id,$metric->id)->percentage}});
+               //        var sum=parseInt(response);
+               //        if ((perspecive_weighting+args.item.weighting)>sum){
+               //          args.cancel = true;
+               //          alert("Specify the name of the item!");
+               //        }
+               //      }
+               // });
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
              
                   args.item._token="{{csrf_token()}}";
                   args.item.metric_id="{{$metric->id}}";
@@ -264,12 +290,15 @@
                 validate: "required"
                   },
                   {
+<<<<<<< HEAD
                    name: "weighting", 
                 type: "number", 
                 width: 50,
                  title: "Weighting<br>(%)", 
                   },
                   {
+=======
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
                    name: "lower", 
                 type: "number",
                 title: "Lower<br>Target", 
@@ -321,7 +350,16 @@
                  }
                 }
                   },
+<<<<<<< HEAD
                   
+=======
+                  {
+                   name: "weighting", 
+                type: "number", 
+                width: 50,
+                 title: "Weighting<br>(%)", 
+                  },
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
                   {
                    name: "comment", 
                 type: "text", 

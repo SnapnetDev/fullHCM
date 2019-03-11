@@ -240,7 +240,10 @@ private function downloadTemplate(Request $request){
 	{
 		$det_detail=BscDetDetail::find($request->id);
 		$det_detail->delete();
+<<<<<<< HEAD
 		return 'success';
+=======
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
 		
 	}
 

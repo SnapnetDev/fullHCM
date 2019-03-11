@@ -76,17 +76,28 @@ class ApproveLeaveRequest extends Notification implements ShouldQueue
             $leave_name=$this->leave_approval->leave_request->leave->name;
         }
         return new DatabaseMessage([
+<<<<<<< HEAD
             'subject'=>'Approve Leave Request-' .$leave_name,
             'details'=>"<ul class=\"list-group list-group-bordered\">
                   <li class=\"list-group-item \"><strong>Employee Name:</strong><span style\"text-align:right\">".$this->leave_request->user->name."</span></li>
                   <li class=\"list-group-item  \"><strong>Leave Type:</strong><span style\"text-align:right\">".$leave_name."</span></li>
+=======
+            'subject'=>'Approve Leave Request-' .$this->leave_request->leave->name,
+            'details'=>"<ul class=\"list-group list-group-bordered\">
+                  <li class=\"list-group-item \"><strong>Employee Name:</strong><span style\"text-align:right\">".$this->leave_request->user->name."</span></li>
+                  <li class=\"list-group-item  \"><strong>Leave Type:</strong><span style\"text-align:right\">".$this->leave_request->leave->name."</span></li>
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
                   <li class=\"list-group-item \"><strong>Start Date:</strong><span style\"text-align:right\">".date("F j, Y", strtotime($this->leave_request->start_date))."</span></li>
                   <li class=\"list-group-item \"><strong>End Date:</strong><span style\"text-align:right\">".date("F j, Y", strtotime($this->leave_request->end_date))."</span></li>
                   <li class=\"list-group-item \"><strong>Priority:</strong><span style\"text-align:right\">". (($this->leave_request->priority==0) ? 'normal' : ($this->leave_request->priority==1?'medium':'high') )."</span></li>
                   <li class=\"list-group-item \"><strong>With Pay:</strong><span style\"text-align:right\">".($this->leave_request->paystatus==0?'without pay':'with pay')."</span></li>
                   <li class=\"list-group-item \"><strong>Reason:</strong><span style\"text-align:right\">".$this->leave_request->reason."</span></li>
                 </ul>",
+<<<<<<< HEAD
             'message'=>'You are to review and approve a leave request '.$leave_name.' applied for by '.$this->leave_request->user->name,
+=======
+            'message'=>'You are to review and approve a leave request '.$this->leave_request->leave->name.' applied for by '.$this->leave_request->user->name,
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
             // 'action'=>route('documents.showreview', ['id'=>$this->document->id]),
             'type'=>'Leave Request',
             'icon'=>'md-calendar'

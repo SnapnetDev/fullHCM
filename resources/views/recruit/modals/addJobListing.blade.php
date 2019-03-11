@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 <div class="modal fade" id="addJoblistingModal" aria-labelledby="examplePositionSidebar" role="dialog" aria-hidden="true" style="display: none;">
+=======
+<div class="modal fade" id="addJoblistingModal" aria-labelledby="examplePositionSidebar" role="dialog" tabindex="-1" aria-hidden="true" style="display: none;">
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
   <form id="addJobListingForm">
   <div class="modal-dialog modal-sidebar modal-lg">
     <div class="modal-content">
@@ -10,6 +14,7 @@
       </div>
       <div class="modal-body">
         @csrf
+<<<<<<< HEAD
         <div class="form-group">
           <label class="example-title" for="target">Posting type</label>
           
@@ -21,6 +26,11 @@
          <div class="form-group ij_cont" id="department_cont" >
           <label class="form-control-label" for="department_id">Department</label>
           <select class="form-control ij_elt" id="department_id" name="department_id"  onchange="departmentChange(this.value);" required>
+=======
+         <div class="form-group " >
+          <label class="form-control-label" for="department_id">Department</label>
+          <select class="form-control" id="department_id" name="department_id"  onchange="departmentChange(this.value);" required>
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
             @forelse($departments as $department)
             <option value="{{$department->id}}" >{{$department->name}}</option>
             @empty
@@ -29,9 +39,15 @@
           </select>
         </div>
 
+<<<<<<< HEAD
         <div class="form-group ij_cont" id="job_cont" >
           <label class="form-control-label" for="jobroles">Job Role</label>
           <select class="form-control ij_elt" id="jobroles" name="job_id" required>
+=======
+        <div class="form-group " >
+          <label class="form-control-label" for="jobroles">Job Role</label>
+          <select class="form-control" id="jobroles" name="job_id" required>
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
             @forelse($jobs as $job)
             <option value="{{$job->id}}" >{{$job->title}}</option>
             @empty
@@ -39,6 +55,7 @@
             @endforelse
           </select>
         </div>
+<<<<<<< HEAD
         <div class="form-group ej_cont" id="">
            <label class="example-title" for="description">Job Title</label>
          <input type="text" name="title" required id="title" class="form-control ej_elt">
@@ -65,6 +82,12 @@
           <label class="example-title" for="jtype">Display</label>
           
           <select required name="jtype" style="width:100%;" id="jtype" class="form-control ij_elt" >
+=======
+        <div class="form-group">
+          <label class="example-title" for="jtype">Display</label>
+          
+          <select required="" name="jtype" style="width:100%;" id="jtype" class="form-control " >
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
             <option  value='1'>Internal</option>
             <option  value='2'>Public</option>
               <option  value='3'>Internal and Public</option>
@@ -80,6 +103,7 @@
               <option  value='4'>Manager</option>
           </select>
         </div>
+<<<<<<< HEAD
          <div class="form-group ej_cont" >
           <label class="form-control-label" for="select">Location (Country)</label>
           <select class="form-control ej_elt" id="country" name="country"  style="width: 100%;">
@@ -96,6 +120,8 @@
                 
             </select>
           </div>
+=======
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
         <div class="form-group">
           <label class="example-title" for="salary_from">Salary </label>
            <div class=" input-group" >
@@ -120,7 +146,11 @@
         </div>
         <div class="form-group">
            <label class="example-title" for="requirements">Extra Requirements</label>
+<<<<<<< HEAD
           <textarea name="requirements" id="requirements" class="form-control summernote" rows="6"></textarea>
+=======
+          <textarea name="requirements" id="requirements" class="form-control" rows="6"></textarea>
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
         </div>
                 <input type="hidden" name="type" value="save_listing">   
         </div>

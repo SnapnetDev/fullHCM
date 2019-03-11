@@ -19,7 +19,11 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#4c4c4c', end
     </div>
     <div class="vertical-align-middle">
       <a class="avatar" href="javascript:void(0)">
+<<<<<<< HEAD
         <img src="{{ file_exists(public_path('uploads/avatar'.$user->image))?asset('uploads/avatar'.$user->image):($user->sex=='M'?asset('global/portraits/male-user.png'):asset('global/portraits/female-user.png'))}}" alt="...">
+=======
+        <img src="{{ File::exists('storage/avatar'.$user->image)?asset('storage/avatar'.$user->image):($user->sex=='M'?asset('global/portraits/male-user.png'):asset('global/portraits/female-user.png'))}}" alt="...">
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
       </a>
       <h3 class="name">{{$user->name}}</h3>
       <h4 class="name">({{$user->role->name}})</h4>

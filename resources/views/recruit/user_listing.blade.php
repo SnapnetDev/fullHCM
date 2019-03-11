@@ -86,7 +86,11 @@ color: #fff;
                 <div class="panel-heading">
                   <h3 class="panel-title">{{$joblisting->job?$joblisting->job->title:''}} - {{ $joblisting->job->department->name }} - {{ $joblisting->job->department->company->name }}</h3>
                   <div class="panel-actions">
+<<<<<<< HEAD
                     <a  href="{{url('recruits/viewjob').'?listing_id='.$joblisting->id}}" class="btn btn-info  waves-effect waves-light waves-round " >
+=======
+                    <a  href="{{url('recruits/view_job_listing').'?listing_id='.$joblisting->id}}" class="btn btn-info  waves-effect waves-light waves-round " >
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
                          View Job Details
                         </a>
                         @if($joblisting->status==1)

@@ -23,11 +23,7 @@
 @section('content')
 <div class="page ">
     <div class="page-header">
-<<<<<<< HEAD
-      <h1 class="page-title">Balance Scorecard Department Template</h1>
-=======
       <h1 class="page-title">Balance Scorecard Department Selection</h1>
->>>>>>> 756669c79ba12453137381addef2325f0d752945
       <div class="page-header-actions">
     <div class="row no-space w-250 hidden-sm-down">
 
@@ -65,7 +61,7 @@
               <div class="panel-heading main-color-bg">
                 <h3 class="panel-title">Evaluation Information</h3>
               </div>
-              <form action="{{ url('bscsettings/get_det') }}" method="GET">
+              <form action="{{ url('e360/department_employees') }}" method="GET">
                 
               <div class="panel-body">
 
@@ -94,11 +90,7 @@
           </div>
           <div class="panel-footer">
        
-<<<<<<< HEAD
-            <button type="submit" class="btn btn-info">View template</button>
-=======
             <button type="submit" class="btn btn-info">View Users</button>
->>>>>>> 756669c79ba12453137381addef2325f0d752945
           </div>
           </form>
         </div>

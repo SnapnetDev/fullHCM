@@ -49,8 +49,11 @@
          		<tr>
               <th>Employee</th>
          		<th>Leave Type</th>
+<<<<<<< HEAD
             <th>Replacement</th>
             <th>Balance</th>
+=======
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
          		<th>Starts</th>
          		<th>Ends</th>
          		<th>Priority</th>
@@ -68,9 +71,13 @@
 
          
           <td>{{$approval->leave_request->user->name}}</td>
+<<<<<<< HEAD
          	<td>{{$approval->leave_request->leave_name}}</td>
           <td>{{$approval->leave_request->replacement?$approval->leave_request->replacement->name:"Not stated"}}</td>
           <td>{{$approval->leave_request->balance}}</td>
+=======
+         	<td>{{$approval->leave_request->leave->name}}</td>
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
          		<td>{{date("F j, Y", strtotime($approval->leave_request->start_date))}}</td>
          		<td>{{date("F j, Y", strtotime($approval->leave_request->end_date))}}</td>
          		<td><span class=" tag tag-outline  {{$approval->leave_request->priority==0?'tag-success':($approval->leave_request->priority==1?'tag-warning':'tag-danger')}}">{{$approval->leave_request->priority==0?'normal':($approval->leave_request->priority==1?'medium':'high')}}</span></td>
@@ -99,9 +106,13 @@
 
            
             <td>{{$approval->leave_request->user->name}}</td>
+<<<<<<< HEAD
             <td>{{$approval->leave_request->leave_name}}</td>
              <td>{{$approval->leave_request->replacement?$approval->leave_request->replacement->name:"Not stated"}}</td>
           <td>{{$approval->leave_request->balance}}</td>
+=======
+            <td>{{$approval->leave_request->leave->name}}</td>
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
               <td>{{date("F j, Y", strtotime($approval->leave_request->start_date))}}</td>
               <td>{{date("F j, Y", strtotime($approval->leave_request->end_date))}}</td>
               <td><span class=" tag tag-outline  {{$approval->leave_request->priority==0?'tag-success':($approval->leave_request->priority==1?'tag-warning':'tag-danger')}}">{{$approval->leave_request->priority==0?'normal':($approval->leave_request->priority==1?'medium':'high')}}</span></td>
@@ -130,9 +141,13 @@
 
            
             <td>{{$approval->leave_request->user->name}}</td>
+<<<<<<< HEAD
             <td>{{$approval->leave_request->leave_name}}</td>
              <td>{{$approval->leave_request->replacement?$approval->leave_request->replacement->name:"Not stated"}}</td>
           <td>{{$approval->leave_request->balance}}</td>
+=======
+            <td>{{$approval->leave_request->leave->name}}</td>
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
               <td>{{date("F j, Y", strtotime($approval->leave_request->start_date))}}</td>
               <td>{{date("F j, Y", strtotime($approval->leave_request->end_date))}}</td>
               <td><span class=" tag tag-outline  {{$approval->leave_request->priority==0?'tag-success':($approval->leave_request->priority==1?'tag-warning':'tag-danger')}}">{{$approval->leave_request->priority==0?'normal':($approval->leave_request->priority==1?'medium':'high')}}</span></td>
@@ -161,9 +176,13 @@
 
          
           <td>{{$approval->leave_request->user->name}}</td>
+<<<<<<< HEAD
           <td>{{$approval->leave_request->leave_name}}</td>
            <td>{{$approval->leave_request->replacement?$approval->leave_request->replacement->name:"Not stated"}}</td>
           <td>{{$approval->leave_request->balance}}</td>
+=======
+          <td>{{$approval->leave_request->leave->name}}</td>
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
             <td>{{date("F j, Y", strtotime($approval->leave_request->start_date))}}</td>
             <td>{{date("F j, Y", strtotime($approval->leave_request->end_date))}}</td>
             <td><span class=" tag tag-outline  {{$approval->leave_request->priority==0?'tag-success':($approval->leave_request->priority==1?'tag-warning':'tag-danger')}}">{{$approval->leave_request->priority==0?'normal':($approval->leave_request->priority==1?'medium':'high')}}</span></td>

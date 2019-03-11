@@ -95,9 +95,14 @@ trait BSCEvaluationTrait{
 		$user=User::find($request->employee);
 		$mp=BscMeasurementPeriod::find($request->mp);
 		$operation='evaluate';
+<<<<<<< HEAD
 		if ($user->grade&&$user->job) {
 			if ($user->job) {
 				if (!$user->grade->grade_category) {
+=======
+		if ($user->grade) {
+			if (!$user->department||!$user->grade->grade_category) {
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
 				$request->session()->flash('error', 'User does not have a grade category or a department');
 				return redirect()->back();
 			}else{
@@ -110,7 +115,11 @@ trait BSCEvaluationTrait{
 					}else{
 						
 						
+<<<<<<< HEAD
 							$evaluation=BscEvaluation::create(['user_id'=>$user->id,'bsc_measurement_period_id'=>$mp->id,'department_id'=>$user->job->department_id,'grade_category_id'=>$user->grade->grade_category->id]);
+=======
+							$evaluation=BscEvaluation::create(['user_id'=>$user->id,'bsc_measurement_period_id'=>$mp->id,'department_id'=>$user->department_id,'grade_category_id'=>$user->grade->grade_category->id]);
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
 							$metrics=BscMetric::all();
 						
 						return view('bsc.evaluation',compact('user','operation','evaluation','metrics'));
@@ -119,6 +128,7 @@ trait BSCEvaluationTrait{
 
 					}
 			}
+<<<<<<< HEAD
 			}else{
 				$request->session()->flash('error', 'User does not have a department ');
 			}
@@ -130,6 +140,15 @@ trait BSCEvaluationTrait{
 				return redirect()->back();
 		}else{
 			return  redirect()->back();
+=======
+
+
+		}elseif(!$user->grade){
+			$request->session()->flash('error', 'User does not have a grade ');
+				return redirect()->back();
+		}else{
+			return 1;
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
 			
 		}
 		

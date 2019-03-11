@@ -23,6 +23,15 @@
     .hide{
       display:none;
     }
+<<<<<<< HEAD
+=======
+    .my-btn.btn-sm {
+    font-size: 0.75rem;
+    width: 1.5rem;
+    height: 1.5rem;
+    padding: 0;
+}
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
   </style>
 
 @endsection
@@ -194,12 +203,15 @@
                  title: "Measure", 
                 validate: "required"
                   },
+<<<<<<< HEAD
                    {
                    name: "weighting", 
                 type: "number", 
                 width: 50,
                  title: "Weighting<br>(%)", 
                   },
+=======
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
                   {
                    name: "lower", 
                 type: "number",
@@ -240,7 +252,16 @@
                 }
                   },
                   
+<<<<<<< HEAD
                  
+=======
+                  {
+                   name: "weighting", 
+                type: "number", 
+                width: 50,
+                 title: "Weighting<br>(%)", 
+                  },
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
                   
 
                   {

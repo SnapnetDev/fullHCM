@@ -46,11 +46,19 @@
                 <a class="list-group-item setting-linker" href="{{ url('payrollsettings/payroll_policy') }}">
                  <i class="icon oi-law setting-linker" aria-hidden="true"></i>{{__('Payroll Policy Settings')}}
                 </a>
+<<<<<<< HEAD
                 {{-- <a class="list-group-item setting-linker" href="{{ url('payrollsettings/tmsa_policy') }}">
                  <i class="icon oi-law setting-linker" aria-hidden="true"></i>{{__('TMSA Policy Settings')}}
                 </a>
                 <a class="list-group-item setting-linker" href="{{ url('payrollsettings/tmsa_components') }}">
                  <i class="icon oi-law setting-linker" aria-hidden="true"></i>{{__('TMSA Component Settings')}}
+=======
+                <a class="list-group-item setting-linker" href="{{ url('payrollsettings/loan_policy') }}">
+                 <i class="icon oi-law setting-linker" aria-hidden="true"></i>{{__('Loan Policy Settings')}}
+                </a>
+                <a class="list-group-item" href="javascript:void(0)">
+                 <i class="icon pe-wallet setting-linker" aria-hidden="true"></i>{{__('Payroll Wallet Settings')}}
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
                 </a>
                 <a class="list-group-item setting-linker" href="{{ url('payrollsettings/tmsa_schedules') }}">
                  <i class="icon oi-law setting-linker" aria-hidden="true"></i>{{__('TMSA Schedule Settings')}}

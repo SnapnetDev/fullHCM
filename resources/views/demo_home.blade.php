@@ -135,6 +135,7 @@
            <div class="col-xl-3 col-md-6 col-xs-12 info-panel marg">
             <div class="card card-shadow card-shadow1">
               <div class="card-block bg-white p-30">
+<<<<<<< HEAD
                 <a href="{{ url('leave/department_approvals') }}"  class="btn btn-floating btn-sm btn-success">
                   <i class="icon md-calendar-check"></i>
                 </a>
@@ -165,8 +166,11 @@
             <div class="card card-shadow card-shadow1">
               <div class="card-block bg-white p-30">
                 <button onclick="{{url('recruits/myjobs')}}" type="button" class="btn btn-floating btn-sm btn-info">
+=======
+                <a href="{{url('recruits/myjobs')}}" type="button" class="btn btn-floating btn-sm btn-info">
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
                   <i class="icon md-accounts-list"></i>
-                </button>
+                </a>
                 <span class="m-l-15 font-weight-400 text-info">Job Openings</span>
                 <div class="content-text text-xs-center m-b-0">
 
@@ -174,7 +178,7 @@
               </div>
               </div>
           </div>
-          <div class="col-xl-3 col-md-6 col-xs-12 info-panel marg">
+          {{-- <div class="col-xl-3 col-md-6 col-xs-12 info-panel marg">
             <div class="card card-shadow card-shadow1">
               <div class="card-block bg-white p-30">
                 <a href="https://primeatlantic.sharepoint.com" type="button" class="btn btn-floating btn-sm btn-info">
@@ -199,6 +203,7 @@
                 </div>
               </div>
               </div>
+<<<<<<< HEAD
           </div>
           @if(Auth::user()->role->permissions->contains('constant', 'manage_user') && Auth::user()->role->manages=='all')
           <div class="col-xl-3 col-md-6 col-xs-12 info-panel marg">
@@ -216,6 +221,9 @@
           </div>
                 
                 @endif
+=======
+          </div> --}}
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
       </div>
       <div class="row">
         <div class="col-md-4">
@@ -243,7 +251,11 @@
           <div class="card">
             <div class="card-header white bg-cyan-600 p-30 clearfix">
               <a class="avatar avatar-100 pull-xs-left m-r-20" href="javascript:void(0)">
+<<<<<<< HEAD
                 <img src="{{ file_exists(public_path('uploads/avatar'.Auth::user()->image))?asset('uploads/avatar'.Auth::user()->image):(Auth::user()->sex=='M'?asset('global/portraits/male-user.png'):asset('global/portraits/female-user.png'))}}" alt="">
+=======
+                <img src="{{ File::exists('storage/avatar'.Auth::user()->image)?asset('storage/avatar'.Auth::user()->image):(Auth::user()->sex=='M'?asset('global/portraits/male-user.png'):asset('global/portraits/female-user.png'))}}" alt="">
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
               </a>
               <div class="pull-xs-left">
                 <div class="font-size-20 m-b-15">{{Auth::user()->name}}</div>

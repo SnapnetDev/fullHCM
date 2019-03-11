@@ -121,8 +121,24 @@ class AssignCompanySeeder extends Seeder
       //  // $num=$cnt+1;
       // \App\Separation::create(['user_id'=>$random->id,'date_of_separation'=>$faker->dateTimeBetween($startDate = '-5 years', $endDate = 'now'),'separation_type_id'=>mt_rand(1,14),'days_of_employment'=>mt_rand(30,5000)]);
 
+<<<<<<< HEAD
       //   // echo $user->company->has('departments')->jobs()->inRandomOrder()->first()->id.'-';
       //   // $user->jobs()->attach($user->company->jobs()->inRandomOrder()->first()->id,['started'=>$user->hiredate]);
+=======
+      $users=App\User::has('promotionHistories.grade')->get();
+       // $cnt=1000;
+      foreach($users as $user){
+        // $faker = Faker\Factory::create();
+       // $num=$cnt+1;
+        // $companies=App\Company::all();
+        $user_grade=$user->promotionHistories()->latest()->first()->grade;
+        // $user_job=$user->jobs()->latest()->first();
+        $user->grade_id=$user_grade->id;
+        $user->save();
+
+        // echo $user->company->has('departments')->jobs()->inRandomOrder()->first()->id.'-';
+        // $user->jobs()->attach($user->company->jobs()->inRandomOrder()->first()->id,['started'=>$user->hiredate]);
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
         
       // }
 

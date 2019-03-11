@@ -11,7 +11,11 @@
                   <div class="col-xs-12"> 
                   	@csrf
                   	
+<<<<<<< HEAD
                     <div class=" form-group">
+=======
+                    
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
                                 <div class="form-group " >
                                   <label class="form-control-label" for="department_id">Department</label>
                                   <select class="form-control" id="department_id" name="department_id"  onchange="departmentChange(this.value);" required>
@@ -22,8 +26,13 @@
                                     @endforelse
                                   </select>
                                 </div>
+<<<<<<< HEAD
                               </div>
                   	<div class=" form-group">
+=======
+                            
+                  	
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
                                 <div class="form-group " >
                                   <label class="form-control-label" for="jobroles">Job Role</label>
                                   <select class="form-control" id="jobroles" name="job_id" required>
@@ -34,7 +43,11 @@
                                     @endforelse
                                   </select>
                                 </div>
+<<<<<<< HEAD
                               </div>
+=======
+                           
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
                     <div class="form-group">
                       <h4 class="example-title">Started</h4>
                        <input type="text"  required placeholder="Started" name="started"   class="form-control datepicker">

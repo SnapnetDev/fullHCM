@@ -17,7 +17,11 @@ class User extends Authenticatable
      *
      * @var array
      */
+<<<<<<< HEAD
     protected $fillable = ['name', 'email', 'password','emp_num','sex','dob','phone','marital_status','password','company_id','branch_id','job_id','hiredate','role_id','image','remember_token','created_at','updated_at','address','lga_id','employment_status','superadmin','bank_id','bank_account_no','state_id','country_id','grade_id','line_manager_id'];
+=======
+    protected $fillable = ['name', 'email', 'password','emp_num','sex','dob','phone','marital_status','password','company_id','branch_id','job_id','hiredate','role_id','image','remember_token','created_at','updated_at','address','lga_id','employment_status_id','superadmin','bank_id','bank_account_no','state_id','country_id','grade_id','line_manager_id'];
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
     protected $dates=['hiredate'];
     /**
      * The attributes that should be hidden for arrays.
@@ -231,6 +235,14 @@ class User extends Authenticatable
   public function progressreport(){
         return $this->hasMany('App\ProgressReport','emp_id');
     }
+    public function myreviews()
+    {
+        return $this->hasMany('App\E360Evaluation','evaluator_id');
+    }
+    public function othersreviews()
+    {
+        return $this->hasMany('App\E360Evaluation','user_id');
+    }
 
 public function getquarter(){
     
@@ -357,6 +369,7 @@ public function getquarter(){
     {
        return $this->belongsTo('App\LocalGovernment');
     }
+<<<<<<< HEAD
      public function state()
     {
        return $this->belongsTo('App\State');
@@ -365,6 +378,8 @@ public function getquarter(){
     {
        return $this->belongsTo('App\Country');
     }
+=======
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
     public function getDRLeaveApprovals()
     {
         $lm_id=$this->id;
@@ -383,6 +398,7 @@ public function getquarter(){
                 ->get();
         # code...
     }
+<<<<<<< HEAD
     public function user_daily_shifts()
     {
          return $this->hasMany('App\UserDailyShift','user_id');
@@ -433,6 +449,15 @@ public function getquarter(){
     public function separation()
     {
         return $this->hasOne('App\Separation');
+=======
+    public function evaluators()
+    {
+        return $this->belongsToMany('App\User','e360_evaluator_evaluatee','evaluatee_id','evaluator_id');
+    }
+    public function evaluatees()
+    {
+        return $this->belongsToMany('App\User','e360_evaluator_evaluatee','evaluator_id','evaluatee_id');
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
     }
     public function applications()
     {
@@ -442,6 +467,7 @@ public function getquarter(){
     {
         return $this->morphMany('App\JobFavorite', 'favorable');
     }
+<<<<<<< HEAD
 
     public function plmanager()
     {
@@ -453,5 +479,7 @@ public function getquarter(){
     }
 
 
+=======
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
 
 }

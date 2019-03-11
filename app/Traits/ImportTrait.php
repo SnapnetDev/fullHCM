@@ -107,6 +107,7 @@ trait ImportTrait {
 		$companies=Company::all();
          return view('import.grades',compact('companies'));
 	}
+<<<<<<< HEAD
 
 	public function importEmpGrade(Request $request)
 	{
@@ -150,6 +151,8 @@ trait ImportTrait {
         }
 				       
 	}
+=======
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
 
 	public function importEmployees(Request $request)
 	{
@@ -186,6 +189,7 @@ trait ImportTrait {
 				       }
                 	}else{
                 		$old_user->update(['name'=>$row['first_name'].' '.$row['last_name'],'email'=>$row['email'],'phone'=>$row['phone'],'emp_num'=>$row['staff_id'],'sex'=>$row['gender'],'address'=>$row['address'],'marital_status'=>$row['marital_status'],'dob'=>date('Y-m-d',strtotime($dob)),'hiredate'=>date('Y-m-d',strtotime($hiredate))]);
+<<<<<<< HEAD
 
                 		if ($row['next_of_kin']!='' && $row['relationship']!='') {
 
@@ -201,6 +205,23 @@ trait ImportTrait {
 				       
 				       $hist=$old_user->promotionHistories()->first();
 
+=======
+
+                		if ($row['next_of_kin']!='' && $row['relationship']!='') {
+
+                			\App\Nok::updateOrCreate(
+											    ['user_id' => $old_user->id],
+											   ['name'=>$row['next_of_kin'],'address'=>$row['address_of_next_of_kin'],'relationship'=>strtolower($row['relationship']),'user_id'=>$old_user->id]
+											);
+				       
+				            
+				       }
+				       $grade=Grade::where('level',$row['grade'])->first();
+				       if ($grade) {
+				       
+				       $hist=$old_user->promotionHistories()->first();
+
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
 				       if ($hist) {
 				       	$hist->update(['approved_by'=>Auth::user()->id,'approved_on'=>date('Y-m-d'),'old_grade_id'=>$grade->id,'grade_id'=>$grade->id]);
 				       	$old_user->grade_id=$grade->id;
@@ -350,6 +371,7 @@ trait ImportTrait {
 		// $document->getSize();
 		// $document->getMimeType();
 		
+<<<<<<< HEAD
 
 		 if($request->hasFile('template')){
             Excel::load($request->file('template')->getRealPath(), function ($reader) use($company) {
@@ -389,6 +411,47 @@ trait ImportTrait {
 
 		 if($request->hasFile('template')){
             Excel::load($request->file('template')->getRealPath(), function ($reader) use($company) {
+=======
+
+		 if($request->hasFile('template')){
+            Excel::load($request->file('template')->getRealPath(), function ($reader) use($company) {
+           
+            	foreach ($reader->toArray() as $key => $row) {
+            		 // $hiredate=\Carbon\Carbon::createFromFormat('d/m/Y', $row['hiredate'])->toDateTimeString();	
+            		if ($row['jobid']) {
+            			$job=\App\Job::find($row['jobid']);
+            			$user=\App\User::where(['emp_num'=>$row['staff_id']])->first();
+            			$user->jobs()->attach($job->id);
+            			$user->job_id=$job->id;
+            			$user->department_id=$job->department->id;
+            			$user->save();
+            		}
+            		
+            		
+						 }
+            });
+            
+          $request->session()->flash('success', 'Import was successful!');
+
+        return back();
+        }
+
+	}
+
+	public function importGrades(Request $request)
+	{
+		// $document = $request->file('template');
+		$company=Company::find($request->company_id);
+		 //$document->getRealPath();
+		// return $document->getClientOriginalName();
+		// $document->getClientOriginalExtension();
+		// $document->getSize();
+		// $document->getMimeType();
+		
+
+		 if($request->hasFile('template')){
+            Excel::load($request->file('template')->getRealPath(), function ($reader) use($company) {
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
             	
             	foreach ($reader->toArray() as $key => $row) {
             		Grade::create(['level'=>$row['level'],'leave_length'=>$row['leave_length'],'basic_pay'=>$row['monthly_gross']]);

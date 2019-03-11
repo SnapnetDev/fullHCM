@@ -48,12 +48,15 @@ trait LeaveTrait
 		case 'approvals':
 		return $this->approvals($request);
 		break;
+<<<<<<< HEAD
 		case 'department_approvals':
 		return $this->departmentApprovals($request);
 		break;
 		case 'get_leave_length':
 			return $this->leaveLength($request);
 			break;
+=======
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
 		
 		default:
 			# code...
@@ -158,7 +161,10 @@ trait LeaveTrait
 		}else{
 				$leavebank=$lp->default_length;
 		}
+<<<<<<< HEAD
 		$leave_left=$leavebank;
+=======
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
 		// $leavebank=Auth::user()->promotionHistories()->latest()->first()->grade->leave_length;
 		$leave_includes_weekend=$lp->includes_weekend;
 		$leave_includes_holiday=$lp->includes_holiday;
@@ -210,7 +216,11 @@ trait LeaveTrait
 		
 		$company_id=companyId();
 		$leave_workflow_id=LeavePolicy::where('company_id',$company_id)->first()->workflow_id;
+<<<<<<< HEAD
 		$leave_request=LeaveRequest::create(['leave_id'=>$request->leave_id,'user_id'=>Auth::user()->id,'start_date'=>date('Y-m-d',strtotime($request->start_date)),'end_date'=>date('Y-m-d',strtotime($request->end_date)),'reason'=>$request->reason,'workflow_id'=>$leave_workflow_id,'paystatus'=>$request->paystatus,'status'=>0,'priority'=>$request->priority,'company_id'=>$company_id,'replacement_id'=>$request->replacement,'balance'=>$request->leavelength]);
+=======
+		$leave_request=LeaveRequest::create(['leave_id'=>$request->leave_id,'user_id'=>Auth::user()->id,'start_date'=>date('Y-m-d',strtotime($request->start_date)),'end_date'=>date('Y-m-d',strtotime($request->end_date)),'reason'=>$request->reason,'workflow_id'=>$leave_workflow_id,'paystatus'=>$request->paystatus,'status'=>0,'priority'=>$request->priority,'company_id'=>$company_id]);
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
 		  $stage=Workflow::find($leave_request->workflow_id)->stages->first();
 		  if($stage->type==1){
 		  	$leave_request->leave_approvals()->create([
@@ -309,16 +319,24 @@ trait LeaveTrait
 			 return view('leave.approvals',compact('user_approvals','role_approvals','group_approvals','dr_approvals'));
 	  }
 
+<<<<<<< HEAD
 	  public function departmentApprovals(Request $request)
 	  {
 	  	$user=Auth::user();
 	  	 $dapprovals = LeaveApproval::whereHas('leave_request.user.job.department',function($query) use($user){
 				$query->where('leave_requests.user_id','!=',$user->id)
 				->where('departments.manager_id',$user->id);
+=======
+	  public function userApprovals(User $user)
+	  {
+	  	return $las = LeaveApproval::whereHas('stage.user',function($query) use($user){
+				$query->where('users.id',$user->id);
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
 
 			})
 
 			 ->where('status',0)->orderBy('id','desc')->get();
+<<<<<<< HEAD
 			  return view('leave.department_approvals',compact('dapprovals'));
 	  }
 
@@ -330,6 +348,8 @@ trait LeaveTrait
 			})
 
 			 ->where('status',0)->orderBy('id','desc')->get();
+=======
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
 
 	  }
 	   public function getDRLeaveApprovals(User $user)
@@ -422,7 +442,11 @@ trait LeaveTrait
           $leave_approval->save();
           // $logmsg=$leave_approval->document->filename.' was rejected in the '.$leave_approval->stage->name.' in the '.$leave_approval->stage->workflow->name;
           // $this->saveLog('info','App\Review',$leave_approval->id,'leave_approvals',$logmsg,Auth::user()->id);
+<<<<<<< HEAD
           $leave_approval->leave_request->user->notify(new LeaveRequestRejected($leave_approval->stage,$leave_approval));
+=======
+          $leave_approval->leave_request->user->notify(new LeaveRequestRejected($leave_approval->leave_request,$leave_approval->stage));
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
           // return redirect()->route('documents.mypendingleave_approvals')->with(['success'=>'Document Reviewed Successfully']);
       }
 

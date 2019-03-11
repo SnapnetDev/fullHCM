@@ -39,6 +39,7 @@
 	          		</div>
 	          		
 		          </div> --}}
+<<<<<<< HEAD
 		          <div class="panel panel-info panel-line">
 		            <div class="panel-heading">
 		              <h3 class="panel-title">System Name and Logo Settings</h3>
@@ -80,6 +81,8 @@
 	          		</div>
 	          		</form>
 		          </div>
+=======
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
 		          <div class="panel panel-info panel-line">
 		            <div class="panel-heading">
 		              <h3 class="panel-title">Use Parent Company Settings Across</h3>

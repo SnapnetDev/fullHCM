@@ -33,6 +33,7 @@ class LeaveRequest extends Model
     {
         return $this->belongsTo('App\Workflow','workflow_id');
     }
+<<<<<<< HEAD
     public function replacement()
     {
         return $this->belongsTo('App\User','replacement_id');
@@ -45,4 +46,6 @@ class LeaveRequest extends Model
             return $this->leave->name;
         }
     }
+=======
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
 }

@@ -1115,6 +1115,7 @@ class AttendanceController extends Controller
 	public function saveAttendance(Request $request)
     {
         $user=User::where(['emp_num'=>$request->empnum])->first();
+<<<<<<< HEAD
        
         if ($user) {
         	$attendance=\App\CustAttendance::firstOrCreate(['user_id'=>$user->id,'clocktime'=>date('H:i:s',strtotime($request->time)),'datetime'=>date('Y-m-d H:i:s',strtotime($request->time))]);
@@ -1122,11 +1123,22 @@ class AttendanceController extends Controller
         
         
        
+=======
+        $attendance=Attendance::firstOrCreate(['date'=>date('Y-m-d',strtotime($request->time)),'shift_id'=>$request->shift,'emp_num'=>$request->empnum]);
+        if($request->type==1){
+        	AttendanceDetail::create(['clock_in'=>date('H:i:s',strtotime($request->time))]);
+        }elseif($request->type==0)
+        {
+        	$ad=$attendance->attendancedetails()->latest()->first();
+        	$ad->update(['clock_out'=>date('H:i:s',strtotime($request->time))])
+        }
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
 
         return "success";
          
             
     }
+<<<<<<< HEAD
 
     public function employeeShiftSchedules(Request $request)
 	{
@@ -1342,4 +1354,6 @@ class AttendanceController extends Controller
     }
      return 'success';
 }
+=======
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
 }

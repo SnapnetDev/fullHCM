@@ -64,7 +64,11 @@
         <table id="mailboxTable" class="table" data-plugin="animateList" data-animate="fade"
         data-child="tr">
           <tbody>
+<<<<<<< HEAD
           	@foreach(Auth::user()->notifications as $notification)
+=======
+          	@foreach(Auth::user()->unreadNotifications as $notification)
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
             <tr id="mid_1" data-url="{{url('userprofile/notification').'?notification_id='.$notification->id}}" data-toggle="slidePanel">
               <td class="cell-60">
                 <span class="checkbox-custom checkbox-primary checkbox-lg">

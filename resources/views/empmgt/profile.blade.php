@@ -82,7 +82,11 @@
                     <div class="col-md-4 col-lg-4">
                       <div class="form-group">
                   <label>Upload Image</label>
+<<<<<<< HEAD
                   <img class="img-circle img-bordered img-bordered-blue text-center" width="150" height="150" src="{{ file_exists(public_path('uploads/avatar'.$user->image))?asset('uploads/avatar'.$user->image):($user->sex=='M'?asset('global/portraits/male-user.png'):asset('global/portraits/female-user.png'))}}" alt="..." id='img-upload'>
+=======
+                  <img class="img-circle img-bordered img-bordered-blue text-center" width="150" height="150" src="{{ File::exists('storage/avatar'.$user->image)?asset('storage/avatar'.$user->image):($user->sex=='M'?asset('global/portraits/male-user.png'):asset('global/portraits/female-user.png'))}}" alt="..." id='img-upload'>
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
                 
                   <div class="input-group">
                       <span class="input-group-btn">
@@ -172,6 +176,7 @@
                     </div>
                       </div>
                       <div class="col-md-4">
+<<<<<<< HEAD
                      <div class="form-group form-material" data-plugin="formMaterial">
                       <label class="form-control-label" for="select">Payroll Type</label>
                       <select class="form-control" id="sex" name="sex">
@@ -179,6 +184,14 @@
                         <option value="tmsa" {{$user->payroll_type=='tmsa'?'selected':''}}>Project TMSA</option>
                         <option value="fpa" {{$user->payroll_type=='fpa'?'selected':''}}>Project FPA</option>
                         <option value="pace" {{$user->payroll_type=='pace'?'selected':''}}>Project PACE</option>
+=======
+                    <div class="form-group form-material" data-plugin="formMaterial">
+                      <label class="form-control-label" for="select">Staff Category</label>
+                      <select class="form-control" id="staff_category" name="staff_category_id">
+                        @foreach($staff_categories as $staff_category)
+                        <option value="{{$staff_category->id}}" {{$user->staff_category_id==$staff_category->id?'selected':''}}>{{$staff_category->name}}</option>
+                        @endforeach
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
                       </select>
                     </div>
                       </div>
@@ -187,7 +200,11 @@
                       <div class="col-md-4">
                     <div class="form-group form-material" data-plugin="formMaterial">
                       <label class="form-control-label" for="select">Country</label>
+<<<<<<< HEAD
                       <select class="form-control " id="country" name="country" >
+=======
+                      <select class="form-control " id="country" name="country"  multiple>
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
                         @if($user->lga)
                         <option value="{{$user->country->id}}">{{$user->country->name}}</option>
                         @endif
@@ -722,9 +739,12 @@
   @include('empmgt.modals.editworkexperience')
   @include('empmgt.modals.changeGrade')
   @include('empmgt.modals.assignjobrole')
+<<<<<<< HEAD
    @if($user->id==Auth::user()->id)
   @include('empmgt.modals.changepassword')
   @endif
+=======
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
 @endsection
 @section('scripts')
 	<script src="{{asset('global/vendor/bootstrap-datepicker/bootstrap-datepicker.js')}}"></script>

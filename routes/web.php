@@ -26,6 +26,7 @@ Auth::routes();
 Route::get('/home', 'HomeController@index')->name('home');
 Route::resource('import','ImportController')->middleware(['auth']);
 
+<<<<<<< HEAD
 Route::get('users/modal/{user_id}','UserController@modal')->name('users.modal')->middleware(['auth']);
 Route::get('users/assignrole','UserController@assignRole')->name('users.assignrole')->middleware(['auth']);
 Route::get('users/alterstatus','UserController@alterStatus')->name('users.alterstatus')->middleware(['auth']);
@@ -38,6 +39,14 @@ Route::get('team-organogram','UserController@teamOrganogram')->name('users.team_
 Route::get('myteam-organogram','UserController@myteamOrganogram')->name('users.myteam_organogram')->middleware(['auth']);
 Route::get('user/dr','UserController@directReports')->name('users.dr')->middleware(['auth']);
 Route::get('directory','UserController@viewDirectory')->name('users.directory')->middleware(['auth']);
+=======
+Route::get('users/modal/{user_id}','UserController@modal')->name('users.modal');
+Route::get('users/assignrole','UserController@assignRole')->name('users.assignrole');
+Route::get('users/alterstatus','UserController@alterStatus')->name('users.alterstatus');
+Route::get('users/assignmanager','UserController@assignManager')->name('users.assignmanager');
+Route::get('users/assigngroup','UserController@assignGroup')->name('users.assigngroup');
+Route::get('users/search','UserController@search')->name('users.search');
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
 Route::post('users/new','UserController@saveNew')->name('users.savenew');
 Route::resource('userprofile','UserProfileController')->middleware(['auth']); 
 Route::resource('users', 'UserController')->middleware(['permission:edit_settings','auth']);
@@ -201,11 +210,16 @@ Route::resource('payrollsettings', 'PayrollSettingController')->middleware(['per
 // executive view
 Route::get('/people_analytics', 'HomeController@executiveView')->name('executive_view')->middleware(['permission:view_hr_reports','auth']);
 Route::get('/people_analytics_leave', 'HomeController@executiveViewLeave')->name('executive_view_leave')->middleware(['permission:view_leave_report','auth']);
+<<<<<<< HEAD
 Route::get('/people_analytics_hr', 'HomeController@executiveViewHR')->name('executive_view_hr')->middleware(['permission:view_attendance_report','auth']);
 Route::get('/people_analytics_employee', 'HomeController@executiveViewEmployee')->name('executive_view_attendance')->middleware(['permission:view_attendance_report','auth']);
 Route::get('/people_analytics_jobrole', 'HomeController@executiveViewJobRole')->name('executive_view_attendance')->middleware(['permission:view_attendance_report','auth']);
 Route::get('/people_analytics_payroll', 'HomeController@executiveViewPayroll')->name('executive_view_attendance')->middleware(['permission:view_attendance_report','auth']);
 Route::get('/bi-report', 'ReportController@getReport')->name('bi_report')->middleware(['auth']);
+=======
+Route::get('/people_analytics_attendance', 'HomeController@executiveViewAttendance')->name('executive_view_attendance')->middleware(['permission:view_attendance_report','auth']);
+Route::get('/bi-report', 'ReportController@getReport')->name('bi_report')->middleware(['permission:view_attendance_report','auth']);
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
 // end of executive view
 Route::resource('roles', 'RoleController')->middleware(['permission:edit_settings','auth']);
 Route::resource('performances', 'PerformanceController')->middleware(['permission:edit_settings','auth']);
@@ -238,6 +252,12 @@ Route::get('/auth/microsoft/callback', 'MicrosoftController@callbackurl');
 Route::resource('bscsettings', 'BSCController')->middleware(['auth']);
 Route::get('bsc/usersearch', 'BSCEvaluationController@usersearch')->middleware(['auth']);
 Route::resource('bsc', 'BSCEvaluationController')->middleware(['auth']);
+<<<<<<< HEAD
+=======
+Route::resource('e360settings', 'E360SettingController')->middleware(['auth']);
+Route::get('e360/usersearch', 'E360Controller@usersearch')->middleware(['auth']);
+Route::resource('e360', 'E360Controller')->middleware(['auth']);
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
 
 
 /*************Payroll Module Start******************/

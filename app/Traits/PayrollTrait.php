@@ -192,7 +192,11 @@ trait PayrollTrait{
           $income_tax+=$detail->paye;
 
        }
+<<<<<<< HEAD
         // Auth::user()->notify(new ApprovePayroll($payroll));
+=======
+        Auth::user()->notify(new ApprovePayroll($payroll));
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
        return view('compensation.payroll',compact('payroll','allowances','deductions','income_tax','salary','date','has_been_run'));
        } else {
           $has_been_run=0;
@@ -248,6 +252,12 @@ trait PayrollTrait{
          $company_id=companyId();
          $basic_pay_percentage=intval(PayrollPolicy::where(['company_id'=>$company_id])->first()->basic_pay_percentage)/100;
          $users=User::has('promotionHistories.grade')->where('company_id',$company_id)->get();
+<<<<<<< HEAD
+=======
+
+        $payroll=Payroll::where(['month'=>$pmonth,'year'=>$pyear,'company_id'=>$company_id])->first();
+        $pp=PayrollPolicy::where('company_id',$company_id)->first();
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
 
         $payroll=Payroll::where(['month'=>$pmonth,'year'=>$pyear,'company_id'=>$company_id])->first();
         $pp=PayrollPolicy::where('company_id',$company_id)->first();

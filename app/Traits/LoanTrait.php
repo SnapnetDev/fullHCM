@@ -95,7 +95,11 @@ trait LoanTrait{
 		$total_interest=$total_amount_repayable-$request->amount;
 			$loan_request=LoanRequest::create(['user_id'=>Auth::user()->id,'netpay'=>$netpay,'amount'=>$request->amount, 'monthly_deduction'=>$payment,'period'=>$request->period,'current_rate'=>$annual_interest,'repayment_starts'=>$repayment_starts,'status'=>0,'approved_by'=>0,'completed'=>0]);
 			$stage=Workflow::find($loan_request->workflow_id)->stages->first();
+<<<<<<< HEAD
         $loan_approval=new LoanApproval::create(['stage_id'=>$stage->id,'status'=>0,'loan_request_id'=>$loan_request->id]);
+=======
+        $loan_approval= LoanApproval::create(['stage_id'=>$stage->id,'status'=>0,'loan_request_id'=>$loan_request->id]);
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
        
 			if($loan_request){
 				return 'success';

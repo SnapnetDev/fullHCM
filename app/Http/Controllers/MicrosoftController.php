@@ -24,7 +24,11 @@ class MicrosoftController extends Controller
 	public function getaccesstoken($granttype){
 	  
 	  $client_id=env('MICROSOFT_CLIENT_ID','');
+<<<<<<< HEAD
 		$redirect_uri=url('auth/microsoft/callback');//env('MICROSOFT_AUTH_URL','');
+=======
+		$redirect_uri=env('MICROSOFT_AUTH_URL','');
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
 		$client_secret=env('MICROSOFT_CLIENT_SECRET','');
 	  try{
 	  $code=session('code');

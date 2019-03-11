@@ -35,7 +35,11 @@ class ReportController extends Controller
 
 
         
+<<<<<<< HEAD
     dd($accessToken=$this->plugPowerBI());
+=======
+        $accessToken=$this->plugPowerBI();
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
 
         $dataSetId=env('QI_DATASETID','');
 
@@ -112,7 +116,11 @@ class ReportController extends Controller
                         ->withData($auth_data)
                         ->post();
         $response= json_decode($response);
+<<<<<<< HEAD
         dd($response);
+=======
+
+>>>>>>> 756669c79ba12453137381addef2325f0d752945
       if(!isset($response->access_token)){
         \Auth::logout();
         return 'Error';
